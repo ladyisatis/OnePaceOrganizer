@@ -1,0 +1,20 @@
+[project]
+name = "one_pace_renamer"
+version = "0.1.0"
+description = "Renames One Pace files and generates NFO metadata for use with Plex or Jellyfin"
+authors = [
+    {name = "Isatis",email = "git@isatis.blue"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "prompt-toolkit (>=3.0.51,<4.0.0)",
+    "pyyaml (>=6.0.2,<7.0.0)",
+    "click (>=8.2.1,<9.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
