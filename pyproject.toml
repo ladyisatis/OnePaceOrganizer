@@ -7,11 +7,15 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<4.0"
 dependencies = [
     "prompt-toolkit (>=3.0.51,<4.0.0)",
     "pyyaml (>=6.0.2,<7.0.0)",
-    "click (>=8.2.1,<9.0.0)"
+    "click (>=8.2.1,<9.0.0)",
+    "orjson (>=3.10.18,<4.0.0)",
+    "httpx[http2] (>=0.28.1,<0.29.0)",
+    "plexapi (>=4.17.0,<5.0.0)",
+    "loguru (>=0.7.3,<0.8.0)"
 ]
 
 

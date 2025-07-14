@@ -2,10 +2,10 @@ import traceback
 import re
 import sys
 import click
+import orjson
 from csv import DictReader as CSVReader
 from yaml import dump as YamlDump, safe_load as YamlLoad
 from pathlib import Path
-import json
 
 @click.group()
 def generate():
@@ -101,5 +101,35 @@ def episodes(file, seasonsyml, outdir):
         sys.exit(1)
 
 generate.add_command(episodes)
+
+@click.command()
+@click.option('--datadir', default='./data')
+@click.option('--json', default='./data.json')
+def json(datadir, json):
+    tvshow_yml = Path(datadir, "tvshow.yml")
+    seasons_yml = Path(datadir, "seasons.yml")
+    episodes_dir = Path(datadir, "episodes")
+
+    out = {}
+
+    with tvshow_yml.open(mode='r', encoding='utf-8') as f:
+        out["tvshow"] = YamlLoad(stream=f)
+
+    with seasons_yml.open(mode='r', encoding='utf-8') as f:
+        out["seasons"] = YamlLoad(stream=f)
+
+    episodes = {}
+
+    for episode_yml in episodes_dir.glob('*.yml'):
+        key = episode_yml.name.replace('.yml', '')
+        with episode_yml.open(mode='r', encoding='utf-8') as f:
+            episodes[key] = YamlLoad(stream=f)
+    
+    out["episodes"] = episodes
+
+    with Path(json).open(mode='wb') as f:
+        f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SORT_KEYS))
+
+generate.add_command(json)
 
 generate()
