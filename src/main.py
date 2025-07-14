@@ -430,7 +430,7 @@ class OnePaceRenamer:
         def worker(set_percentage, log_text):
             i = 0
 
-            for filepath, crc32 in video_files:
+            for filepath, crc32 in video_files.items():
                 i = i + 1
                 episode_info = cls.yml["episodes"][crc32]
                 if isinstance(episode_info, list):
@@ -482,7 +482,7 @@ class OnePaceRenamer:
             text=(
                 f"All of the One Pace files have been created in:\n"
                 f"{out_path}\n\n"
-                "Please move the {out_path.name} folder to the Plex library folder you've selected,\n"
+                "Please move the \"{out_path.name}\" folder to the Plex library folder you've selected,\n"
                 "and make sure that it appears in Plex. Seasons and episodes will temporarily have\n"
                 "incorrect information, and the next step will correct them.\n\n"
                 "Click OK once this has been done and you can see the One Pace video files in Plex."
@@ -564,7 +564,7 @@ class OnePaceRenamer:
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = f"{k}. {v['title']}"
 
             src = Path(".", "data", "posters", "tvshow.png")
-            dst = Path(season_path, "poster.png")
+            dst = Path(out_path, "poster.png")
             shcopy(src, dst)
 
             art = ET.SubElement(root, "art")
@@ -582,7 +582,7 @@ class OnePaceRenamer:
         def worker(set_percentage, log_text):
             i = 0
 
-            for filepath, crc32 in video_files:
+            for filepath, crc32 in video_files.items():
                 i = i + 1
                 episode_info = cls.yml["episodes"][crc32]
                 if isinstance(episode_info, list):
