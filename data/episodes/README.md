@@ -1,5 +1,9 @@
 Each YAML file is the CRC32 with the .yml extension, e.g. `E5F09F49.yml`.
 
+This CRC32 is based off the 8-character ID-looking thing at the end of the filename, for example: `[One Pace][1] Romance Dawn 01 [1080p][E5F09F49].mkv`
+
+The contents of the `.yml` file:
+
 ```
 season: 1
 episode: 1

@@ -67,8 +67,8 @@ class OnePaceRenamer:
             default=cls.config["path_to_eps"]
         ).run()
 
-        if cls.config["path_to_eps"] is None:
-            return
+        if cls.config["path_to_eps"] == None:
+            sys.exit(0)
 
         cls.config["episodes"] = input_dialog(
             title=cls.title,
@@ -76,8 +76,8 @@ class OnePaceRenamer:
             default=cls.config["episodes"]
         ).run()
 
-        if cls.config["episodes"] is None:
-            return
+        if cls.config["episodes"] == None:
+            sys.exit(0)
 
         cls.config["plex"]["enabled"] = yes_no_dialog(
             title=cls.title,
@@ -761,7 +761,7 @@ class OnePaceRenamer:
 
             message_dialog(
                 title=cls.title,
-                text="The renamer is complete!"
+                text=f"The renamer is complete! All files have been moved to:\n{out_path}"
             ).run() 
 
 if __name__ == '__main__':
