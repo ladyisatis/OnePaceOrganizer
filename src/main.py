@@ -6,6 +6,7 @@ import traceback
 import orjson
 import xml.etree.ElementTree as ET
 import datetime
+from shutil import copy as shcopy
 from time import sleep
 from re import compile as Regexp, sub as rsub
 from hashlib import blake2s
@@ -37,6 +38,7 @@ class OnePaceRenamer:
         "episodes": str(Path(".", "out").resolve()),
         "plex": {
             "enabled": False,
+            "first_time_edits": False,
             "url": "http://127.0.0.1:32400",
             "use_token": False,
             "name": "",
@@ -70,7 +72,7 @@ class OnePaceRenamer:
 
         cls.config["episodes"] = input_dialog(
             title=cls.title,
-            text='Where should this program move the renamed video files to?\nThis will create folders such as Season 01, Season 02, etc.',
+            text='Where should this program move the renamed video files to?\nThis will create folders in it such as Season 01, Season 02, etc.',
             default=cls.config["episodes"]
         ).run()
 
@@ -316,19 +318,13 @@ class OnePaceRenamer:
                     else:
                         cls.yml["episodes"][crc32].append(YamlLoad(stream=f))
 
-        log_text(f"adding seasons.yml [{total_files-1}/{total_files}]")
-        #set_percentage(int(total_files-1 / total_files))
-
         with cls.data_seasons_yml.open(mode='r', encoding='utf-8') as f:
             cls.yml["seasons"] = YamlLoad(stream=f)
         
-        log_text(f"\nadding tvshow.yml [{total_files}/{total_files}]")
         set_percentage(100)
 
         with cls.data_tvshow_yml.open(mode='r', encoding='utf-8') as f:
             cls.yml["tvshow"] = YamlLoad(stream=f)
-
-        sleep(5.0)
 
     @classmethod
     def check_setup(cls):
@@ -340,7 +336,7 @@ class OnePaceRenamer:
                     buttons=[
                         ("Yes", 1),
                         ("No", 2),
-                        ("View Config", 3)
+                        ("View", 3)
                     ]
                 ).run()
 
@@ -403,18 +399,30 @@ class OnePaceRenamer:
 
     @classmethod
     def run_plex(cls, video_files, out_path):
+        if cls.plex_account is None:
+            if cls.config["plex"]["use_token"]:
+                cls.plex_ask_token()
+            else:
+                cls.plex_username_password_login()
+
+        if cls.plex_server is None:
+            cls.plex_server = cls.plex_account.resource(cls.config["plex"]["name"]).connect()
+
         show = cls.plex_server.library.sectionByID(cls.config["plex"]["library_key"]).getGuid(cls.config["plex"]["show_guid"])
 
-        show.editTitle(cls.yml["tvshow"]["title"])
-        show.editOriginalTitle(cls.yml["tvshow"]["originaltitle"])
-        show.editSortTitle(cls.yml["tvshow"]["sortttitle"])
-        show.editSummary(cls.yml["tvshow"]["plot"])
-        show.editContentRating(cls.yml["tvshow"]["default_rating"])
+        if not cls.config["plex"]["first_time_edits"]:
+            show.editTitle(cls.yml["tvshow"]["title"])
+            show.editOriginalTitle(cls.yml["tvshow"]["originaltitle"])
+            show.editSortTitle(cls.yml["tvshow"]["sortttitle"])
+            show.editSummary(cls.yml["tvshow"]["plot"])
+            show.editContentRating(cls.yml["tvshow"]["rating"])
 
-        if isinstance(cls.yml["tvshow"]["premiered"], datetime.date):
-            show.editOriginallyAvailable(cls.yml["tvshow"]["premiered"].isoformat())
-        else:
-            show.editOriginallyAvailable(cls.yml["tvshow"]["premiered"])
+            if isinstance(cls.yml["tvshow"]["premiered"], datetime.date):
+                show.editOriginallyAvailable(cls.yml["tvshow"]["premiered"].isoformat())
+            else:
+                show.editOriginallyAvailable(cls.yml["tvshow"]["premiered"])
+
+            show.uploadPoster(filepath=str(Path(".", "data", "posters", "tvshow.png")))
 
         total = len(video_files)
         queue = []
@@ -441,8 +449,9 @@ class OnePaceRenamer:
                 season = episode_info["season"]
                 episode = episode_info["episode"]
 
-                season_path = Path(out_path, f"Season {season:02d}")
+                season_path = Path(out_path, "Specials" if season == 0 else f"Season {season:02d}")
                 season_path_exists = season_path.exists()
+
                 if not season_path_exists:
                     season_path.mkdir(exist_ok=True)
 
@@ -475,7 +484,7 @@ class OnePaceRenamer:
                 f"{out_path}\n\n"
                 "Please move the {out_path.name} folder to the Plex library folder you've selected,\n"
                 "and make sure that it appears in Plex. Seasons and episodes will temporarily have\n"
-                "incorrect information.\n\n"
+                "incorrect information, and the next step will correct them.\n\n"
                 "Click OK once this has been done and you can see the One Pace video files in Plex."
             )
         )
@@ -487,16 +496,23 @@ class OnePaceRenamer:
                 new_video_file_path = item[0]
                 episode_info = item[1]
 
-                if not episode_info['season'] in seasons_done:
+                if not cls.config["plex"]["first_time_edits"] and not episode_info['season'] in seasons_done:
                     seasons_done.append(episode_info['season'])
                     season_str = f"{episode_info['season']}"
+
+                    log_text(f"Season: {season_str}\n")
 
                     plex_season = show.season(season=episode_info['season'])
                     plex_season.editTitle(cls.yml["seasons"][season_str]["title"])
                     plex_season.editSummary(cls.yml["seasons"][season_str]["summary"])
+                    plex_season.uploadPoster(filepath=str(Path(".", "data", "posters", f"season{season_str}-poster.png")))
+
+                log_text(f"Season: {episode_info['season']} Episode: {episode_info['episode']}\n")
 
                 plex_episode = show.episode(season=episode_info['season'], episode=episode_info['episode'])
+
                 plex_episode.editTitle(episode_info["title"])
+                plex_episode.editContentRating(cls.yml["tvshow"]["rating"])
 
                 if "sorttitle" in episode_info:
                     plex_episode.editSortTitle(episode_info["sorttitle"])
@@ -519,6 +535,15 @@ class OnePaceRenamer:
                 set_percentage(int((i / len(queue)) * 100))
 
             set_percentage(100)
+            cls.config["plex"]["first_time_edits"] = True
+
+        cls.progress_dialog(
+            title=cls.title,
+            text="Setting information for all seasons and episodes...",
+            run_callback=plex_worker
+        )
+
+        cls.save()
 
     @classmethod
     def run_nfo(cls, video_files, out_path):
@@ -529,11 +554,21 @@ class OnePaceRenamer:
             for k, v in cls.yml["tvshow"].items():
                 if isinstance(v, datetime.date):
                     ET.SubElement(root, k).text = v.isoformat()
+                elif k == "plot":
+                    ET.SubElement(root, "plot").text = v
+                    ET.SubElement(root, "outline").text = v
                 else:
-                    ET.SubElement(root, k).text = str(v)
+                    ET.SubElement(root, str(k)).text = str(v)
 
             for k, v in dict(sorted(cls.yml["seasons"].items())).items():
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = f"{k}. {v['title']}"
+
+            src = Path(".", "data", "posters", "tvshow.png")
+            dst = Path(season_path, "poster.png")
+            shcopy(src, dst)
+
+            art = ET.SubElement(root, "art")
+            ET.SubElement(art, "poster").text = str(dst)
 
             ET.indent(root)
             ET.ElementTree(root).write(
@@ -565,8 +600,9 @@ class OnePaceRenamer:
 
                 season = episode_info["season"]
 
-                season_path = Path(out_path, f"Season {season:02d}")
+                season_path = Path(out_path, "Specials" if season == 0 else f"Season {season:02d}")
                 season_path_exists = season_path.exists()
+
                 if not season_path_exists:
                     season_path.mkdir(exist_ok=True)
 
@@ -578,6 +614,14 @@ class OnePaceRenamer:
                     ET.SubElement(root, "outline").text = season_info["description"]
                     ET.SubElement(root, "seasonnumber").text = f"{season}"
 
+                    src = Path(".", "data", "posters", f"season{season}-poster.png")
+                    dst = Path(season_path, "poster.png")
+                    shcopy(src, dst)
+
+                    art = ET.SubElement(root, "art")
+                    ET.SubElement(art, "poster").text = str(dst)
+
+                    ET.indent(root)
                     ET.ElementTree(root).write(
                         str(Path(season_path, "season.nfo")),
                         encoding="utf-8",
@@ -625,6 +669,7 @@ class OnePaceRenamer:
                     ET.SubElement(episodedetails, "premiered").text = date
                     ET.SubElement(episodedetails, "aired").text = date
 
+                ET.indent(episodedetails)
                 ET.ElementTree(episodedetails).write(
                     str(Path(season_path, f"{filename}.nfo")), 
                     encoding='utf-8', 
@@ -645,6 +690,8 @@ class OnePaceRenamer:
                 text="Creating episode metadata and moving the video files...",
                 run_callback=worker
             )
+
+        cls.save()
 
     @classmethod
     def progress_dialog(cls, *args, **kwargs):
