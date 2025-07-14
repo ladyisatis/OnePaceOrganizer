@@ -62,4 +62,5 @@ For additional data that this program uses:
 - Craigy (@verywittyname on Discord) for Episode Descriptions spreadsheets and updates
 - [SpykerNZ/one-pace-for-plex](https://github.comSpykerNZ/one-pace-for-plex) for NFO setup
   - and posters (which were also done by [/u/piratezekk](https://www.reddit.com/user/piratezekk))
+- [matteron/one-pace-plex-api](https://github.com/matteron/one-pace-plex-api) for the code that updates the Plex API
 - The [One Pace Team](https://onepace.net/) itself for fantastic edits and for getting the group I watch One Piece with through without losing their minds
