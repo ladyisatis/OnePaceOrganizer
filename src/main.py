@@ -301,38 +301,37 @@ class OnePaceRenamer:
         for num, info_file in enumerate(crc32_files):
             log_text(f"adding {info_file.name} [{num+1}/{total_files}]\n")
 
-            p = int((num / total_files) * 100)
-            if p > 100:
-                p = 100
-
-            set_percentage(p)
+            crc32 = info_file.name.replace(".yml", "")
 
             with info_file.open(mode='r', encoding='utf-8') as f:
-                crc32 = info_file.name.replace(".yml", "")
                 parsed = YamlLoad(stream=f)
 
-                if "reference" in parsed:
-                    if parsed["reference"] in cls.yml["episodes"] and isinstance(cls.yml["episodes"][parsed["reference"]], dict):
-                        cls.yml["episodes"][crc32] = cls.yml["episodes"][parsed["reference"]]
-                    else:
-                        with Path(info_file.parent, f"parsed['reference'].yml").open(mode='r', encoding='utf-8') as fi:
-                            cls.yml["episodes"][crc32] = YamlLoad(stream=f)
-                elif len(crc32) == 8:
-                    cls.yml["episodes"][crc32] = parsed
+            if "reference" in parsed:
+                if parsed["reference"] in cls.yml["episodes"] and isinstance(cls.yml["episodes"][parsed["reference"]], dict):
+                    cls.yml["episodes"][crc32] = cls.yml["episodes"][parsed["reference"]]
                 else:
-                    crc32 = crc32.split("_")[0]
-                    if crc32 in cls.yml["episodes"]:
-                        cls.yml["episodes"][crc32].append(parsed)
-                    else:
-                        cls.yml["episodes"][crc32] = [parsed]
+                    with Path(info_file.parent, f"{parsed['reference']}.yml").open(mode='r', encoding='utf-8') as fi:
+                        cls.yml["episodes"][crc32] = YamlLoad(stream=fi)
+            elif len(crc32) == 8:
+                cls.yml["episodes"][crc32] = parsed
+            else:
+                crc32 = crc32.split("_")[0]
+                if crc32 in cls.yml["episodes"]:
+                    cls.yml["episodes"][crc32].append(parsed)
+                else:
+                    cls.yml["episodes"][crc32] = [parsed]
 
-        with cls.data_seasons_yml.open(mode='r', encoding='utf-8') as f:
-            cls.yml["seasons"] = YamlLoad(stream=f)
-        
-        set_percentage(100)
+            set_percentage(int((num / total_files) * 100))
 
         with cls.data_tvshow_yml.open(mode='r', encoding='utf-8') as f:
             cls.yml["tvshow"] = YamlLoad(stream=f)
+
+        set_percentage(int((total_files-1 / total_files) * 100))
+
+        with cls.data_seasons_yml.open(mode='r', encoding='utf-8') as f:
+            cls.yml["seasons"] = YamlLoad(stream=f)
+
+        set_percentage(100)
 
     @classmethod
     def check_setup(cls):
@@ -512,27 +511,30 @@ class OnePaceRenamer:
             for i, item in enumerate(queue):
                 new_video_file_path = item[0]
                 episode_info = item[1]
+                season = episode_info['season']
 
-                if not cls.config["plex"]["first_time_edits"] and not episode_info['season'] in seasons_done:
-                    seasons_done.append(episode_info['season'])
-                    season_str = f"{episode_info['season']}"
+                if not cls.config["plex"]["first_time_edits"] and not season in seasons_done:
+                    seasons_done.append(season)
 
-                    log_text(f"Season: {season_str}\n")
+                    if season in cls.yml["seasons"]:
+                        season_info = cls.yml["seasons"][season]
+                    else:
+                        season_info = cls.yml["seasons"][f"{season}"]
 
-                    plex_season = show.season(season=episode_info['season'])
-                    plex_season.editTitle(cls.yml["seasons"][season_str]["title"])
-                    plex_season.editSummary(cls.yml["seasons"][season_str]["summary"])
-                    plex_season.uploadPoster(filepath=str(Path(".", "data", "posters", f"season{season_str}-poster.png")))
+                    log_text(f"Season: {season}\n")
 
-                log_text(f"Season: {episode_info['season']} Episode: {episode_info['episode']}\n")
+                    plex_season = show.season(season=season)
+                    plex_season.editTitle(season_info["title"])
+                    plex_season.editSummary(season_info["summary"])
+                    plex_season.uploadPoster(filepath=str(Path(".", "data", "posters", f"season{season}-poster.png")))
 
-                plex_episode = show.episode(season=episode_info['season'], episode=episode_info['episode'])
+                log_text(f"Season: {season} Episode: {episode_info['episode']}\n")
+
+                plex_episode = show.episode(season=season, episode=episode_info['episode'])
 
                 plex_episode.editTitle(episode_info["title"])
-                plex_episode.editContentRating(cls.yml["tvshow"]["rating"])
-
-                if "sorttitle" in episode_info:
-                    plex_episode.editSortTitle(episode_info["sorttitle"])
+                plex_episode.editContentRating(episode_info["rating"] if "rating" in episode_info else cls.yml["tvshow"]["rating"])
+                plex_episode.editSortTitle(episode_info["sorttitle"] if "sorttitle" in episode_info else episode_info["title"].replace("The ", "", 1))
 
                 if "released" in episode_info:
                     if isinstance(episode_info["released"], datetime.date):
@@ -624,7 +626,11 @@ class OnePaceRenamer:
                     season_path.mkdir(exist_ok=True)
 
                     root = ET.Element("season")
-                    season_info = cls.yml["seasons"][season]
+
+                    if season in cls.yml["seasons"]:
+                        season_info = cls.yml["seasons"][season]
+                    else:
+                        season_info = cls.yml["seasons"][f"{season}"]
 
                     ET.SubElement(root, "title").text = f"{season}. {season_info['title']}"
                     ET.SubElement(root, "plot").text = season_info["description"]
@@ -662,6 +668,7 @@ class OnePaceRenamer:
                 ET.SubElement(episodedetails, "showtitle").text = cls.yml["tvshow"]["title"]
                 ET.SubElement(episodedetails, "season").text = f"{season}"
                 ET.SubElement(episodedetails, "episode").text = f"{episode_info['episode']}"
+                ET.SubElement(episodedetails, "rating").text = episode_info["rating"] if "rating" in episode_info else cls.yml["tvshow"]["rating"]
 
                 manga_anime = f"Manga Chapter(s): {episode_info['manga_chapters']}\n\nAnime Episode(s): {episode_info['anime_episodes']}"
 
@@ -671,9 +678,6 @@ class OnePaceRenamer:
                     description = f"{episode_info['description']}\n\n{manga_anime}"
 
                 ET.SubElement(episodedetails, "plot").text = description
-
-                if "rating" in episode_info:
-                    ET.SubElement(episodedetails, "rating").text = episode_info["rating"]
 
                 if "released" in episode_info:
                     date = ""
