@@ -10,6 +10,7 @@ from shutil import copy as shcopy
 from time import sleep
 from re import compile as Regexp, sub as rsub
 from hashlib import blake2s
+from zlib import crc32
 from tomllib import load as TomlLoad
 from yaml import safe_load as YamlLoad
 from pathlib import Path
@@ -308,15 +309,22 @@ class OnePaceRenamer:
 
             with info_file.open(mode='r', encoding='utf-8') as f:
                 crc32 = info_file.name.replace(".yml", "")
+                parsed = YamlLoad(stream=f)
 
-                if len(crc32) == 8:
-                    cls.yml["episodes"][crc32] = YamlLoad(stream=f)
+                if "reference" in parsed:
+                    if parsed["reference"] in cls.yml["episodes"] and isinstance(cls.yml["episodes"][parsed["reference"]], dict):
+                        cls.yml["episodes"][crc32] = cls.yml["episodes"][parsed["reference"]]
+                    else:
+                        with Path(info_file.parent, f"parsed['reference'].yml").open(mode='r', encoding='utf-8') as fi:
+                            cls.yml["episodes"][crc32] = YamlLoad(stream=f)
+                elif len(crc32) == 8:
+                    cls.yml["episodes"][crc32] = parsed
                 else:
                     crc32 = crc32.split("_")[0]
-                    if not crc32 in cls.yml["episodes"]:
-                        cls.yml["episodes"][crc32] = [YamlLoad(stream=f)]
+                    if crc32 in cls.yml["episodes"]:
+                        cls.yml["episodes"][crc32].append(parsed)
                     else:
-                        cls.yml["episodes"][crc32].append(YamlLoad(stream=f))
+                        cls.yml["episodes"][crc32] = [parsed]
 
         with cls.data_seasons_yml.open(mode='r', encoding='utf-8') as f:
             cls.yml["seasons"] = YamlLoad(stream=f)
@@ -396,6 +404,15 @@ class OnePaceRenamer:
                 h.update(chunk)
 
         return h.hexdigest()[:16]
+
+    @classmethod
+    def calc_crc32(cls, filepath):
+        crc_value = 0
+        with filepath.open(mode='rb') as f:
+            while chunk := f.read(262144):
+                crc_value = crc32(chunk, crc_value)
+
+        return f"{crc_value & 0xFFFFFFFF:08x}"
 
     @classmethod
     def run_plex(cls, video_files, out_path):
@@ -747,8 +764,21 @@ class OnePaceRenamer:
             crc_pattern = Regexp(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
             for f in video_files_path.glob("*.[mM][kK][vV]"):
                 match = crc_pattern.search(f.name)
+                fpath = f.resolve()
+
                 if match:
-                    video_files[f.resolve()] = match.group(1)
+                    video_files[fpath] = match.group(1)
+                else:
+                    video_files[fpath] = cls.crc32(fpath)
+
+            for f in video_files_path.glob("*.[mM][pP]4"):
+                match = crc_pattern.search(f.name)
+                fpath = f.resolve()
+
+                if match:
+                    video_files[fpath] = match.group(1)
+                else:
+                    video_files[fpath] = cls.crc32(fpath)
 
             out_path = Path(cls.config["episodes"])
             if not out_path.exists():
