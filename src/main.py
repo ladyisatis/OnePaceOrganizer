@@ -7,14 +7,11 @@ import orjson
 import xml.etree.ElementTree as ET
 import datetime
 from shutil import copy as shcopy
-from time import sleep
 from re import compile as Regexp, sub as rsub
 from hashlib import blake2s
 from zlib import crc32
 from tomllib import load as TomlLoad
-from yaml import safe_load as YamlLoad
 from pathlib import Path
-from functools import partial
 from prompt_toolkit import PromptSession
 from prompt_toolkit.patch_stdout import patch_stdout
 from prompt_toolkit.shortcuts import message_dialog, input_dialog, yes_no_dialog, radiolist_dialog, progress_dialog, button_dialog
@@ -115,8 +112,9 @@ class OnePaceRenamer:
                 text='Do you want to remember your Plex username and password?'
             ).run()
 
+            cls.config["plex"]["remember"] = remember
+
             if remember:
-                cls.config["plex"]["remember"] = True
                 cls.config["plex"]["username"] = username
                 cls.config["plex"]["password"] = password
         else:
@@ -155,8 +153,7 @@ class OnePaceRenamer:
                 text='Invalid username or password, please try again.'
             ).run()
 
-        if cls.config["plex"]["remember"]:
-            cls.config["plex"]["token"] = cls.plex_account.authenticationToken
+        cls.config["plex"]["token"] = cls.plex_account.authenticationToken if cls.config["plex"]["remember"] else ""
 
     @classmethod
     def plex_ask_token(cls):
