@@ -40,7 +40,6 @@ class OnePaceRenamer:
         "episodes": str(Path(".", "out").resolve()),
         "plex": {
             "enabled": False,
-            "first_time_edits": False,
             "url": "http://127.0.0.1:32400",
             "use_token": False,
             "name": "",
@@ -158,6 +157,9 @@ class OnePaceRenamer:
                 text='Invalid username or password, please try again.'
             ).run()
 
+        if cls.config["plex"]["remember"]:
+            cls.config["plex"]["token"] = cls.plex_account.authenticationToken
+
     @classmethod
     def plex_ask_token(cls):
         while cls.plex_account is None:
@@ -220,30 +222,29 @@ class OnePaceRenamer:
                 cont = yes_no_dialog(
                     title=cls.title,
                     text='Error: There are no Plex servers to choose from. Do you want to continue without Plex access?'
-                )
+                ).run()
                 if cont:
                     return
                 else:
                     sys.exit(1)
             elif len(resources) == 1:
                 cls.plex_server = resources[0].connect()
-                cls.config["plex"]["name"] = resources[0].name
-                cls.config["plex"]["token"] = cls.plex_server._token
+                cls.config["plex"]["name"] = resources[0].clientIdentifier
             else:
-                for resource in resources:
-                    options.append((resource.name, resource.name))
+                for i, resource in enumerate(resources):
+                    options.append((i, resource.name))
 
-                cls.config["plex"]["name"] = radiolist_dialog(
+                index = radiolist_dialog(
                     title=cls.title,
                     text='Select your Plex server:',
                     values=options
                 ).run()
 
-                if cls.config["plex"]["name"] is None:
+                if index is None:
                     return
 
-                cls.plex_server = cls.plex_account.resource(cls.config["plex"]["name"])
-                cls.config["plex"]["token"] = cls.plex_server._token
+                cls.plex_server = resources[i].connect()
+                cls.config["plex"]["name"] = resources[index].clientIdentifier
 
         options = []
         sections = cls.plex_server.library.sections()
@@ -251,7 +252,7 @@ class OnePaceRenamer:
             cont = yes_no_dialog(
                 title=cls.title,
                 text='Error: There are no Plex sections to choose from. Do you want to continue without Plex access?'
-            )
+            ).run()
             if cont:
                 return
             else:
@@ -277,7 +278,7 @@ class OnePaceRenamer:
             cont = yes_no_dialog(
                 title=cls.title,
                 text='Error: There are no shows to choose from. Do you want to continue without Plex access?'
-            )
+            ).run()
             if cont:
                 return
             else:
@@ -448,13 +449,25 @@ class OnePaceRenamer:
     def run_plex(cls, video_files, out_path):
         try:
             if cls.plex_account is None:
-                if cls.config["plex"]["use_token"]:
-                    cls.plex_ask_token()
-                else:
-                    cls.plex_username_password_login()
+                try:
+                    cls.plex_account = MyPlexAccount(token=cls.config["plex"]["token"])
+                except:
+                    if cls.config["plex"]["use_token"]:
+                        cls.plex_ask_token()
+                    else:
+                        cls.plex_username_password_login()
 
             if cls.plex_server is None:
-                cls.plex_server = cls.plex_account.resource(cls.config["plex"]["name"]).connect()
+                for resource in enumerate(cls.plex_account.resources()):
+                    if resource.clientIdentifier == cls.config["plex"]["name"]:
+                        cls.plex_server = resource.connect()
+                        break
+
+                if cls.plex_server is None:
+                    message_dialog(
+                        title=cls.title,
+                        text="Plex server not found - please rerun the setup if it's changed."
+                    ).run()
 
             show = cls.plex_server.library.sectionByID(cls.config["plex"]["library_key"]).getGuid(cls.config["plex"]["show_guid"])
 
@@ -515,11 +528,10 @@ class OnePaceRenamer:
                         logger.error(f"crc32 {crc32} has no title, please report this as a GitHub issue")
                         continue
 
-                title = episode_info["title"]
-                safe_title = rsub(cls.illegal_filename_chars, "", title)
-                filename = f"One Pace - S{season:02d}E{episode_info['episode']:02d} - {safe_title}"
-                new_video_file_path = Path(season_path, f"{filename}{filepath.suffix}")
+                prefix = f"One Pace - S{season:02d}E{episode_info['episode']:02d} - "
+                safe_title = rsub(cls.illegal_filename_chars, "", episode_info["title"])
 
+                new_video_file_path = Path(season_path, f"{prefix}{safe_title}{filepath.suffix}")
                 filepath.rename(new_video_file_path)
 
                 queue.append((new_video_file_path, episode_info))
@@ -610,7 +622,6 @@ class OnePaceRenamer:
                 set_percentage(int((i / len(queue)) * 100))
 
             set_percentage(100)
-            cls.config["plex"]["first_time_edits"] = True
 
         cls.progress_dialog(
             title=cls.title,
@@ -636,7 +647,10 @@ class OnePaceRenamer:
                     ET.SubElement(root, str(k)).text = str(v)
 
             for k, v in dict(sorted(cls.yml["seasons"].items())).items():
-                ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = f"{k}. {v['title']}"
+                if k == 0:
+                    ET.SubElement(root, "namedseason", attrib={"number": "0"}).text = str(v['title'])
+                else:
+                    ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = f"{k}. {v['title']}"
 
             src = Path(".", "data", "posters", "tvshow.png")
             dst = Path(out_path, "poster.png")
@@ -688,7 +702,9 @@ class OnePaceRenamer:
                     else:
                         season_info = cls.yml["seasons"][f"{season}"]
 
-                    ET.SubElement(root, "title").text = f"{season}. {season_info['title']}"
+                    title_text = season_info['title'] if season == 0 else f"{season}. {season_info['title']}"
+
+                    ET.SubElement(root, "title").text = title_text
                     ET.SubElement(root, "plot").text = season_info["description"]
                     ET.SubElement(root, "outline").text = season_info["description"]
                     ET.SubElement(root, "seasonnumber").text = f"{season}"
@@ -710,17 +726,17 @@ class OnePaceRenamer:
                 episodedetails = ET.Element("episodedetails")
 
                 if not "title" in episode_info or episode_info["title"] == "":
-                        logger.error(f"crc32 {crc32} has no title, please report this as a GitHub issue")
-                        continue
+                    logger.error(f"crc32 {crc32} has no title, please report this as a GitHub issue")
+                    continue
 
-                title = episode_info["title"]
-                safe_title = rsub(cls.illegal_filename_chars, "", title)
-                filename = f"One Pace - S{season:02d}E{episode_info['episode']:02d} - {safe_title}"
-                new_video_file_path = Path(season_path, f"{filename}{filepath.suffix}")
+                prefix = f"One Pace - S{season:02d}E{episode_info['episode']:02d} - "
+                safe_title = rsub(cls.illegal_filename_chars, "", episode_info["title"])
+
+                new_video_file_path = Path(season_path, f"{prefix}{safe_title}{filepath.suffix}")
 
                 log_text(f"creating metadata and moving {filepath.name} to {new_video_file_path}\n")
 
-                ET.SubElement(episodedetails, "title").text = title
+                ET.SubElement(episodedetails, "title").text = episode_info["title"]
                 ET.SubElement(episodedetails, "showtitle").text = cls.yml["tvshow"]["title"]
                 ET.SubElement(episodedetails, "season").text = f"{season}"
                 ET.SubElement(episodedetails, "episode").text = f"{episode_info['episode']}"
@@ -736,8 +752,6 @@ class OnePaceRenamer:
                 ET.SubElement(episodedetails, "plot").text = description
 
                 if "released" in episode_info:
-                    date = ""
-
                     if isinstance(episode_info["released"], datetime.date):
                         date = episode_info["released"].isoformat()
                     else:
@@ -756,10 +770,9 @@ class OnePaceRenamer:
                 filepath.rename(new_video_file_path)
 
                 if total > 0:
-                    set_percentage(int(i / total))
+                    set_percentage(int((i / total) * 100))
 
             set_percentage(100)
-            sleep(1.0)
 
         if total > 0:
             cls.progress_dialog(
