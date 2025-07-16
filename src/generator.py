@@ -128,7 +128,7 @@ def json(datadir, json):
     out["episodes"] = episodes
 
     with Path(json).open(mode='wb') as f:
-        f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SORT_KEYS))
+        f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SORT_KEYS ))
 
 generate.add_command(json)
 
