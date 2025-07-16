@@ -26,9 +26,7 @@ from loguru import logger
 class OnePaceRenamer:
     title = "One Pace Renamer"
     config_file = Path(".", "config.json")
-    data_episodes_folder = Path(".", "data", "episodes")
-    data_seasons_yml = Path(".", "data", "seasons.yml")
-    data_tvshow_yml = Path(".", "data", "tvshow.yml")
+    data_file = Path(".", "data.json")
     toml_file = Path(".", "pyproject.toml")
     video_files = {}
     plex_account: MyPlexAccount = None
@@ -292,43 +290,6 @@ class OnePaceRenamer:
             text='Which show is One Pace?',
             values=options
         ).run()
-
-    @classmethod
-    def do_cache_yml(cls, set_percentage, log_text):
-        crc32_path = Path(cls.data_episodes_folder)
-        crc32_files = [x for x in crc32_path.glob("*.yml")]
-
-        total_files = len(crc32_files) + 2
-        for num, info_file in enumerate(crc32_files):
-            crc32 = info_file.name.replace(".yml", "")
-
-            with info_file.open(mode='r', encoding='utf-8') as f:
-                parsed = YamlLoad(stream=f)
-
-            if "reference" in parsed:
-                if parsed["reference"] in cls.yml["episodes"] and isinstance(cls.yml["episodes"][parsed["reference"]], dict):
-                    cls.yml["episodes"][crc32] = cls.yml["episodes"][parsed["reference"]]
-                else:
-                    with Path(info_file.parent, f"{parsed['reference']}.yml").open(mode='r', encoding='utf-8') as fi:
-                        cls.yml["episodes"][crc32] = YamlLoad(stream=fi)
-            elif len(crc32) == 8:
-                cls.yml["episodes"][crc32] = parsed
-            else:
-                crc32 = crc32.split("_")[0]
-                if crc32 in cls.yml["episodes"]:
-                    cls.yml["episodes"][crc32].append(parsed)
-                else:
-                    cls.yml["episodes"][crc32] = [parsed]
-
-            set_percentage(int((num / total_files) * 100))
-
-        with cls.data_tvshow_yml.open(mode='r', encoding='utf-8') as f:
-            cls.yml["tvshow"] = YamlLoad(stream=f)
-
-        with cls.data_seasons_yml.open(mode='r', encoding='utf-8') as f:
-            cls.yml["seasons"] = YamlLoad(stream=f)
-
-        set_percentage(100)
 
     @classmethod
     def check_setup(cls):
@@ -813,6 +774,11 @@ class OnePaceRenamer:
 
     @classmethod
     def run(cls):
+        in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+        if in_bundle:
+            cls.data_file = Path(sys._MEIPASS, "data.json")
+            cls.toml_file = Path(sys._MEIPASS, "pyproject.toml")
+
         try:
             with cls.toml_file.open(mode='rb', encoding='utf-8') as f:
                 toml = TomlLoad(f)
@@ -821,13 +787,15 @@ class OnePaceRenamer:
             pass
 
         with patch_stdout():
-            cls.check_setup()
+            try:
+                r = httpx.get("https://raw.githubusercontent.com/ladyisatis/one_pace_renamer/refs/heads/main/data.json")
+                r.raise_for_status()
 
-            cls.progress_dialog(
-                title=cls.title,
-                text="Caching all available episode metadata...",
-                run_callback=cls.do_cache_yml
-            )
+                cls.yml = orjson.loads(r.content)
+            except:
+                cls.yml = orjson.loads(cls.data_file.read_bytes())
+
+            cls.check_setup()
 
             cls.progress_dialog(
                 title=cls.title,
