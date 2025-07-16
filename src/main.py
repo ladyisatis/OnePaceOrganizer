@@ -30,6 +30,7 @@ class OnePaceRenamer:
     data_seasons_yml = Path(".", "data", "seasons.yml")
     data_tvshow_yml = Path(".", "data", "tvshow.yml")
     toml_file = Path(".", "pyproject.toml")
+    video_files = {}
     plex_account: MyPlexAccount = None
     plex_server: PlexServer = None
     illegal_filename_chars = r'[<>:"/\\|?*\x00-\x1F]'
@@ -228,7 +229,7 @@ class OnePaceRenamer:
                 cls.plex_server = resources[0].connect()
                 cls.config["plex"]["name"] = resources[0].name
                 cls.config["plex"]["token"] = cls.plex_server._token
-            else: 
+            else:
                 for resource in resources:
                     options.append((resource.name, resource.name))
 
@@ -285,7 +286,6 @@ class OnePaceRenamer:
         for show in all_shows:
             options.append((show.guid, show.title))
 
-        # use via cls.plex_server.library.getGuid()
         cls.config["plex"]["show_guid"] = radiolist_dialog(
             title=cls.title,
             text='Which show is One Pace?',
@@ -299,8 +299,6 @@ class OnePaceRenamer:
 
         total_files = len(crc32_files) + 2
         for num, info_file in enumerate(crc32_files):
-            log_text(f"adding {info_file.name} [{num+1}/{total_files}]\n")
-
             crc32 = info_file.name.replace(".yml", "")
 
             with info_file.open(mode='r', encoding='utf-8') as f:
@@ -325,8 +323,6 @@ class OnePaceRenamer:
 
         with cls.data_tvshow_yml.open(mode='r', encoding='utf-8') as f:
             cls.yml["tvshow"] = YamlLoad(stream=f)
-
-        set_percentage(int((total_files-1 / total_files) * 100))
 
         with cls.data_seasons_yml.open(mode='r', encoding='utf-8') as f:
             cls.yml["seasons"] = YamlLoad(stream=f)
@@ -398,8 +394,9 @@ class OnePaceRenamer:
     @classmethod
     def calc_blake2s_16(cls, video_file):
         h = blake2s()
+        chunks = 1024*1024*8
         with Path(video_file).open(mode='rb') as f:
-            while chunk := f.read(8192):
+            while chunk := f.read(chunks):
                 h.update(chunk)
 
         return h.hexdigest()[:16]
@@ -407,38 +404,81 @@ class OnePaceRenamer:
     @classmethod
     def calc_crc32(cls, filepath):
         crc_value = 0
+        chunks = 1024*1024*8
         with filepath.open(mode='rb') as f:
-            while chunk := f.read(262144):
+            while chunk := f.read(chunks):
                 crc_value = crc32(chunk, crc_value)
 
-        return f"{crc_value & 0xFFFFFFFF:08x}"
+        res = f"{crc_value & 0xFFFFFFFF:08x}"
+        return res.upper()
+
+    @classmethod
+    def do_cache_crc32(cls, set_percentage, log_text):
+        crc_pattern = Regexp(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
+
+        video_files_path = Path(cls.config["path_to_eps"])
+        cls.video_files = {}
+
+        log_text("searching for .mkv and .mp4 files...\n")
+
+        filelist = []
+        filelist.extend(list(video_files_path.glob("**/*.[mM][kK][vV]")))
+        filelist.extend(list(video_files_path.glob("**/*.[mM][pP]4")))
+
+        for i, f in enumerate(filelist):
+            match = crc_pattern.search(f.name)
+            fpath = f.resolve()
+
+            if match:
+                crc32 = match.group(1)
+            else:
+                log_text(f"calculating for {fpath.name}...\n")
+                crc32 = cls.calc_crc32(fpath)
+
+            if crc32 in cls.yml["episodes"]:
+                cls.video_files[fpath] = crc32
+            else:
+                log_text(f"skipping {fpath.name}, episode metadata missing\n")
+
+            set_percentage(int((i / len(filelist)) * 100))
+
+        set_percentage(100)
 
     @classmethod
     def run_plex(cls, video_files, out_path):
-        if cls.plex_account is None:
-            if cls.config["plex"]["use_token"]:
-                cls.plex_ask_token()
-            else:
-                cls.plex_username_password_login()
+        try:
+            if cls.plex_account is None:
+                if cls.config["plex"]["use_token"]:
+                    cls.plex_ask_token()
+                else:
+                    cls.plex_username_password_login()
 
-        if cls.plex_server is None:
-            cls.plex_server = cls.plex_account.resource(cls.config["plex"]["name"]).connect()
+            if cls.plex_server is None:
+                cls.plex_server = cls.plex_account.resource(cls.config["plex"]["name"]).connect()
 
-        show = cls.plex_server.library.sectionByID(cls.config["plex"]["library_key"]).getGuid(cls.config["plex"]["show_guid"])
+            show = cls.plex_server.library.sectionByID(cls.config["plex"]["library_key"]).getGuid(cls.config["plex"]["show_guid"])
 
-        if not cls.config["plex"]["first_time_edits"]:
-            show.editTitle(cls.yml["tvshow"]["title"])
-            show.editOriginalTitle(cls.yml["tvshow"]["originaltitle"])
-            show.editSortTitle(cls.yml["tvshow"]["sortttitle"])
-            show.editSummary(cls.yml["tvshow"]["plot"])
-            show.editContentRating(cls.yml["tvshow"]["rating"])
+            mismatch_title = show.title != cls.yml["tvshow"]["title"]
+            mismatch_originaltitle = show.originalTitle != cls.yml["tvshow"]["originaltitle"]
+            mismatch_summary = show.summary != cls.yml["tvshow"]["plot"]
+            mismatch_contentRating = show.contentRating != cls.yml["tvshow"]["rating"]
 
-            if isinstance(cls.yml["tvshow"]["premiered"], datetime.date):
-                show.editOriginallyAvailable(cls.yml["tvshow"]["premiered"].isoformat())
-            else:
-                show.editOriginallyAvailable(cls.yml["tvshow"]["premiered"])
+            if mismatch_title or mismatch_originaltitle or mismatch_summary or mismatch_contentRating:
+                show.editTitle(cls.yml["tvshow"]["title"])
+                show.editOriginalTitle(cls.yml["tvshow"]["originaltitle"])
+                show.editSortTitle(cls.yml["tvshow"]["sorttitle"])
+                show.editSummary(cls.yml["tvshow"]["plot"])
+                show.editContentRating(cls.yml["tvshow"]["rating"])
 
-            show.uploadPoster(filepath=str(Path(".", "data", "posters", "tvshow.png")))
+                if isinstance(cls.yml["tvshow"]["premiered"], datetime.date):
+                    show.editOriginallyAvailable(cls.yml["tvshow"]["premiered"].isoformat())
+                else:
+                    show.editOriginallyAvailable(cls.yml["tvshow"]["premiered"])
+
+                show.uploadPoster(filepath=str(Path(".", "data", "posters", "tvshow.png")))
+        except:
+            traceback.print_exc()
+            sys.exit(1)
 
         total = len(video_files)
         queue = []
@@ -480,12 +520,13 @@ class OnePaceRenamer:
                 filename = f"One Pace - S{season:02d}E{episode_info['episode']:02d} - {safe_title}"
                 new_video_file_path = Path(season_path, f"{filename}{filepath.suffix}")
 
-                log_text(f"creating metadata and moving {filepath.name} to {new_video_file_path}\n")
                 filepath.rename(new_video_file_path)
 
                 queue.append((new_video_file_path, episode_info))
 
                 set_percentage(int((i / total) * 100))
+
+            set_percentage(100)
 
         cls.progress_dialog(
             title=cls.title,
@@ -498,58 +539,73 @@ class OnePaceRenamer:
             text=(
                 f"All of the One Pace files have been created in:\n"
                 f"{out_path}\n\n"
-                "Please move the \"{out_path.name}\" folder to the Plex library folder you've selected,\n"
+                f"Please move the \"{out_path.name}\" folder to the Plex library folder you've selected,\n"
                 "and make sure that it appears in Plex. Seasons and episodes will temporarily have\n"
                 "incorrect information, and the next step will correct them.\n\n"
                 "Click OK once this has been done and you can see the One Pace video files in Plex."
             )
-        )
+        ).run()
 
         def plex_worker(set_percentage, log_text):
             seasons_done = []
 
             for i, item in enumerate(queue):
-                new_video_file_path = item[0]
-                episode_info = item[1]
-                season = episode_info['season']
+                try:
+                    new_video_file_path = item[0]
+                    episode_info = item[1]
+                    season = episode_info['season']
 
-                if not cls.config["plex"]["first_time_edits"] and not season in seasons_done:
-                    seasons_done.append(season)
+                    if not season in seasons_done:
+                        seasons_done.append(season)
 
-                    if season in cls.yml["seasons"]:
-                        season_info = cls.yml["seasons"][season]
-                    else:
-                        season_info = cls.yml["seasons"][f"{season}"]
+                        plex_season = show.season(season=season)
 
-                    log_text(f"Season: {season}\n")
+                        if season in cls.yml["seasons"]:
+                            season_info = cls.yml["seasons"][season]
+                        else:
+                            season_info = cls.yml["seasons"][f"{season}"]
 
-                    plex_season = show.season(season=season)
-                    plex_season.editTitle(season_info["title"])
-                    plex_season.editSummary(season_info["summary"])
-                    plex_season.uploadPoster(filepath=str(Path(".", "data", "posters", f"season{season}-poster.png")))
+                        new_title = season_info['title'] if season == 0 else f"{season}. {season_info['title']}"
 
-                log_text(f"Season: {season} Episode: {episode_info['episode']}\n")
+                        mismatch_title = plex_season.title != new_title
+                        mismatch_desc = plex_season.summary != season_info["description"]
 
-                plex_episode = show.episode(season=season, episode=episode_info['episode'])
+                        if mismatch_title or mismatch_desc:
+                            log_text(f"Season: {new_title}\n")
+                            plex_season.editTitle(new_title)
+                            plex_season.editSummary(season_info["description"])
+                            plex_season.uploadPoster(filepath=str(Path(".", "data", "posters", f"season{season}-poster.png")))
 
-                plex_episode.editTitle(episode_info["title"])
-                plex_episode.editContentRating(episode_info["rating"] if "rating" in episode_info else cls.yml["tvshow"]["rating"])
-                plex_episode.editSortTitle(episode_info["sorttitle"] if "sorttitle" in episode_info else episode_info["title"].replace("The ", "", 1))
+                    try:
+                        plex_episode = show.episode(season=season, episode=episode_info['episode'])
 
-                if "released" in episode_info:
-                    if isinstance(episode_info["released"], datetime.date):
-                        plex_episode.editOriginallyAvailable(episode_info["released"].isoformat())
-                    else:
-                        plex_episode.editOriginallyAvailable(str(episode_info["released"]))
+                        if plex_episode.title != episode_info['title']:
+                            log_text(f"Season: {season} Episode: {episode_info['episode']}\n")
 
-                manga_anime = f"Manga Chapter(s): {episode_info['manga_chapters']}\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+                            plex_episode.editTitle(episode_info["title"])
+                            plex_episode.editContentRating(episode_info["rating"] if "rating" in episode_info else cls.yml["tvshow"]["rating"])
+                            plex_episode.editSortTitle(episode_info["sorttitle"] if "sorttitle" in episode_info else episode_info["title"].replace("The ", "", 1))
 
-                if not "description" in episode_info or episode_info["description"] == "":
-                    description = manga_anime
-                else:
-                    description = f"{episode_info['description']}\n\n{manga_anime}"
-                
-                plex_episode.editSummary(description)
+                            if "released" in episode_info:
+                                if isinstance(episode_info["released"], datetime.date):
+                                    plex_episode.editOriginallyAvailable(episode_info["released"].isoformat())
+                                else:
+                                    plex_episode.editOriginallyAvailable(str(episode_info["released"]))
+
+                            manga_anime = f"Manga Chapter(s): {episode_info['manga_chapters']}\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+
+                            if not "description" in episode_info or episode_info["description"] == "":
+                                description = manga_anime
+                            else:
+                                description = f"{episode_info['description']}\n\n{manga_anime}"
+                            
+                            plex_episode.editSummary(description)
+                    except:
+                        log_text(f"Skipping Season {season} Episode {episode_info['episode']} due to an error\n")
+
+                except:
+                    e = traceback.format_exc()
+                    log_text(f"{e}\n")
 
                 set_percentage(int((i / len(queue)) * 100))
 
@@ -662,7 +718,7 @@ class OnePaceRenamer:
                 filename = f"One Pace - S{season:02d}E{episode_info['episode']:02d} - {safe_title}"
                 new_video_file_path = Path(season_path, f"{filename}{filepath.suffix}")
 
-                log_text(f"creating metadata and moving {filepath.name} to {new_video_file_path}")
+                log_text(f"creating metadata and moving {filepath.name} to {new_video_file_path}\n")
 
                 ET.SubElement(episodedetails, "title").text = title
                 ET.SubElement(episodedetails, "showtitle").text = cls.yml["tvshow"]["title"]
@@ -751,8 +807,6 @@ class OnePaceRenamer:
         except:
             pass
 
-        using_plex = cls.config["plex"]["enabled"]
-
         with patch_stdout():
             cls.check_setup()
 
@@ -762,36 +816,20 @@ class OnePaceRenamer:
                 run_callback=cls.do_cache_yml
             )
 
-            video_files_path = Path(cls.config["path_to_eps"])
-            video_files = {}
-
-            crc_pattern = Regexp(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
-            for f in video_files_path.glob("*.[mM][kK][vV]"):
-                match = crc_pattern.search(f.name)
-                fpath = f.resolve()
-
-                if match:
-                    video_files[fpath] = match.group(1)
-                else:
-                    video_files[fpath] = cls.crc32(fpath)
-
-            for f in video_files_path.glob("*.[mM][pP]4"):
-                match = crc_pattern.search(f.name)
-                fpath = f.resolve()
-
-                if match:
-                    video_files[fpath] = match.group(1)
-                else:
-                    video_files[fpath] = cls.crc32(fpath)
+            cls.progress_dialog(
+                title=cls.title,
+                text="Fetching all checksums for the video files...",
+                run_callback=cls.do_cache_crc32
+            )
 
             out_path = Path(cls.config["episodes"])
             if not out_path.exists():
                 out_path.mkdir(exist_ok=True)
 
-            if using_plex:
-                cls.run_plex(video_files, out_path)
+            if cls.config["plex"]["enabled"]:
+                cls.run_plex(cls.video_files, out_path)
             else:
-                cls.run_nfo(video_files, out_path)
+                cls.run_nfo(cls.video_files, out_path)
 
             message_dialog(
                 title=cls.title,
