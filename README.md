@@ -12,9 +12,11 @@ By the end, on your Plex or Jellyfin setup, you should have:
 
 You can also re-run the program when new One Pace releases for quick renaming, and this does not require every single One Pace release ever released in order to function.
 
-Note: Plex support is currently in alpha. It should be stable not before too long.
+**Note: this program is in BETA. Things may break and error handling could be a lot better. Contributions also welcome on that.**
 
 ## Usage
+
+### Running the Program
 
 There are two ways you can run this. The first is via the [Releases](https://github.com/ladyisatis/one_pace_renamer/releases) page.
 
@@ -34,9 +36,19 @@ $ poetry install
 $ python src/main.py
 ```
 
-When the program runs, there will be a wizard to help guide through the process, since this all might seem a lot more complicated than it actually is!
+### Instructions
 
-It's recommended that you have a directory all ready to go with all of the video files (`.mkv` or `.mp4`) and can point the program there. It's also recommended that the output directory be the place where your One Pace files will live, e.g. `C:\path\to\Jellyfin\Anime\One Pace` as it'll create season folders inside there.
+1. Create a folder containing nothing except the `.mkv` (or `.mp4`) files. By default, it'll assume you've made a folder named `in` in the same directory as the `.exe` (if using Windows release) or one folder up from `src`.
+2. Run the `.exe` (Windows release) or `python src/main.py` (from source code).
+3. There will be a wizard to guide you through the steps. I'm hoping this wizard is replaced with an actual windowed GUI in the near future instead of a scary-looking terminal outfit.
+
+The first step will ask for the folder you made in step 1.
+
+For output, this will assume a directory of, for example, `C:\Plex_Jellyfin\Anime\One Pace`, `/mnt/storage/Anime/One Pace`, etc., however keep in mind this won't be the *exact* path needed. This is going to be the folder that `Season 01`, `Season 02`, ...and so on and all of the subsequent video files will be put into.
+
+If you're using Jellyfin, nothing else is necessary, and the program is re-usable for newer One Pace releases, even if it's for a single video file.
+
+If you're using Plex, there will be a two step process: one will move all of the video files to the output directory, so in case your Plex server is on a separate server/computer, this will give you time to transfer everything. Let Plex (incorrectly) index all of said files that get added to Plex. Once that's done, the second step will contact the Plex API to upload posters and edit show, arc/season, and episode metadata.
 
 ## Adding Data on Episodes and Seasons
 
