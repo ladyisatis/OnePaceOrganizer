@@ -490,7 +490,7 @@ class OnePaceRenamer:
                 safe_title = rsub(cls.illegal_filename_chars, "", episode_info["title"])
 
                 new_video_file_path = Path(season_path, f"{prefix}{safe_title}{filepath.suffix}")
-                filepath.rename(new_video_file_path)
+                shmove(str(filepath), str(new_video_file_path))
 
                 queue.append((new_video_file_path, episode_info))
 
@@ -720,12 +720,12 @@ class OnePaceRenamer:
 
                 ET.indent(episodedetails)
                 ET.ElementTree(episodedetails).write(
-                    str(Path(season_path, f"{filename}.nfo")), 
+                    str(Path(season_path, f"{prefix}{safe_title}.nfo")), 
                     encoding='utf-8', 
                     xml_declaration=True
                 )
                 
-                filepath.rename(new_video_file_path)
+                shmove(str(filepath), str(new_video_file_path))
 
                 if total > 0:
                     set_percentage(int((i / total) * 100))
