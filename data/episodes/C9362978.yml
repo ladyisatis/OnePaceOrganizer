@@ -1,9 +1,18 @@
 season: 31
 episode: 18
+
 title: Fujitora's Outlook
+# originaltitle: 
+# sorttitle: 
 description: Viola, once a princess of the Dressrosan royal family, shows Luffy and
   the others a secret entrance into the palace. In the meantime, Admiral Fujitora
   reveals his audacious plans for the Seven Warlords of the Sea!
 manga_chapters: 734-735
 anime_episodes: 666-667
-released: '2014-11-25'
+
+# rating: TV-14
+released: 2014-11-25
+
+hashes:
+  crc32: C9362978
+# blake2: 

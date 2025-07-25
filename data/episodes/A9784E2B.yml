@@ -1,9 +1,18 @@
 season: 21
 episode: 15
+
 title: Clash! The Titanic Battle Against Zombie 900!
+# originaltitle: 
+# sorttitle: 
 description: The Straw Hats sans Luffy are faced with the insurmountable task of taking
   out Oars. To knock him down, Franky decides they will need to use his newly developed
   tactic. But as they begin "docking" onto one another, a slight problem arises.
 manga_chapters: 471-472
 anime_episodes: 365-367
-released: '2013-12-20'
+
+# rating: TV-14
+released: 2013-12-20
+
+hashes:
+  crc32: A9784E2B
+# blake2: 

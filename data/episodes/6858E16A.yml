@@ -1,10 +1,19 @@
 season: 5
 episode: 5
+
 title: Pearl
+# originaltitle: 
+# sorttitle: 
 description: Mihawk departs after defeating Zoro, and Krieg continues his assault
   on the Baratie. Pearl, one of Krieg's strongest men, goes on the offensive with
   fiery attacks and multiple shields at his disposal, so Sanji reveals his unique
   fighting style.
 manga_chapters: 53-55
-anime_episodes: '25'
-released: '2023-05-15'
+anime_episodes: 25
+
+# rating: TV-14
+released: 2023-05-15
+
+hashes:
+  crc32: 6858E16A
+# blake2: 

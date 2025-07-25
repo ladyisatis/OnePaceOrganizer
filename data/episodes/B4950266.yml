@@ -1,10 +1,19 @@
 season: 15
 episode: 3
+
 title: People's Dreams
+# originaltitle: 
+# sorttitle: 
 description: After a one-sided brawl with Bellamy, the Straw Hats meet a black-haired
   pirate outside the bar who reaffirms their dreams and insists the sky island is
   real. As they depart for the other side of Jaya, another salvager of the Saruyama
   Alliance appears.
 manga_chapters: 225-226
-anime_episodes: '147'
-released: '2023-03-11'
+anime_episodes: 147
+
+# rating: TV-14
+released: 2023-03-11
+
+hashes:
+  crc32: B4950266
+# blake2: 

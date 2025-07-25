@@ -1,9 +1,18 @@
 season: 31
 episode: 39
+
 title: Zoro vs. Pica
+# originaltitle: 
+# sorttitle: 
 description: Pica loses his temper and becomes a terrible and true force of nature.
   With the lives of King Riku, Usopp, and the others in the balance, Zoro must dig
   deep and discover a powerful technique to counter Pica's near-unstoppable onslaught.
 manga_chapters: 776-778
 anime_episodes: 716-719
-released: '2017-03-20'
+
+# rating: TV-14
+released: 2017-03-20
+
+hashes:
+  crc32: 7391ECD4
+# blake2: 

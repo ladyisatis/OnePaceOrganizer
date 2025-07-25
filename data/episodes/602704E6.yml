@@ -1,9 +1,18 @@
 season: 16
 episode: 10
+
 title: Pirate Luffy vs. Berserker Wyper
+# originaltitle: 
+# sorttitle: 
 description: Only 80 remain in the Upper Yard survival game. Zoro finds himself face-to-face
   with the Shandian Braham, Luffy takes on Wyper and his burning bazooka, and Nami’s
   group on the Merry has the deadliest encounter of all!
 manga_chapters: 258-260
 anime_episodes: 170-171
-released: '2023-12-02'
+
+# rating: TV-14
+released: 2023-12-02
+
+hashes:
+  crc32: 602704E6
+# blake2: 

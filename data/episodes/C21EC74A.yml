@@ -1,9 +1,18 @@
 season: 31
 episode: 21
+
 title: Usoland the Liar
+# originaltitle: 
+# sorttitle: 
 description: With the Tontattas beaten, Robin turned into a toy, and Luffy, Franky,
   and the others busy elsewhere, Usopp is the last hope for Operation SOP! Among the
   cries of the Tontattas, Usopp has a difficult decision to make.
 manga_chapters: 740-741
 anime_episodes: 672-675
-released: '2015-03-02'
+
+# rating: TV-14
+released: 2015-03-02
+
+hashes:
+  crc32: C21EC74A
+# blake2: 

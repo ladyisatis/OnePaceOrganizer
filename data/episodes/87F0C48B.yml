@@ -1,9 +1,18 @@
 season: 18
 episode: 15
+
 title: Departing Shortly
+# originaltitle: 
+# sorttitle: 
 description: While the members of Galley-La help Chopper search for Luffy and Zoro,
   Nami rushes to the departing sea train to keep Robin from sacrificing her freedom.
   At the station, a man finds Nami and hands her a letter from Sanji.
 manga_chapters: 360-362
 anime_episodes: 252-254
-released: '2023-12-22'
+
+# rating: TV-14
+released: 2023-12-22
+
+hashes:
+  crc32: 87F0C48B
+# blake2: 

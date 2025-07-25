@@ -1,9 +1,18 @@
 season: 30
 episode: 8
+
 title: Blizzard with a Chance of Slime
+# originaltitle: 
+# sorttitle: 
 description: Zoro, Sanji, and Brook continue their search for the samurai, and Law
   tries to sneak Chopper into the laboratory! And then, Luffy’s battle with his old
   nemesis Smoker is interrupted by the arrival of a terrifying toxic blob.
 manga_chapters: 669-670
 anime_episodes: 595-596
-released: '2013-06-02'
+
+# rating: TV-14
+released: 2013-06-02
+
+hashes:
+  crc32: 658D36CE
+# blake2: 

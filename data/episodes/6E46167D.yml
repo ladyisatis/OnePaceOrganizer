@@ -1,8 +1,17 @@
 season: 1
 episode: 4
+
 title: The First
+# originaltitle: 
+# sorttitle: 
 description: Luffy convinces the captive Zoro to join his pirate crew, but they must
   first defeat the tyrannical Captain Morgan.
 manga_chapters: 5-7
-anime_episodes: '3'
-released: '2025-05-03'
+anime_episodes: 3
+
+# rating: TV-14
+released: 2025-05-03
+
+hashes:
+  crc32: 6E46167D
+# blake2: 

@@ -1,9 +1,18 @@
 season: 26
 episode: 1
+
 title: Marine Headquarters
+# originaltitle: 
+# sorttitle: 
 description: 'Fifty warships, 100,000 Marines, the Seven Warlords, and three admirals:
   Akainu, Aokiji, and Kizaru. The stage is set, and, as a battle with Whitebeard looms,
   Fleet Admiral Sengoku reveals a shocking truth about Ace.'
 manga_chapters: 549-550
 anime_episodes: 452, 459
-released: '2020-10-07'
+
+# rating: TV-14
+released: 2020-10-07
+
+hashes:
+  crc32: 92956F40
+# blake2: 

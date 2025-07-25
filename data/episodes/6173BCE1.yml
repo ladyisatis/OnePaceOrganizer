@@ -1,9 +1,18 @@
 season: 35
 episode: 24
+
 title: Olin
+# originaltitle: 
+# sorttitle: 
 description: A very big and hungry visitor arrives at Udon looking for Superstar Queen’s
   sweet red bean oshiruko, and Rasetsu town is in a full-blown riot with the Straw
   Hats at the center!
-manga_chapters: '945'
+manga_chapters: 945
 anime_episodes: 942-944
-released: '2022-01-18'
+
+# rating: TV-14
+released: 2022-01-18
+
+hashes:
+  crc32: 6173BCE1
+# blake2: 

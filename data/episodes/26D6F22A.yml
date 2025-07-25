@@ -1,10 +1,19 @@
-season: 11
+season: 10
 episode: 1
-title: The Town of Celebration
+
+title: The Town of Welcome
+# originaltitle: 
+# sorttitle: 
 description: As the Straw Hat Pirates travel from Reverse Mountain to Whisky Peak,
   Nami adjusts to having to watch the log pose constantly. When they arrive at their
   destination, the townspeople greet them warmly, despite the sight of their Jolly
   Roger.
 manga_chapters: 106-109
 anime_episodes: 64-65
-released: '2017-08-10'
+
+# rating: TV-14
+released: 2017-08-10
+
+hashes:
+  crc32: 26D6F22A
+# blake2: 

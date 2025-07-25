@@ -1,9 +1,18 @@
 season: 5
 episode: 9
+
 title: The Fourth
+# originaltitle: 
+# sorttitle: 
 description: As the dust of battle settles, the still poisoned Gin decides to go back
   to the Grand Line with Krieg, and Sanji makes the difficult decision to join Luffy's
   crew. Suddenly, Yosaku returns with news of where Nami took the Going Merry.
 manga_chapters: 67-69
-anime_episodes: '30'
-released: '2023-07-29'
+anime_episodes: 30
+
+# rating: TV-14
+released: 2023-07-29
+
+hashes:
+  crc32: D8C1FD62
+# blake2: 

@@ -1,10 +1,19 @@
 season: 31
 episode: 31
+
 title: The Operation Fruit
+# originaltitle: 
+# sorttitle: 
 description: All hopes rest on Luffy and Law being able to take down Doflamingo; however,
   the Warlord has other plans in mind as he gives the two the fight of their lives,
   and he reveals his true, shocking history! Meanwhile, Sabo finds out Fujitora’s
   true intention.
 manga_chapters: 760-761
 anime_episodes: 699-700
-released: '2016-10-13'
+
+# rating: TV-14
+released: 2016-10-13
+
+hashes:
+  crc32: 9C3360D6
+# blake2: 

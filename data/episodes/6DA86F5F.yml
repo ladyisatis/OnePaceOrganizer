@@ -1,9 +1,18 @@
 season: 35
 episode: 8
+
 title: The Ruins of Oden Castle
+# originaltitle: 
+# sorttitle: 
 description: Zoro and the others dash out of Bakura Town on the treasure ship filled
   with food! Luffy catches up to them, and together, they distribute food and water
   to the people of Okobore Town. Later, Law takes them to the ruins of a hilltop castle.
 manga_chapters: 918-919
 anime_episodes: 906, 908-909
-released: '2020-03-14'
+
+# rating: TV-14
+released: 2020-03-14
+
+hashes:
+  crc32: 6DA86F5F
+# blake2: 

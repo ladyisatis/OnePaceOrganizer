@@ -1,9 +1,18 @@
 season: 5
 episode: 8
+
 title: The Stalwart War Spear
+# originaltitle: 
+# sorttitle: 
 description: The struggle with Krieg nears its end. Luffy's fighting spirit is unwavering,
   even after taking several hits from Krieg's Stalwart War Spear. Straw Hat’s strategy
   shifts to smashing through Krieg’s defenses and attacking the spear head-on.
 manga_chapters: 63-67
 anime_episodes: 28-29
-released: '2023-07-22'
+
+# rating: TV-14
+released: 2023-07-22
+
+hashes:
+  crc32: F850EAFD
+# blake2: 

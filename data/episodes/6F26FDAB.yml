@@ -1,9 +1,18 @@
 season: 35
 episode: 2
-title: Seppuku (Extended)
+
+title: Seppuku
+# originaltitle: 
+# sorttitle: 
 description: A mysterious country, a rampaging slasher, an ancient samurai ritual
   of seppuku—and Zoro in the crosshairs! Stranded alone on the beach, Luffy tries
   to gather his bearings only to be confronted by some dangerous local fauna.
 manga_chapters: 909-911
 anime_episodes: 892-894
-released: '2025-05-17'
+
+# rating: TV-14
+released: 2025-05-17
+
+hashes:
+  crc32: 6F26FDAB
+# blake2: 

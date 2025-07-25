@@ -1,10 +1,19 @@
 season: 30
 episode: 22
+
 title: The Arrival of the Mysterious Man and the News Coo!
+# originaltitle: 
+# sorttitle: 
 description: Doflamingo—a.k.a. Joker—arrives on the scene and wreaks havoc! Only an
   icy intercession can save Smoker and send Joker off to rethink his strategy. Meanwhile,
   the Sunny sails through the rough seas of the New World where even a bit of hail
   portends doom!
 manga_chapters: 698-699
 anime_episodes: 624-626, 628
-released: '2014-01-20'
+
+# rating: TV-14
+released: 2014-01-20
+
+hashes:
+  crc32: 021A8886
+# blake2: 

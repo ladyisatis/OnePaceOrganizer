@@ -1,9 +1,18 @@
 season: 21
 episode: 18
+
 title: The Crew's Annihilation! Oars vs. Nightmare Luffy
+# originaltitle: 
+# sorttitle: 
 description: 'Moria’s strange combination with Oars defeats the Straw Hats one after
   the other. They are at their breaking point when a powerful figure swoops in and
   takes up the fight in their stead. The hellish creation: Nightmare Luffy!'
 manga_chapters: 477-479
 anime_episodes: 371-372
-released: '2014-01-30'
+
+# rating: TV-14
+released: 2014-01-30
+
+hashes:
+  crc32: 2295F0A1
+# blake2: 

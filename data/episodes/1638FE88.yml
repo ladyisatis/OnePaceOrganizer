@@ -1,9 +1,18 @@
 season: 26
 episode: 9
+
 title: Assault
+# originaltitle: 
+# sorttitle: 
 description: The pirates are trapped in the bay, held there by Akainu’s magma. Amid
   the chaos, the order for Ace’s execution is given, and Luffy makes a drastic decision
   that puts him face-to-face with the Marines' most powerful men.
 manga_chapters: 565-566
 anime_episodes: 474-475
-released: '2020-10-07'
+
+# rating: TV-14
+released: 2020-10-07
+
+hashes:
+  crc32: 1638FE88
+# blake2: 

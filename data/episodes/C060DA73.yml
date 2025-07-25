@@ -1,9 +1,18 @@
 season: 6
 episode: 3
+
 title: Sea Charts and Fishmen
+# originaltitle: 
+# sorttitle: 
 description: Luffy’s group has reached the island but are met with a shocking revelation.
   Unmoved by Nami’s apparent actions and her insistence that he leaves, Luffy stubbornly
   sticks around.
 manga_chapters: 74-76
 anime_episodes: 33-34
-released: '2025-01-11'
+
+# rating: TV-14
+released: 2025-01-11
+
+hashes:
+  crc32: C060DA73
+# blake2: 

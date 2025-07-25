@@ -1,9 +1,18 @@
 season: 30
 episode: 20
+
 title: Die for Me! The Dangerous Man Makes His Move!
+# originaltitle: 
+# sorttitle: 
 description: As the Straw Hats and co. flee the crumbling laboratory, Caesar’s desperate
   act of vengeance thwarts Joker’s plan to forever silence his enemies. Franky continues
   his battle with Buffalo and Baby 5, and Usopp takes a shot at capturing Caesar.
 manga_chapters: 693-695
 anime_episodes: 619-621
-released: '2013-12-02'
+
+# rating: TV-14
+released: 2013-12-02
+
+hashes:
+  crc32: 5012E091
+# blake2: 

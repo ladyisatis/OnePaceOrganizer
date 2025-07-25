@@ -1,10 +1,19 @@
 season: 12
 episode: 4
+
 title: Luffy vs. Mr. 3
+# originaltitle: 
+# sorttitle: 
 description: Luffy, Usopp, and Karoo launch headlong into rescuing their friends,
   but Miss Golden Week runs a colorful interference. Mr. 3 is forced to take matters
   into his own conniving hands, and Usopp brainstorms how he will finally free his
   friends.
 manga_chapters: 123-126
 anime_episodes: 75-76
-released: '2020-11-19'
+
+# rating: TV-14
+released: 2025-07-12
+
+hashes:
+  crc32: 8BE7A415
+# blake2: 

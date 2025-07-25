@@ -1,9 +1,18 @@
 season: 33
 episode: 36
+
 title: Pirate Luffy vs. Commander Katakuri
+# originaltitle: 
+# sorttitle: 
 description: Desiring revenge after complete embarrassment, Big Mom’s children band
   together to smash the Straw Hats. Meanwhile, Luffy and Katakuri are locked in a
   duel to end all duels, where each blow could be the last.
 manga_chapters: 892-895
 anime_episodes: 865, 867-870
-released: '2020-12-11'
+
+# rating: TV-14
+released: 2020-12-11
+
+hashes:
+  crc32: 3AF37912
+# blake2: 

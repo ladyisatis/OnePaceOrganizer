@@ -1,10 +1,19 @@
 season: 14
 episode: 18
+
 title: I Will Defeat You
+# originaltitle: 
+# sorttitle: 
 description: Vivi finds the cannon but realizes the bomb can't be stopped so casually.
   Then Pell swoops in with a decisive, if tragic, solution. The final battle between
   Luffy and Crocodile, which has both parties driven to their utmost, reaches its
   conclusion.
 manga_chapters: 206-210
 anime_episodes: 125-126
-released: '2024-07-06'
+
+# rating: TV-14
+released: 2024-07-06
+
+hashes:
+  crc32: E4F68497
+# blake2: 

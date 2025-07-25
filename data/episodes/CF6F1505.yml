@@ -1,8 +1,17 @@
 season: 19
 episode: 11
+
 title: Jump into the Waterfall!!
+# originaltitle: 
+# sorttitle: 
 description: Franky stages his own rebellious act against Spandam while Luffy's crew
   makes a daring leap of faith to hopefully gain entrance to the Tower of Justice.
 manga_chapters: 399-400
 anime_episodes: 284-285
-released: '2019-08-20'
+
+# rating: TV-14
+released: 2019-08-20
+
+hashes:
+  crc32: CF6F1505
+# blake2: 

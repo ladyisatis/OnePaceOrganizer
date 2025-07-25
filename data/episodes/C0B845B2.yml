@@ -1,11 +1,18 @@
 season: 36
 episode: 14
-title: The Legendary Hero (Extended)
+
+title: The Legendary Hero
+# originaltitle: 
+# sorttitle: 
 description: While Koby desperately attempts to flee Beehive, Cross Guild's bounty
   entices the hundreds of pirates there to hunt him down. But before they can seal
   his fate and claim the prize, a familiar Marine warship descends from the sky!
-
-  Extended version of Egghead 14 - includes one additional scene at the start of the episode.
 manga_chapters: 1080-1081
 anime_episodes: 1113-1115
-released: '2024-10-02'
+
+# rating: TV-14
+released: 2024-10-02
+
+hashes:
+  crc32: C0B845B2
+# blake2: 

@@ -1,3 +1,16 @@
-manga_chapters: '303'
+season: 17
+episode: 0
+
+title: ''
+# originaltitle: 
+# sorttitle: 
+description: ''
+manga_chapters: 303
 anime_episodes: 207, 225
-released: '2025-05-08'
+
+# rating: TV-14
+released: 2025-05-08
+
+hashes:
+  crc32: E85B9E9D
+# blake2: 

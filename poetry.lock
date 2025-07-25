@@ -252,6 +252,21 @@ socks = ["socksio (==1.*)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
+name = "httpx-retries"
+version = "0.4.0"
+description = "A retry layer for HTTPX."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "httpx_retries-0.4.0-py3-none-any.whl", hash = "sha256:61df3e70889e2f74ebcaf1ae4213f1bdb67dc68dfa8b2e9da41a63afd513e3fb"},
+    {file = "httpx_retries-0.4.0.tar.gz", hash = "sha256:a7aa513e3f1eef347aac69adecfad9f421210a84df88c88f935ec130f98e6642"},
+]
+
+[package.dependencies]
+httpx = ">=0.27.0"
+
+[[package]]
 name = "hyperframe"
 version = "6.1.0"
 description = "Pure-Python HTTP/2 framing"
@@ -558,4 +573,4 @@ dev = ["black (>=19.3b0) ; python_version >= \"3.6\"", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0"
-content-hash = "ca78d9392b96f22306a659f1bcc14b5c1b647cb015c478c07e2eef053683c676"
+content-hash = "7304ff57482d4bc465a85661fcb3863195b8496eee678963b499aa41e44baa29"

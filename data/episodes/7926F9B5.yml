@@ -1,9 +1,18 @@
 season: 29
 episode: 11
+
 title: The Shocking Truth of Tiger! The End of the Sun Pirates
+# originaltitle: 
+# sorttitle: 
 description: Fisher Tiger’s past quickly caught up to him, and he left his crew with
   a sobering, final command. While Jinbe vowed to uphold Tiger’s and Otohime’s ideals,
   Arlong’s resentment only grew, and soon, the Sun Pirates faced a crisis of identity.
 manga_chapters: 623-624
 anime_episodes: 543-545
-released: '2013-04-14'
+
+# rating: TV-14
+released: 2013-04-14
+
+hashes:
+  crc32: 7926F9B5
+# blake2: 

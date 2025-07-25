@@ -1,10 +1,19 @@
 season: 35
 episode: 34
+
 title: The Day of the Mountain God
+# originaltitle: 
+# sorttitle: 
 description: Forty-one years ago, Oden had not yet earned the respect of everyone,
   but when the angry mountain god almost killed Kin’emon, Oden stepped in. Still,
   disavowed by his father, Oden journeyed around the country, gathering followers
   as he went.
 manga_chapters: 960-961
 anime_episodes: 960-961
-released: '2023-09-23'
+
+# rating: TV-14
+released: 2023-09-23
+
+hashes:
+  crc32: 224B7846
+# blake2: 

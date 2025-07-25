@@ -1,10 +1,19 @@
 season: 27
 episode: 6
+
 title: Cheer
+# originaltitle: 
+# sorttitle: 
 description: Determined to return to Sabaody and keep his promise to his crew, Luffy
   prepares for departure. However, when Dark King Rayleigh appears and makes him a
   surprising offer, Luffy is forced to make a decision that could alter the fate of
   his entire journey.
 manga_chapters: 591-592
 anime_episodes: 507-510
-released: '2020-09-17'
+
+# rating: TV-14
+released: 2020-09-17
+
+hashes:
+  crc32: 735F9F49
+# blake2: 

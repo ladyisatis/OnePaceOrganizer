@@ -1,9 +1,18 @@
 season: 29
 episode: 6
+
 title: The Mermaid Princess in Hard-Shell Tower! Shirahoshi of the Neptune Family!
+# originaltitle: 
+# sorttitle: 
 description: Plagued by the unwanted advances of a lunatic fishman with a dangerous
   power, Mermaid Princess Shirahoshi has been hidden away in a lonely tower for years.
   Meanwhile in the palace, things take a sour turn for the Straw Hats.
 manga_chapters: 613-614
 anime_episodes: 532-533
-released: '2013-04-06'
+
+# rating: TV-14
+released: 2013-04-06
+
+hashes:
+  crc32: 64FB3990
+# blake2: 

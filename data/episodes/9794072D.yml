@@ -1,9 +1,18 @@
 season: 13
 episode: 8
+
 title: Hiriluk's Cherry Blossoms
+# originaltitle: 
+# sorttitle: 
 description: Finally convinced to join the Straw Hat Pirates, Chopper announces his
   intentions to Dr. Kureha. While she doesn’t receive the news well at first, she
   decides to give the Straw Hats a fond parting gift while they exit the island.
 manga_chapters: 153-156
 anime_episodes: 90-91
-released: '2023-07-05'
+
+# rating: TV-14
+released: 2023-07-05
+
+hashes:
+  crc32: 9794072D
+# blake2: 

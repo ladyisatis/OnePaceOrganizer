@@ -1,9 +1,18 @@
 season: 31
 episode: 30
+
 title: Secret Plan
+# originaltitle: 
+# sorttitle: 
 description: Luffy and Law finally surmount incredible odds to land themselves in
   striking distance of Doflamingo. However, Sugar stands in their way, so Usopp uses
   Viola's clairvoyance to prepare his ammunition to take her out.
 manga_chapters: 758-759
 anime_episodes: 694, 696-698
-released: '2016-10-06'
+
+# rating: TV-14
+released: 2016-10-06
+
+hashes:
+  crc32: 4F16C5DC
+# blake2: 

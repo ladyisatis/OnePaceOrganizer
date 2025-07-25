@@ -1,9 +1,18 @@
 season: 5
 episode: 2
+
 title: Pirate Commodore Don Krieg
+# originaltitle: 
+# sorttitle: 
 description: Luffy is on hiatus from pirating to work as a cabin boy to pay off the
   damage done to the Baratie. While he tries to convince Sanji to join his crew, the
   pirate Gin brings the infamous Don Krieg and his starving forces to the sea restaurant.
 manga_chapters: 45-47
 anime_episodes: 21-22
-released: '2021-12-20'
+
+# rating: TV-14
+released: 2021-12-20
+
+hashes:
+  crc32: FCF3D074
+# blake2: 

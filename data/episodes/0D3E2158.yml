@@ -1,10 +1,19 @@
 season: 3
 episode: 5
+
 title: The Pirate "Kuro of a Hundred Plans"
+# originaltitle: 
+# sorttitle: 
 description: While the fight between Luffy and Kuro continues, Jango works to force
   Kaya to bequeath her family's money to the Black Cat captain. Despite the Usopp
   Pirates' efforts to stop the hypnotist, it seems as if the transaction is all but
   inevitable.
 manga_chapters: 35-37
 anime_episodes: 15-16
-released: '2025-04-11'
+
+# rating: TV-14
+released: 2025-07-12
+
+hashes:
+  crc32: 0D3E2158
+# blake2: 

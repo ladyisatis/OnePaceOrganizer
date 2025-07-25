@@ -1,10 +1,19 @@
 season: 31
 episode: 35
+
 title: Bellamy the Pirate
+# originaltitle: 
+# sorttitle: 
 description: Luffy continues to fight the Doflamingo doppelganger but keeps accidentally
   attacking Bellamy instead. Meanwhile, the tide of battle turns against Law as painful
   scars from the past resurface, and Zoro gets unexpected help in his battle with
   Pica.
 manga_chapters: 768-769
 anime_episodes: 707-711
-released: '2016-12-17'
+
+# rating: TV-14
+released: 2016-12-17
+
+hashes:
+  crc32: 1B5DC33C
+# blake2: 

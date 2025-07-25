@@ -1,9 +1,18 @@
 season: 24
 episode: 4
+
 title: Inferno Hell
+# originaltitle: 
+# sorttitle: 
 description: Luffy and his deranged team pummel everything from Level 3 to Level 4
   that dares to stand in their path. However, the powerful guard Minotaurus is ready
   to do some pummeling of his own while a boiling bath of blood awaits below.
 manga_chapters: 532-533
 anime_episodes: 433-434
-released: '2017-01-20'
+
+# rating: TV-14
+released: 2017-01-20
+
+hashes:
+  crc32: 5DD0859D
+# blake2: 

@@ -1,10 +1,19 @@
 season: 35
 episode: 50
+
 title: Army of One
+# originaltitle: 
+# sorttitle: 
 description: Luffy invokes memories of the Straw Hats pirates' battle against Oars
   as he topples one of the gargantuan Numbers... with the help of an unforeseen ally!
   Meanwhile, Queen readies a demonic secret weapon that will ice over the samurai
   invasion.
 manga_chapters: 990-991
 anime_episodes: 1001-1003
-released: '2025-06-06'
+
+# rating: TV-14
+released: 2025-06-06
+
+hashes:
+  crc32: 0144BBBA
+# blake2: 

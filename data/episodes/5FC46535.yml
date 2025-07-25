@@ -1,9 +1,18 @@
 season: 31
 episode: 22
+
 title: Dressrosa in Turmoil
+# originaltitle: 
+# sorttitle: 
 description: Usopp creates a miracle! Toys across Dressrosa regain their true forms,
   a flood of lost memories return, and a forgotten hero launches a long overdue attack
   on the villainous tyrant Doflamingo!
 manga_chapters: 742-743
 anime_episodes: 675-678
-released: '2015-03-07'
+
+# rating: TV-14
+released: 2015-03-07
+
+hashes:
+  crc32: 5FC46535
+# blake2: 

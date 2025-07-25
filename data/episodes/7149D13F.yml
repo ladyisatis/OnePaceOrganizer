@@ -1,9 +1,18 @@
 season: 32
 episode: 5
+
 title: The Curly Hat Pirates Arrive
+# originaltitle: 
+# sorttitle: 
 description: While they put up a good fight, the minks were not able to subdue Jack.
   In the aftermath of Jack's deadly attack, Chopper and Sanji rushed in to save the
   fallen minks and enlisted the help of Caesar to overcome the lingering gas problem.
 manga_chapters: 810-811
 anime_episodes: 759-762
-released: '2016-11-16'
+
+# rating: TV-14
+released: 2016-11-16
+
+hashes:
+  crc32: 7149D13F
+# blake2: 

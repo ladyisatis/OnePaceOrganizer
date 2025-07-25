@@ -1,10 +1,19 @@
 season: 12
 episode: 3
+
 title: Foul Play
+# originaltitle: 
+# sorttitle: 
 description: Despite his internal injuries and Luffy's warnings, the prideful giant
   Dorry insists on continuing his duel with Brogy. Meanwhile, the Baroque Works officer
   agents begin to make their move on the island with the Straw Hats as their next
   targets.
 manga_chapters: 119-122
 anime_episodes: 73-74
-released: '2025-04-18'
+
+# rating: TV-14
+released: 2025-04-18
+
+hashes:
+  crc32: B5D2AC50
+# blake2: 

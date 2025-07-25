@@ -1,10 +1,19 @@
 season: 35
 episode: 21
+
 title: Sparks of Rebellion
+# originaltitle: 
+# sorttitle: 
 description: The smiling man Tonoyasu leaves all who met him mystified, what with
   his familiar terms of address and his shocking knowledge of the rebellion. In Udon
   prison, Luffy continues his new haki training, and during a brief respite, Raizo
   appears before him.
 manga_chapters: 940-941
 anime_episodes: 936-938
-released: '2021-02-28'
+
+# rating: TV-14
+released: 2021-02-28
+
+hashes:
+  crc32: 0B965026
+# blake2: 

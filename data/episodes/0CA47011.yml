@@ -1,9 +1,18 @@
 season: 31
 episode: 34
+
 title: Cora
+# originaltitle: 
+# sorttitle: 
 description: Corazón had finally obtained the Op Op Fruit! Doflamingo and his Family
   were zeroing in on Corazón and Law's whereabouts, so Corazón hid Law long enough
   to let him escape, even at the risk of his own life.
 manga_chapters: 766-767
 anime_episodes: 705-706
-released: '2016-12-02'
+
+# rating: TV-14
+released: 2016-12-02
+
+hashes:
+  crc32: 0CA47011
+# blake2: 

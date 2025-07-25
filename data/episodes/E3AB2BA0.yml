@@ -1,10 +1,19 @@
 season: 35
 episode: 33
+
 title: The Designated Port
+# originaltitle: 
+# sorttitle: 
 description: On the day of the Fire Festival, Orochi heads for Onigashima where a
   big banquet is being held, and the Red Scabbards meet at the Tokage Port rendezvous
   point. However, Kin'emon and his compatriots are stunned that none of their allies
   are there.
 manga_chapters: 958-959
 anime_episodes: 959-960
-released: '2023-09-02'
+
+# rating: TV-14
+released: 2023-09-02
+
+hashes:
+  crc32: E3AB2BA0
+# blake2: 

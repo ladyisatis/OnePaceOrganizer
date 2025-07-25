@@ -1,9 +1,18 @@
 season: 26
 episode: 11
+
 title: The White Monster
+# originaltitle: 
+# sorttitle: 
 description: Faced with the might of the admirals, even Whitebeard's commanders falter.
   Refusing to relent, Luffy begs Ivankov for a final chance at victory. Amid a bevy
   of Marines, an old friend of Luffy’s appears for a much too premature reunion.
 manga_chapters: 568-569
 anime_episodes: 477-478
-released: '2020-10-07'
+
+# rating: TV-14
+released: 2020-10-07
+
+hashes:
+  crc32: A84B5499
+# blake2: 

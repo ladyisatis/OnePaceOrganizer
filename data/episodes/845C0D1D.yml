@@ -1,10 +1,19 @@
 season: 14
 episode: 19
+
 title: Some Justice
+# originaltitle: 
+# sorttitle: 
 description: Igaram appears with proof of Cobra's innocence, and Koza tells the people
   the truth behind the war. Luffy and his crew are brought into Cobra's palace to
   rest, and, during this time, Igaram receives word that there are new bounties making
   the rounds!
 manga_chapters: 211-213
 anime_episodes: 127-128
-released: '2024-08-02'
+
+# rating: TV-14
+released: 2024-08-02
+
+hashes:
+  crc32: 845C0D1D
+# blake2: 

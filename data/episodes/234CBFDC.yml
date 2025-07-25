@@ -1,9 +1,18 @@
 season: 22
 episode: 6
+
 title: The Auction House Incident
+# originaltitle: 
+# sorttitle: 
 description: Nami's group arrives at the Grove 1 auction house where Camie will be
   sold to the highest bidder. With 200 million berries in hand, Nami is determined
   to win back their friend. The auction wears on as Luffy and co. race to the grove.
 manga_chapters: 501-502
 anime_episodes: 395-396
-released: '2017-12-01'
+
+# rating: TV-14
+released: 2017-12-01
+
+hashes:
+  crc32: 234CBFDC
+# blake2: 

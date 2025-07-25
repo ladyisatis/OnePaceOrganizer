@@ -1,9 +1,18 @@
 season: 2
 episode: 1
+
 title: 'Enter: Nami'
+# originaltitle: 
+# sorttitle: 
 description: Nami, a street-smart girl who loves money and tangerines, makes Luffy's
   acquaintance. To save herself and steal a map to the Grand Line, she tricks Luffy
   into allowing her to turn him over to the infamous pirate Buggy the Clown.
 manga_chapters: 8-11
 anime_episodes: 4-6
-released: '2025-04-11'
+
+# rating: TV-14
+released: 2025-04-11
+
+hashes:
+  crc32: C23AC8D3
+# blake2: 

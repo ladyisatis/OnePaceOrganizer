@@ -1,9 +1,18 @@
 season: 13
 episode: 3
+
 title: The Summit
+# originaltitle: 
+# sorttitle: 
 description: A devastating avalanche sweeps Drum Island and puts everyone at risk,
   but Luffy—step-by-step, hand-over-hand—continues his death-defying ascent up the
   mountain. Meanwhile, Vivi, Usopp, and Zoro reunite in the wake of the disaster.
 manga_chapters: 136-139
 anime_episodes: 82-83
-released: '2022-09-26'
+
+# rating: TV-14
+released: 2022-09-26
+
+hashes:
+  crc32: 2971EF62
+# blake2: 

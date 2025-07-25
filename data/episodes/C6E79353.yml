@@ -1,9 +1,18 @@
 season: 36
 episode: 5
+
 title: The Six Vegapunks
+# originaltitle: 
+# sorttitle: 
 description: Lilith takes the Sunny and its remaining crew to the laboratory in the
   clouds, where a new threat lurking within its corridors attacks unexpectedly. As
   the battle ensues, Vegapunk's satellites look on with excitement.
 manga_chapters: 1064-1065
 anime_episodes: 1093-1095
-released: '2025-01-11'
+
+# rating: TV-14
+released: 2025-01-11
+
+hashes:
+  crc32: C6E79353
+# blake2: 

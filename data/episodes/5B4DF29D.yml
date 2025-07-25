@@ -1,9 +1,18 @@
 season: 21
 episode: 5
+
 title: Perona's Wonder Garden and the Charge of the General Zombies!
+# originaltitle: 
+# sorttitle: 
 description: Nami, Usopp, and Chopper manage to escape their coffin but find themselves
   in a garden surrounded by animal zombies, including one acting remarkably like Sanji.
   It also seems that one by one, the Straw Hats are disappearing.
 manga_chapters: 451-452
 anime_episodes: 345-346
-released: '2013-08-25'
+
+# rating: TV-14
+released: 2013-08-25
+
+hashes:
+  crc32: 5B4DF29D
+# blake2: 

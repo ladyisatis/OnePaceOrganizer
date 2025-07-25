@@ -1,10 +1,19 @@
 season: 19
 episode: 1
+
 title: The Superhumans of Enies Lobby
+# originaltitle: 
+# sorttitle: 
 description: As the Straw Hats and their allies approach Enies Lobby on Rocketman,
   they hatch a plan to save Robin before she passes through the Gates of Justice.
   Meanwhile, Spandam holds a meeting with CP9 where they await Lucci's return in the
   Tower of Justice.
 manga_chapters: 375-376
 anime_episodes: 263-265
-released: '2020-06-22'
+
+# rating: TV-14
+released: 2020-06-22
+
+hashes:
+  crc32: A6CD3EBB
+# blake2: 

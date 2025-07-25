@@ -1,9 +1,18 @@
 season: 6
 episode: 4
+
 title: Bell-mère
+# originaltitle: 
+# sorttitle: 
 description: Nojiko goes into detail about Nami's childhood and their adoptive mother
   Bell-mère, a former Marine. Despite being poor and unrelated by blood, they had
   a happy life on their tangerine orchard.
 manga_chapters: 77-78
 anime_episodes: 34-36
-released: '2025-01-24'
+
+# rating: TV-14
+released: 2025-01-24
+
+hashes:
+  crc32: DB23E2E6
+# blake2: 

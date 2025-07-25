@@ -1,10 +1,19 @@
 season: 19
 episode: 6
+
 title: Unprecedented
+# originaltitle: 
+# sorttitle: 
 description: Kaku and Kalifa of CP9 are offered a rare chance for new powers and are
   each served a devil fruit. The Straw Hats finally arrive at the courthouse plaza
   when Spandam receives an urgent call, and he realizes things are much worse than
   previously reported.
 manga_chapters: 385-387
 anime_episodes: 271-273
-released: '2019-05-02'
+
+# rating: TV-14
+released: 2019-05-02
+
+hashes:
+  crc32: 0E201E28
+# blake2: 

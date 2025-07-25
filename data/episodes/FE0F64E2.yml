@@ -1,9 +1,18 @@
 season: 19
 episode: 13
+
 title: Mr. Chivalry
+# originaltitle: 
+# sorttitle: 
 description: 'Sanji faces his greatest weakness: fighting a beautiful woman! Meanwhile,
   Franky begins to run low on cola energy, but he must battle the peculiar Fukuro
   to obtain more of his refreshing fuel from the kitchen.'
 manga_chapters: 403-404
 anime_episodes: 287-288
-released: '2020-04-03'
+
+# rating: TV-14
+released: 2020-04-03
+
+hashes:
+  crc32: FE0F64E2
+# blake2: 

@@ -1,10 +1,19 @@
 season: 27
 episode: 1
+
 title: Creeping Future
+# originaltitle: 
+# sorttitle: 
 description: The Summit War has thrown the entire world into chaos. Emboldened by
   Whitebeard's final words, pirates once again envision a wave they can ride into
   a new era. At Hancock’s order, Luffy is taken to Amazon Lily to hide from the Marines
   while he recovers.
 manga_chapters: 581-582
 anime_episodes: 490-491
-released: '2020-07-24'
+
+# rating: TV-14
+released: 2020-07-24
+
+hashes:
+  crc32: E7B15590
+# blake2: 

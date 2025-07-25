@@ -1,8 +1,17 @@
 season: 1
 episode: 1
+
 title: Romance Dawn, the Dawn of an Adventure
+# originaltitle: 
+# sorttitle: 
 description: Influenced by the straw-hat-wearing pirate Red-Haired Shanks, an enthusiastic
   young boy named Monkey D. Luffy dreams of one day becoming King of the Pirates.
-manga_chapters: '1'
-anime_episodes: Episode of East Blue, 312 (Intro)
-released: '2025-05-03'
+manga_chapters: 1
+anime_episodes: 312
+
+# rating: TV-14
+released: 2025-05-03
+
+hashes:
+  crc32: E5F09F49
+# blake2: 

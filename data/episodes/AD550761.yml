@@ -1,9 +1,18 @@
 season: 30
 episode: 9
+
 title: My Name Is Kin'emon!!
+# originaltitle: 
+# sorttitle: 
 description: Law's plan to infiltrate Caesar’s facility hits a snag when an unexpected
   guest complicates things. Meanwhile, Chopper investigates the Master’s lab, and
   the mysterious samurai shows what he can do with a full body!
 manga_chapters: 671-672
 anime_episodes: 597-598
-released: '2013-06-07'
+
+# rating: TV-14
+released: 2013-06-07
+
+hashes:
+  crc32: AD550761
+# blake2: 

@@ -1,9 +1,18 @@
 season: 3
 episode: 4
+
 title: The Silent Man
+# originaltitle: 
+# sorttitle: 
 description: Captain Kuro makes his appearance, and with Zoro too injured to fight,
   Luffy incapacitated, and Usopp and Nami too weak to make a stand, the situation
   is desperate. However, Kaya herself arrives, intent on bargaining with Kuro.
 manga_chapters: 31-34
 anime_episodes: 13-14
-released: '2017-07-16'
+
+# rating: TV-14
+released: 2025-07-07
+
+hashes:
+  crc32: 89B18321
+# blake2: 

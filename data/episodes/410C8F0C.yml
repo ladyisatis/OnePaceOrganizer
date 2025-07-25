@@ -1,9 +1,18 @@
 season: 33
 episode: 6
+
 title: Vinsmoke Judge
+# originaltitle: 
+# sorttitle: 
 description: Sanji faces his father in a duel as the wounds of his childhood are laid
   bare! Meanwhile, Luffy falls for the illusions of the forest, and Big Mom has Caesar
   at her whims, ready to use him to continue her maniacal pursuits.
 manga_chapters: 833-834
 anime_episodes: 793-795
-released: '2020-12-11'
+
+# rating: TV-14
+released: 2020-12-11
+
+hashes:
+  crc32: 410C8F0C
+# blake2: 

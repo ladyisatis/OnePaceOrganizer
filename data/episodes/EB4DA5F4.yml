@@ -1,9 +1,18 @@
 season: 21
 episode: 4
+
 title: General Zombie Night! Thriller Bark's Mysterious Four
+# originaltitle: 
+# sorttitle: 
 description: The Straw Hats learn that the head honcho on the island is one of the
   Seven Warlords, and he has concocted a shadowy scheme. As Absalom rallies the zombies,
   the master of Thriller Bark awakens.
 manga_chapters: 449-450
 anime_episodes: 342-344
-released: '2013-08-08'
+
+# rating: TV-14
+released: 2013-08-08
+
+hashes:
+  crc32: EB4DA5F4
+# blake2: 

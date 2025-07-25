@@ -1,9 +1,18 @@
 season: 35
 episode: 37
+
 title: Roger and Whitebeard
+# originaltitle: 
+# sorttitle: 
 description: Back in Wano, the Shogun Sukiyaki seemed to fall critically ill and named
   Orochi proxy Shogun. Meanwhile, Whitebeard's crew made landfall where the Roger
   Pirates were fighting against the Marines on the other side of the island.
 manga_chapters: 965-966
 anime_episodes: 964-967
-released: '2023-12-15'
+
+# rating: TV-14
+released: 2023-12-15
+
+hashes:
+  crc32: AD8C9C16
+# blake2: 

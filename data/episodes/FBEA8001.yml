@@ -1,9 +1,18 @@
 season: 16
 episode: 17
+
 title: Deathpiea
+# originaltitle: 
+# sorttitle: 
 description: As the citizens of the sky run for their lives, Enel activates Deathpiea!
   Luffy must discover a way to lay hands on the heinous holy man before he's sent
   overboard, and Sanji and Usopp mount a midair rescue mission.
 manga_chapters: 280-283
 anime_episodes: 183-185
-released: '2024-12-07'
+
+# rating: TV-14
+released: 2024-12-07
+
+hashes:
+  crc32: FBEA8001
+# blake2: 

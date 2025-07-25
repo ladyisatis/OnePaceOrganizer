@@ -1,8 +1,17 @@
 season: 19
 episode: 10
+
 title: Declaration of War
+# originaltitle: 
+# sorttitle: 
 description: To prove his undying loyalty to Robin, Luffy makes a defiant statement
   to the World Government.
 manga_chapters: 397-398
-anime_episodes: '278'
-released: '2019-07-25'
+anime_episodes: 278
+
+# rating: TV-14
+released: 2019-07-25
+
+hashes:
+  crc32: 6C908F32
+# blake2: 

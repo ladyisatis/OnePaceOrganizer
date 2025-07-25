@@ -1,9 +1,18 @@
 season: 33
 episode: 27
+
 title: A Woman's Honor
+# originaltitle: 
+# sorttitle: 
 description: Big Mom is relentless in her pursuit of the Straw Hats. Elsewhere, the
   plan to recreate the wedding cake progresses while Pudding’s unpredictable heart
   confuses everyone, including herself.
 manga_chapters: 875-876
 anime_episodes: 846-848
-released: '2020-12-11'
+
+# rating: TV-14
+released: 2020-12-11
+
+hashes:
+  crc32: 2CDA8E9D
+# blake2: 

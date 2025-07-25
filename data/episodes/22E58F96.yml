@@ -1,8 +1,17 @@
 season: 21
 episode: 21
+
 title: Brook's Past! The Rumbar Pirates and Laboon!
+# originaltitle: 
+# sorttitle: 
 description: Brook recalls his past, thinking back on the time when the small whale
   Laboon started following his pirate ship and befriended the crew.
 manga_chapters: 486-487
 anime_episodes: 378-380
-released: '2014-10-11'
+
+# rating: TV-14
+released: 2014-10-11
+
+hashes:
+  crc32: 22E58F96
+# blake2: 

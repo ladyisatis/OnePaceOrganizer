@@ -1,9 +1,18 @@
 season: 35
 episode: 12
+
 title: Hah
+# originaltitle: 
+# sorttitle: 
 description: Luffy is sent to a great mine where prisoners must endure harsh, forced
   labor. There, he has an unexpected reunion. Meanwhile, Okiku rushes to the ruins
   of Oden Castle to confirm the safety of the Straw Hats and the others.
-manga_chapters: '924'
-anime_episodes: '916'
-released: '2020-04-01'
+manga_chapters: 924
+anime_episodes: 916
+
+# rating: TV-14
+released: 2020-04-01
+
+hashes:
+  crc32: 5ACE812A
+# blake2: 

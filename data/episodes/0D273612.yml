@@ -1,9 +1,18 @@
 season: 18
 episode: 11
+
 title: Klabautermann
+# originaltitle: 
+# sorttitle: 
 description: As Usopp works to repair the Going Merry, he contends with Franky's insistence
   on dismantling it. During this time, Usopp reflects on who it was that conducted
   the ship's repairs while in Skypiea, and Franky confirms his suspicions.
 manga_chapters: 349-352
 anime_episodes: 246-248
-released: '2022-01-28'
+
+# rating: TV-14
+released: 2022-01-28
+
+hashes:
+  crc32: 0D273612
+# blake2: 

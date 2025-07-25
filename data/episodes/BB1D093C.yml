@@ -1,10 +1,19 @@
 season: 14
 episode: 1
+
 title: Sir Crocodile, the Pirate
+# originaltitle: 
+# sorttitle: 
 description: In Arabasta, the hero Crocodile appears and puts a decisive end to a
   pillaging band of pirates. Meanwhile, Mr. 2 Bon Kurei pays a visit to the newly
   arrived Straw Hats. When he puts his abilities on display, Vivi notices something
   shocking.
 manga_chapters: 155-157
-anime_episodes: '92'
-released: '2022-05-14'
+anime_episodes: 92
+
+# rating: TV-14
+released: 2022-05-14
+
+hashes:
+  crc32: BB1D093C
+# blake2: 

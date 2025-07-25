@@ -1,9 +1,18 @@
 season: 19
 episode: 22
+
 title: The Legend of the Mermaid
+# originaltitle: 
+# sorttitle: 
 description: Lucci corners Luffy, weakened by his new ability’s aftereffects. Back
   on the bridge, Spandam makes an attempt on Robin's life, so Franky jumps into action.
   Meanwhile, the rest of the gang is about to drown in the flooded passageway.
 manga_chapters: 423-424
 anime_episodes: 306-307
-released: '2020-06-15'
+
+# rating: TV-14
+released: 2020-06-15
+
+hashes:
+  crc32: C0B33E05
+# blake2: 

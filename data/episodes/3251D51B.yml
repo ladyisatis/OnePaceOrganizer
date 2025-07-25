@@ -1,9 +1,18 @@
 season: 19
 episode: 25
+
 title: A Gentle Snowfall of Remembrance
+# originaltitle: 
+# sorttitle: 
 description: Enies Lobby and the buster call fleet are out of sight, but the Going
   Merry begins to break apart. The Straw Hats are intercepted by Iceburg aboard his
   company ship and discover how the Merry found her way back to them one last time.
-manga_chapters: '430'
-anime_episodes: '312'
-released: '2020-08-27'
+manga_chapters: 430
+anime_episodes: 312
+
+# rating: TV-14
+released: 2020-08-27
+
+hashes:
+  crc32: 3251D51B
+# blake2: 

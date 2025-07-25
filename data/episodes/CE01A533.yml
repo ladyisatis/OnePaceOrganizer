@@ -1,8 +1,17 @@
 season: 9
 episode: 1
+
 title: Reverse Mountain
+# originaltitle: 
+# sorttitle: 
 description: Following a near disaster in the Calm Belt, the Straw Hats take a wild
   ride up and down a mountain… and are promptly swallowed by a giant whale!
 manga_chapters: 101-102
 anime_episodes: 54-55, 61-62
-released: '2024-01-05'
+
+# rating: TV-14
+released: 2024-01-05
+
+hashes:
+  crc32: CE01A533
+# blake2: 

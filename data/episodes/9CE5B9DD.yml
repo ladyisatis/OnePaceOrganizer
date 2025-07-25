@@ -1,9 +1,18 @@
 season: 30
 episode: 15
+
 title: Vice Admiral vs. Vice Admiral and the Truth Behind Punk Hazard's Destruction!
+# originaltitle: 
+# sorttitle: 
 description: Smoker attacks the estranged Vice Admiral Vergo for assaulting his men,
   and in the trash heap, Luffy meets something strange. Meanwhile, Caesar’s bloated
   words to his men about the island’s history do not match what occurred.
 manga_chapters: 683-684
 anime_episodes: 609-610
-released: '2013-09-17'
+
+# rating: TV-14
+released: 2013-09-17
+
+hashes:
+  crc32: 9CE5B9DD
+# blake2: 

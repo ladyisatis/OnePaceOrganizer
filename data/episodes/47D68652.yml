@@ -1,9 +1,18 @@
 season: 18
 episode: 18
+
 title: Ramen Kenpo
+# originaltitle: 
+# sorttitle: 
 description: Sogeking appears in grand fashion! Wanze threatens Sanji's group with
   his ramen kenpo, so the Straw Hat cook urges the others ahead. Franky takes on CP9's
   newest recruit “Sea Weasel” Nero, and Sogeking moves forward to meet up with Robin.
 manga_chapters: 368-369
 anime_episodes: 258-259
-released: '2024-02-23'
+
+# rating: TV-14
+released: 2024-02-23
+
+hashes:
+  crc32: 47D68652
+# blake2: 

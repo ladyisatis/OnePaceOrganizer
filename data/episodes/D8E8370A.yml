@@ -1,9 +1,18 @@
 season: 31
 episode: 11
+
 title: A Sad Past! Rebecca and Soldier-san
+# originaltitle: 
+# sorttitle: 
 description: A voice from the past unsettles Luffy and sends him into a rage! Also,
   it's discovered that Rebecca's eternal bond with the one-legged toy soldier is linked
   to the violent overthrow of the old regime, perpetrated by none other than Doflamingo!
 manga_chapters: 720-721
 anime_episodes: 650-651
-released: '2014-07-24'
+
+# rating: TV-14
+released: 2014-07-24
+
+hashes:
+  crc32: D8E8370A
+# blake2: 

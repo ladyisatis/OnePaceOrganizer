@@ -1,9 +1,18 @@
 season: 21
 episode: 3
+
 title: The Invisible Man and the Secret of the Mansion!
+# originaltitle: 
+# sorttitle: 
 description: While staying at Hogback's eerie mansion, Nami is assaulted by an invisible
   figure in the shower. It does not end there as Usopp battles haunted paintings with
   a handful of candles. Meanwhile, the rest of the Straw Hats finally make landfall.
 manga_chapters: 446-448
 anime_episodes: 340-342
-released: '2013-07-31'
+
+# rating: TV-14
+released: 2013-07-31
+
+hashes:
+  crc32: C2AAAAF7
+# blake2: 

@@ -1,9 +1,18 @@
 season: 35
 episode: 23
+
 title: SMILE
+# originaltitle: 
+# sorttitle: 
 description: The truth behind the smiles of the Ebisu villagers finally comes to light,
   the Shogun and Kaido’s plan revealed! And in Udon Luffy and Hyo are shocked to see
   Captain Kid return in chains alongside a smiling newcomer.
 manga_chapters: 943-944
 anime_episodes: 941-943
-released: '2022-01-18'
+
+# rating: TV-14
+released: 2022-01-18
+
+hashes:
+  crc32: 37670A03
+# blake2: 

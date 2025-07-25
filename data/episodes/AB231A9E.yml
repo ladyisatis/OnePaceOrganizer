@@ -1,9 +1,18 @@
 season: 18
 episode: 17
+
 title: Sogeking
+# originaltitle: 
+# sorttitle: 
 description: Rocketman blasts out of Water Seven and connects with the sea tracks,
   and old foes become allies for the coming struggle. Aqua Laguna swells, and it's
   up to Luffy and Zoro to combine their might and create safe passage for all aboard.
 manga_chapters: 366-367
 anime_episodes: 256-257
-released: '2024-02-17'
+
+# rating: TV-14
+released: 2024-02-17
+
+hashes:
+  crc32: AB231A9E
+# blake2: 

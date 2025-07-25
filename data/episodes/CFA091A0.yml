@@ -1,9 +1,18 @@
 season: 14
 episode: 7
+
 title: It Begins
+# originaltitle: 
+# sorttitle: 
 description: Luffy leads a daring—but foolish—raid on Crocodile’s casino. His poor
   planning lands him behind bars with Captain Smoker. But more importantly, these
   actions leave Vivi alone and unprotected.
 manga_chapters: 169-170
-anime_episodes: '106'
-released: '2021-07-13'
+anime_episodes: 106
+
+# rating: TV-14
+released: 2021-07-13
+
+hashes:
+  crc32: CFA091A0
+# blake2: 

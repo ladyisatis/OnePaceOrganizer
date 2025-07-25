@@ -1,10 +1,19 @@
 season: 36
 episode: 8
+
 title: The Strongest Form of Humanity
+# originaltitle: 
+# sorttitle: 
 description: As the rematch between Luffy and Lucci kicks off, Dr. Vegapunk notices
   something very fascinating about the Straw Hat captain's new abilities. Meanwhile,
   Sentomaru arrives with the latest pacifista models as a very unlikely ally to the
   pirates!
 manga_chapters: 1069-1070
 anime_episodes: 1099-1102
-released: '2025-03-08'
+
+# rating: TV-14
+released: 2025-03-08
+
+hashes:
+  crc32: 4C1997F3
+# blake2: 

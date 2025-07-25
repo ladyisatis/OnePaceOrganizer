@@ -1,9 +1,18 @@
 season: 24
 episode: 7
+
 title: Infinite Hell
+# originaltitle: 
+# sorttitle: 
 description: Luffy is back in action, and he prepares to set off, now with even more
   powerful allies who have ties to his old man. When they reach the lowest level of
   Impel Down, the legendary Level 6, they are in for a few new surprises.
 manga_chapters: 539-540
 anime_episodes: 440-443
-released: '2017-06-23'
+
+# rating: TV-14
+released: 2017-06-23
+
+hashes:
+  crc32: 379DD054
+# blake2: 

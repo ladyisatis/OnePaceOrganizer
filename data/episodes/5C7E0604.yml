@@ -1,9 +1,18 @@
 season: 35
 episode: 29
+
 title: Once a Fox
+# originaltitle: 
+# sorttitle: 
 description: Zoro runs after the warrior-monk who took Shusui, and Kawamatsu shares
   his memory of a fox that was guarding the graves in Ringo. Soon, they find a room
   filled with swords, and Hiyori tells Zoro to give Shusui back to the land of Wano.
 manga_chapters: 953-954
 anime_episodes: 954-955
-released: '2022-12-18'
+
+# rating: TV-14
+released: 2022-12-18
+
+hashes:
+  crc32: 5C7E0604
+# blake2: 

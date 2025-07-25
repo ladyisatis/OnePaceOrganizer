@@ -1,9 +1,18 @@
 season: 32
 episode: 6
+
 title: Tea Party Invitation
+# originaltitle: 
+# sorttitle: 
 description: The mystery of Sanji's disappearance only deepens as Luffy learns that
   Big Mom’s lackeys caught up with him and offered him an invitation from one of the
   Four Emperors that simply could not be refused.
 manga_chapters: 812-813
 anime_episodes: 762-764
-released: '2016-12-24'
+
+# rating: TV-14
+released: 2016-12-24
+
+hashes:
+  crc32: 7F73DB45
+# blake2: 

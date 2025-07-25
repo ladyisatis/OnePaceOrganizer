@@ -1,9 +1,18 @@
 season: 6
 episode: 9
+
 title: Happiness
+# originaltitle: 
+# sorttitle: 
 description: Luffy springs into action against Arlong, and their intense struggle
   commences! Luffy becomes enraged when he discovers how exactly Arlong had been using
   Nami, and he comes to a quick decision on how to finally free her of her shackles.
 manga_chapters: 91-94
 anime_episodes: 42-43
-released: '2020-09-12'
+
+# rating: TV-14
+released: 2020-09-12
+
+hashes:
+  crc32: A57211D1
+# blake2: 

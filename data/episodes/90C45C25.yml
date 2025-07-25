@@ -1,9 +1,18 @@
 season: 16
 episode: 25
-title: Finale (G-8 Edition)
+
+title: Finale
+# originaltitle: 
+# sorttitle: 
 description: With a little help from their new friends—and a giant octopus—the Straw
   Hats bid farewell to Skypiea and begin their descent back to the Blue Sea. Then
   as night falls, a certain Warlord makes an appearance at Jaya...
 manga_chapters: 302-303
 anime_episodes: 195, 203, 207
-released: '2025-05-03'
+
+# rating: TV-14
+released: 2025-05-03
+
+hashes:
+  crc32: 90C45C25
+# blake2: 

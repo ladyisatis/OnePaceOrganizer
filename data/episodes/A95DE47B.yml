@@ -1,9 +1,18 @@
 season: 31
 episode: 5
+
 title: B Block on Fire! Outlandish Competitors and King Punch!
+# originaltitle: 
+# sorttitle: 
 description: The battle in Block B hits a crescendo as the Fighting King Elizabello
   II prepares his devastating King Punch! But as the powerful attack becomes imminent,
   the Kingdom of Prodence faction unravels!
 manga_chapters: 708-709
 anime_episodes: 637-638
-released: '2014-04-25'
+
+# rating: TV-14
+released: 2014-04-25
+
+hashes:
+  crc32: A95DE47B
+# blake2: 

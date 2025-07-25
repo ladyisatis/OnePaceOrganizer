@@ -1,9 +1,18 @@
 season: 29
 episode: 5
+
 title: The King of Fishman Island Invited to Ryugu Palace!
+# originaltitle: 
+# sorttitle: 
 description: The pirates receive an unexpected invitation to Ryugu Palace from Neptune
   himself, king of Fishman Island. Tempted by the smell of food, Luffy wanders the
   palace and soon finds an enormous tower with a sturdy yet battle-worn door.
 manga_chapters: 611-612
 anime_episodes: 530-531
-released: '2013-04-04'
+
+# rating: TV-14
+released: 2013-04-04
+
+hashes:
+  crc32: DA5B5D04
+# blake2: 

@@ -1,10 +1,19 @@
 season: 16
 episode: 7
+
 title: Overture
+# originaltitle: 
+# sorttitle: 
 description: Gan Fall is severely burned during his battle with Shura, and Chopper
   musters the courage for a leap of faith. Elsewhere, Luffy and co. finally discover
   a way to defeat the mantra-wielding Satori, and the Shandians prepare for an all-out
   attack on God!
 manga_chapters: 250-251
 anime_episodes: 163-164
-released: '2023-10-21'
+
+# rating: TV-14
+released: 2023-10-21
+
+hashes:
+  crc32: 3C665F73
+# blake2: 

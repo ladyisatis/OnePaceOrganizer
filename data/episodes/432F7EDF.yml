@@ -1,8 +1,17 @@
 season: 6
 episode: 2
+
 title: Monsters of the Grand Line
+# originaltitle: 
+# sorttitle: 
 description: Usopp, having challenged the fishmen, has been caught. To effectively
   prove her loyalty to the Arlong Pirates, Nami is left with a morbid choice.
 manga_chapters: 71-73
 anime_episodes: 32-33
-released: '2024-11-23'
+
+# rating: TV-14
+released: 2024-11-23
+
+hashes:
+  crc32: 432F7EDF
+# blake2: 

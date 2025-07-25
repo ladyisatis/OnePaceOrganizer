@@ -1,10 +1,19 @@
 season: 16
 episode: 8
+
 title: Vearth
+# originaltitle: 
+# sorttitle: 
 description: The Shandians’ attack on Upper Yard commences! At the Sacrificial Altar,
   the crew is finally reunited, and everyone recounts what has happened. Chopper looks
   after the injured Gan Fall, and the pirates devise a plan to steal the gold on the
   island.
 manga_chapters: 252-254
 anime_episodes: 165-167
-released: '2023-10-28'
+
+# rating: TV-14
+released: 2023-10-28
+
+hashes:
+  crc32: 236CCF51
+# blake2: 

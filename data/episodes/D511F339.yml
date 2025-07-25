@@ -1,10 +1,19 @@
 season: 36
 episode: 2
+
 title: The Matter Involving Captain Koby
+# originaltitle: 
+# sorttitle: 
 description: The three-way struggle between the Marines, the Blackbeard Pirates, and
   the Kuja Pirates comes to an end when an unexpected figure shows up. On the Sunny,
   the Straw Hats talk about the recent incidents around the world and Luffy’s words
   surprise everyone.
 manga_chapters: 1059-1060
 anime_episodes: 1087-1088
-released: '2024-09-14'
+
+# rating: TV-14
+released: 2024-09-14
+
+hashes:
+  crc32: D511F339
+# blake2: 

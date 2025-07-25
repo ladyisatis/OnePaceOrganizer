@@ -1,10 +1,19 @@
 season: 13
 episode: 5
+
 title: Quack Doctor
+# originaltitle: 
+# sorttitle: 
 description: Chopper began life as an ordinary reindeer but was shunned by his own
   kind because of his unusual blue nose. Even after eating the Human-Human Devil Fruit,
   the islanders wanted nothing to do with him. That is, until Chopper met a certain
   quack doctor.
 manga_chapters: 140-145
 anime_episodes: 85-86
-released: '2023-03-21'
+
+# rating: TV-14
+released: 2023-03-21
+
+hashes:
+  crc32: E7044DBE
+# blake2: 

@@ -1,9 +1,18 @@
 season: 29
 episode: 9
+
 title: At the Sea Forest! Arlong and Hody
+# originaltitle: 
+# sorttitle: 
 description: Jinbe reunites with Luffy in the undersea forest and reveals a shocking
   connection to an old foe. The former Warlord begins a tale of when two famous figures
   fought to undo the animosity that existed between humans and fishmen.
 manga_chapters: 619-620
 anime_episodes: 538-539, 541
-released: '2013-04-09'
+
+# rating: TV-14
+released: 2013-04-09
+
+hashes:
+  crc32: FCF7F7E4
+# blake2: 

@@ -1,10 +1,19 @@
 season: 36
 episode: 3
+
 title: Future Island Egghead
+# originaltitle: 
+# sorttitle: 
 description: Sabo contacts his comrades, which prompts a certain eavesdropper to take
   action against an entire island nation! Meanwhile, Luffy, Chopper, and Jinbe alongside
   a mysterious girl become separated from the rest of the Straw Hats when a giant
   shark attacks.
 manga_chapters: 1060-1061
 anime_episodes: 1089-1090
-released: '2025-01-11'
+
+# rating: TV-14
+released: 2025-01-11
+
+hashes:
+  crc32: 5B546203
+# blake2: 

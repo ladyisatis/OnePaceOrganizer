@@ -1,9 +1,18 @@
 season: 1
 episode: 2
+
 title: They Call Him "Straw Hat" Luffy
+# originaltitle: 
+# sorttitle: 
 description: While Alvida and her pirates plunder a cruise ship, they come across
   a barrel containing a strange boy named Monkey D. Luffy. The timid Koby befriends
   Luffy, and they share their grand dreams with each other.
-manga_chapters: '2'
-anime_episodes: '1'
-released: '2025-05-03'
+manga_chapters: 2
+anime_episodes: 1
+
+# rating: TV-14
+released: 2025-05-03
+
+hashes:
+  crc32: A465972A
+# blake2: 

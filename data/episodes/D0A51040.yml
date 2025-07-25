@@ -1,9 +1,18 @@
 season: 3
 episode: 7
+
 title: To the Sea
+# originaltitle: 
+# sorttitle: 
 description: The island is saved without any villagers ever knowing what almost befell
   their home. Kaya, grateful to the Straw Hats for what they did, gifts them something
   invaluable for sailing the high seas. Meanwhile, one more person joins Luffy's crew.
 manga_chapters: 40-41
-anime_episodes: '17'
-released: '2017-10-21'
+anime_episodes: 17
+
+# rating: TV-14
+released: 2025-07-12
+
+hashes:
+  crc32: D0A51040
+# blake2: 

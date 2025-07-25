@@ -1,10 +1,19 @@
 season: 35
 episode: 52
+
 title: A Kunoichi's Oath
+# originaltitle: 
+# sorttitle: 
 description: Friend and foe alike fall victim to Queen's chilling virus, and Apoo
   is playing keep-away with the vial of antibodies. Perospero and Marco's brief alliance
   is shattered, and so are Nami and Usopp's skulls as they face down Ulti and Page
   One.
 manga_chapters: 994-995
 anime_episodes: 1006-1009
-released: '2025-06-20'
+
+# rating: TV-14
+released: 2025-06-20
+
+hashes:
+  crc32: D985734A
+# blake2: 

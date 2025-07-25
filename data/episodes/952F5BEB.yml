@@ -1,9 +1,18 @@
 season: 19
 episode: 9
+
 title: Ohara vs. The World Government
+# originaltitle: 
+# sorttitle: 
 description: Robin's mother Olvia was on the run from the World Government, and tragedy
   was unavoidable from the moment Professor Clover and his colleagues decided to continue
   their research. No one on Ohara was safe.
 manga_chapters: 394-396
 anime_episodes: 276-277
-released: '2019-06-27'
+
+# rating: TV-14
+released: 2019-06-27
+
+hashes:
+  crc32: 952F5BEB
+# blake2: 

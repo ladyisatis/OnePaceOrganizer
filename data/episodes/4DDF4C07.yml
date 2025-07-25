@@ -1,9 +1,18 @@
 season: 31
 episode: 44
+
 title: Heaven and Earth
+# originaltitle: 
+# sorttitle: 
 description: With just over a minute to spare, everyone in Dressrosa turns their efforts
   toward slowing the birdcage. Meanwhile, Rebecca, under the control of Doflamingo,
   advances to attack Viola, and a hero’s recovery cannot come soon enough!
 manga_chapters: 788-790
 anime_episodes: 730-733
-released: '2017-05-28'
+
+# rating: TV-14
+released: 2017-05-28
+
+hashes:
+  crc32: 4DDF4C07
+# blake2: 

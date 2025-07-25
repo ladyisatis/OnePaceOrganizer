@@ -1,9 +1,18 @@
 season: 21
 episode: 13
+
 title: Zoro vs. Ryuuma and Chopper's Rage!
+# originaltitle: 
+# sorttitle: 
 description: Zoro stands in for Brook and duels Ryuma, the swordsman zombie from faraway
   Wano. In the mansion, Chopper's former respect for Dr. Hogback is completely erased
   after coming to realize the man's twisted views on life.
 manga_chapters: 467-468
 anime_episodes: 362-363
-released: '2013-11-20'
+
+# rating: TV-14
+released: 2013-11-20
+
+hashes:
+  crc32: 3AEE90B8
+# blake2: 

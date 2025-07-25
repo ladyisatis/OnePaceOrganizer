@@ -1,9 +1,18 @@
 season: 31
 episode: 14
+
 title: The Plight of the Riku Clan! The Lurking Hero Awaits in the Shadows!
+# originaltitle: 
+# sorttitle: 
 description: The losers of the colosseum who are being held below the infirmary have
   an unexpected addition to their numbers. Meanwhile, the history of Tontatta is made
   clear, as is the shocking identity of the toy soldier!
 manga_chapters: 726-727
 anime_episodes: 648, 657-659
-released: '2014-10-21'
+
+# rating: TV-14
+released: 2014-10-21
+
+hashes:
+  crc32: E3C90B8B
+# blake2: 

@@ -1,9 +1,18 @@
 season: 35
 episode: 7
+
 title: The Provisions Ship
+# originaltitle: 
+# sorttitle: 
 description: Luffy and co. finally find Otama hanging from the mouth of a lion in
   Holdem’s stomach. Luffy prepares to save Otama from Kaido’s lackey, and elsewhere,
   a mysterious figure confronts Basil Hawkins.
 manga_chapters: 916-917
 anime_episodes: 904-905
-released: '2019-11-22'
+
+# rating: TV-14
+released: 2019-11-22
+
+hashes:
+  crc32: F71F9B71
+# blake2: 
