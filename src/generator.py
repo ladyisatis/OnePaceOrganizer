@@ -3,10 +3,11 @@ import re
 import sys
 import orjson
 import httpx
-import datetime
 import io
 import os
+import time
 from csv import DictReader as CSVReader
+from datetime import date, datetime, timezone
 from yaml import dump as YamlDump, safe_load as YamlLoad
 from pathlib import Path
 from httpx_retries import RetryTransport, Retry
@@ -107,11 +108,11 @@ def update():
 
                         release_date_group = release_date.split(".")
                         if len(release_date_group) == 3:
-                            release_date = datetime.date(int(release_date_group[0]), int(release_date_group[1]), int(release_date_group[2]))
+                            release_date = date(int(release_date_group[0]), int(release_date_group[1]), int(release_date_group[2]))
                         else:
                             release_date_group = release_date.split("-")
                             if len(release_date_group) == 3:
-                                release_date = datetime.date(int(release_date_group[0]), int(release_date_group[1]), int(release_date_group[2]))
+                                release_date = date(int(release_date_group[0]), int(release_date_group[1]), int(release_date_group[2]))
                             else:
                                 print(f"Skipping: {row} (invalid release date)")
                                 continue
@@ -213,7 +214,9 @@ def generate_json():
     with seasons_yml.open(mode='r', encoding='utf-8') as f:
         out["seasons"] = YamlLoad(stream=f)
 
-    episodes = {}
+    episodes = {
+        "last_update": datetime.now(timezone.utc).isoformat()
+    }
 
     for episode_yml in episodes_dir.glob('*.yml'):
         key = episode_yml.name.replace('.yml', '')

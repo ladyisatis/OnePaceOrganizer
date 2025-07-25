@@ -1,11 +1,13 @@
 name: One Pace Metadata Updater
 
 on:
-  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - 'data/episodes/**'
+      - 'data/seasons.yml'
+      - 'data/tvshow.yml'
+      - 'src/generator.py'
 
 jobs:
   build:
