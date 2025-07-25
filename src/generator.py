@@ -206,7 +206,7 @@ def generate_json():
     seasons_yml = Path(".", "data", "seasons.yml")
     episodes_dir = Path(".", "data", "episodes")
 
-    out = {}
+    out = {"last_update": datetime.now(timezone.utc).isoformat()}
 
     with tvshow_yml.open(mode='r', encoding='utf-8') as f:
         out["tvshow"] = YamlLoad(stream=f)
@@ -214,9 +214,7 @@ def generate_json():
     with seasons_yml.open(mode='r', encoding='utf-8') as f:
         out["seasons"] = YamlLoad(stream=f)
 
-    episodes = {
-        "last_update": datetime.now(timezone.utc).isoformat()
-    }
+    episodes = {}
 
     for episode_yml in episodes_dir.glob('*.yml'):
         key = episode_yml.name.replace('.yml', '')
