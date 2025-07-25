@@ -27,11 +27,8 @@ jobs:
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-        env:
-          POETRY_HOME: $HOME/.poetry
-
-      - name: Add Poetry to PATH
-        run: echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          poetry config virtualenvs.in-project true
 
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
