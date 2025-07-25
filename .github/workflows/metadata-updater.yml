@@ -1,0 +1,61 @@
+name: One Pace Metadata Updater
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/episodes/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+        env:
+          POETRY_HOME: $HOME/.poetry
+
+      - name: Add Poetry to PATH
+        run: echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Run data.json updater
+        env:
+          GCLOUD_API_KEY: ${{ secrets.GCLOUD_API_KEY }}
+        run: poetry run python src/generator.py json
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add data.json
+          git diff --cached --quiet || git commit -m "Update data.json [automated]"
+          git push
