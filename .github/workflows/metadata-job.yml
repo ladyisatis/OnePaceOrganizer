@@ -2,7 +2,10 @@ name: One Pace Metadata Job
 
 on:
   schedule:
+    - cron: '0 0 * * *'
+    - cron: '0 6 * * *'
     - cron: '0 12 * * *'
+    - cron: '0 18 * * *'
 
 jobs:
   build:
@@ -44,7 +47,9 @@ jobs:
       - name: Run metadata updater
         env:
           GCLOUD_API_KEY: ${{ secrets.GCLOUD_API_KEY }}
-        run: poetry run python src/generator.py update
+        run: |
+          poetry run python src/generator.py update
+          poetry run python src/generator.py json
 
       - name: Commit and push changes
         run: |
@@ -52,5 +57,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           git add data
-          git diff --cached --quiet || git commit -m "Update One Pace metadata [automated]"
+          git diff --cached --quiet || (git add data.json && git commit -m "Update One Pace metadata [automated]")
           git push
