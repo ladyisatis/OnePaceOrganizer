@@ -233,7 +233,7 @@ def generate_json():
     out["episodes"] = episodes
 
     with Path(".", "data.json").open(mode='wb') as f:
-        f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS ))
+        f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2 ))
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'update':
