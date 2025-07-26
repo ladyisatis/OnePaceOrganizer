@@ -121,7 +121,7 @@ def update():
                         out_episodes[mkv_crc32] = {
                             "season": season,
                             "episode": episode,
-                            "title": f"{out_seasons[season]['title']} {episode}",
+                            "title": f"{out_seasons[season]['title']} {episode:02d}",
                             "description": "",
                             "manga_chapters": chapters,
                             "anime_episodes": anime_episodes,
