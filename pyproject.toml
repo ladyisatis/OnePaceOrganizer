@@ -1,13 +1,13 @@
 [project]
-name = "one_pace_renamer"
-version = "0.1.0"
+name = "OnePaceOrganizer"
+version = "0.1.1"
 description = "Renames One Pace files and generates NFO metadata for use with Plex or Jellyfin"
 authors = [
     {name = "Isatis",email = "git@isatis.blue"}
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.13,<4.0"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "prompt-toolkit (>=3.0.51,<4.0.0)",
     "pyyaml (>=6.0.2,<7.0.0)",
@@ -16,9 +16,10 @@ dependencies = [
     "httpx[http2] (>=0.28.1,<0.29.0)",
     "plexapi (>=4.17.0,<5.0.0)",
     "loguru (>=0.7.3,<0.8.0)",
-    "httpx-retries (>=0.4.0,<0.5.0)"
+    "httpx-retries (>=0.4.0,<0.5.0)",
+    "enzyme (>=0.5.2,<0.6.0)",
+    "pyside6 (>=6.9.1,<7.0.0)"
 ]
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
