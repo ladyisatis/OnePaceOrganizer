@@ -204,7 +204,7 @@ def update():
 
         season_path = Path(".", "data", "seasons.yml")
         with season_path.open(mode='w') as f:
-            YamlDump(data=out_seasons, stream=f, allow_unicode=True)
+            YamlDump(data=out_seasons, stream=f, allow_unicode=True, sort_keys=False)
 
     except:
         print(traceback.format_exc())
@@ -233,7 +233,7 @@ def generate_json():
     out["episodes"] = episodes
 
     with Path(".", "data.json").open(mode='wb') as f:
-        f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SORT_KEYS ))
+        f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS ))
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'update':
