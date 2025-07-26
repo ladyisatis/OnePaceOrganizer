@@ -846,22 +846,39 @@ class OnePaceOrganizer(QWidget):
                     ep_title = " - ".join(title[1:]) if len(title) > 1 else title[0]
                     ep_date = mkv.info.date if mkv.info.date != None else datetime.date.fromtimestamp(file_path.stat().st_ctime)
 
+                    m_season = 0
+                    m_episode = 0
+
                     if match:
                         arc_name = match.group(1).strip()
                         ep_num = int(match.group(2))
 
                         for season, season_info in self.seasons.items():
                             if season_info["title"] == arc_name and crc32 not in self.episodes:
-                                self.episodes[crc32] = {
-                                    "season": season,
-                                    "episode": ep_num,
-                                    "title": ep_title,
-                                    "description": "",
-                                    "manga_chapters": "",
-                                    "anime_episodes": "",
-                                    "released": ep_date.isoformat()
-                                }
-                                video_files.append((crc32, file_path))
+                                m_season = season
+                                m_episode = ep_num
+
+                    if m_season != 0 and m_episode != 0:
+                        found_existing = False
+
+                        for j, episode_info in self.episodes.items():
+                            if episode_info["season"] == m_season and episode_info["episode"] == m_episode:
+                                self.episodes[crc32] = episode_info
+                                found_existing = True
+
+                        if not found_existing:
+                            self.episodes[crc32] = {
+                                "season": m_season,
+                                "episode": m_episode,
+                                "title": ep_title,
+                                "description": "",
+                                "manga_chapters": "",
+                                "anime_episodes": "",
+                                "released": ep_date.isoformat()
+                            }
+
+                        video_files.append((crc32, file_path))
+
                     else:
                         self.log_output.append(f"Skipping {file.name}: Episode metadata missing, infering information from MKV also failed")
 
