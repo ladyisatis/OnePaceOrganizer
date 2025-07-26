@@ -52,7 +52,6 @@ def update():
                     out_seasons[part] = {
                         "saga": row['saga_title'],
                         "title": row['title_en'],
-                        "originaltitle": row['title_en'],
                         "description": row['description_en']
                     }
 
@@ -67,6 +66,7 @@ def update():
                 season_title = sheet['properties']['title']
 
                 if season_title != out_seasons[season]['title']:
+                    out_seasons[season]['originaltitle'] = out_seasons[season]['title']
                     out_seasons[season]['title'] = season_title
 
                 with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_GUIDE_ID}/export?gid={sheetId}&format=csv", follow_redirects=True) as resp:
@@ -121,7 +121,7 @@ def update():
                         out_episodes[mkv_crc32] = {
                             "season": season,
                             "episode": episode,
-                            "title": "",
+                            "title": f"{out_seasons[season]['title']} {episode}",
                             "description": "",
                             "manga_chapters": chapters,
                             "anime_episodes": anime_episodes,
@@ -131,7 +131,14 @@ def update():
                         if len(mkv_crc32_ext) > 0:
                             out_episodes[mkv_crc32_ext] = out_episodes[mkv_crc32]
 
-                        season_eps[f"{out_seasons[season]['originaltitle']} {episode}"] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
+                        key = f"{out_seasons[season]['originaltitle']} {episode}" if 'originaltitle' in out_seasons[season] else f"{out_seasons[season]['title']} {episode}"
+                        if key in season_eps:
+                            season_eps[key].append(mkv_crc32)
+
+                            if mkv_crc32_ext != '':
+                                season_eps[key].append(mkv_crc32_ext)
+                        else:
+                            season_eps[key] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
 
                 with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_DESC_ID}/export?gid=0&format=csv", follow_redirects=True) as resp:
                     reader = CSVReader(resp.iter_lines())
