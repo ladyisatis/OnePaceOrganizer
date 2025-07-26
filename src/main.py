@@ -20,8 +20,8 @@ from plexapi.server import PlexServer
 from plexapi.exceptions import Unauthorized as PlexApiUnauthorizedException, TwoFactorRequired as PlexApiTwoFactorRequiredException
 from loguru import logger
 
-class OnePaceRenamer:
-    title = "One Pace Renamer"
+class OnePaceOrganizer:
+    title = "One Pace Organizer"
     config_file = Path(".", "config.json")
     data_file = Path(".", "data.json")
     toml_file = Path(".", "pyproject.toml")
@@ -779,13 +779,13 @@ class OnePaceRenamer:
         try:
             with cls.toml_file.open(mode='rb', encoding='utf-8') as f:
                 toml = TomlLoad(f)
-                cls.title = f"One Pace Renamer v{version}"
+                cls.title = f"One Pace Organizer v{version}"
         except:
             pass
 
         with patch_stdout():
             try:
-                r = httpx.get("https://raw.githubusercontent.com/ladyisatis/one_pace_renamer/refs/heads/main/data.json")
+                r = httpx.get("https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data.json", follow_redirects=True)
                 r.raise_for_status()
 
                 cls.yml = orjson.loads(r.content)
@@ -811,11 +811,11 @@ class OnePaceRenamer:
 
             message_dialog(
                 title=cls.title,
-                text=f"The renamer is complete! All files have been moved to:\n{out_path}"
+                text=f"Completed! All files have been moved to:\n{out_path}"
             ).run() 
 
 if __name__ == '__main__':
     try:
-        sys.exit(OnePaceRenamer.run())
+        sys.exit(OnePaceOrganizer.run())
     except KeyboardInterrupt:
         sys.exit(0)

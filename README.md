@@ -1,4 +1,4 @@
-# One Pace Renamer
+# One Pace Organizer
 
 This program renames all One Pace video files to a format that is compatible for both Plex and Jellyfin, and either updates the metadata if running on Plex, or generates metadata files for use with Jellyfin.
 
@@ -10,6 +10,8 @@ By the end, on your Plex or Jellyfin setup, you should have:
 - TV Show, Season/Arc, and Episode metadata automatically set
 - All One Pace files renamed to be recognized by Plex
 
+If there's no added metadata in the repository for an episode, like say, the One Pace team just released an episode 2 minutes ago? It will look into the .mkv file and create the metadata for you.
+
 You can also re-run the program when new One Pace releases for quick renaming, and this does not require every single One Pace release ever released in order to function.
 
 **Note: this program is in BETA. Things may break and error handling could be a lot better. Contributions also welcome on that.**
@@ -18,7 +20,7 @@ You can also re-run the program when new One Pace releases for quick renaming, a
 
 ### Running the Program
 
-There are two ways you can run this. The first is via the [Releases](https://github.com/ladyisatis/one_pace_renamer/releases) page.
+There are two ways you can run this. The first is via the [Releases](https://github.com/ladyisatis/OnePaceOrganizer/releases) page, and use either the `OnePaceOrganizer-gui` ones if you prefer a user interface, or `OnePaceOrganizer-cli` ones if you prefer in the Terminal/Command Line.
 
 The other is through Python 3.13+, run via these instructions:
 
@@ -31,15 +33,19 @@ $ pip install -U pip setuptools
 $ pip install poetry
 $ poetry install
 
-# To run the program:
+# To run the program in Terminal:
 
 $ python src/main.py
+
+# To run the Qt version:
+
+$ python src/gui.py
 ```
 
 ### Instructions
 
 1. Create a folder containing nothing except the `.mkv` (or `.mp4`) files. By default, it'll assume you've made a folder named `in` in the same directory as the `.exe` (if using Windows release) or one folder up from `src`.
-2. Run the `.exe` (Windows release) or `python src/main.py` (from source code).
+2. Run the `.exe` (Windows release), `python src/gui.py` (GUI version) or `python src/main.py` (Terminal version).
 3. There will be a wizard to guide you through the steps. I'm hoping this wizard is replaced with an actual windowed GUI in the near future instead of a scary-looking terminal outfit.
 
 The first step will ask for the folder you made in step 1.
@@ -52,22 +58,22 @@ If you're using Plex, there will be a two step process: one will move all of the
 
 ## Adding Data on Episodes and Seasons
 
-Metadata is provided in YAML format. For episodes, this [README](https://github.com/ladyisatis/one_pace_renamer/tree/main/data/episodes#readme) at the bottom of `data/episodes` gives a bit of information on how to add new files.
-
-If there are new One Pace releases, send a [Pull Request](https://github.com/ladyisatis/one_pace_renamer/pulls) with the added `.yml` in the `data/episodes` folder.
-
-The following two are used for metadata:
+The metadata is updated once per day at 12:00pm UTC / 8:00am EST / 5:00am PST based upon these two spreadsheets:
 
 - [One Pace Episode Guide](https://docs.google.com/spreadsheets/d/1HQRMJgu_zArp-sLnvFMDzOyjdsht87eFLECxMK858lA/) for CRC32, Manga Chapters, Anime Episodes
 - [One Pace Episode Descriptions](https://docs.google.com/spreadsheets/d/1M0Aa2p5x7NioaH9-u8FyHq6rH3t5s6Sccs8GoC6pHAM/) for descriptions for arcs and episodes
+
+Metadata is provided in YAML format. For episodes, this [README](https://github.com/ladyisatis/OnePaceOrganizer/tree/main/data/episodes#readme) at the bottom of `data/episodes` gives a bit of information on how to add new files.
+
+If there are new One Pace releases that the automatic updater misses, send a [Pull Request](https://github.com/ladyisatis/OnePaceOrganizer/pulls) with the added `.yml` in the `data/episodes` folder. Already-existing `.yml` files do not get overwritten by the automatic metadata updater.
 
 Note that future One Pace releases are allowed to be submitted as well, though if the CRC32 isn't known, it can be submitted in the format `Season_99_Episode_99.yml` where 99 in both the season and episode is replaced with the actual season number and episode number with no leading zeroes. Any future releases will be renamed once the actual video file is out and the CRC32 is known.
 
 For additional data that this program uses:
 
-- [Posters for both One Pace itself and all arcs](https://github.com/ladyisatis/one_pace_renamer/tree/main/data/posters) (`data/posters`)
-- [Season/Arc information](https://github.com/ladyisatis/one_pace_renamer/blob/main/data/seasons.yml) (`data/seasons.yml`)
-- [One Pace Show information](https://github.com/ladyisatis/one_pace_renamer/blob/main/data/tvshow.yml) (`data/tvshow.yml`)
+- [Posters for both One Pace itself and all arcs](https://github.com/ladyisatis/OnePaceOrganizer/tree/main/data/posters) (`data/posters`)
+- [Season/Arc information](https://github.com/ladyisatis/OnePaceOrganizer/blob/main/data/seasons.yml) (`data/seasons.yml`)
+- [One Pace Show information](https://github.com/ladyisatis/OnePaceOrganizer/blob/main/data/tvshow.yml) (`data/tvshow.yml`)
 
 ## Thanks
 
