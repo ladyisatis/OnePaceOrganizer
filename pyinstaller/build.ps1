@@ -1,16 +1,16 @@
 $BuildDir = "dist"
-$CommonOptions = "--clean --noconfirm"
+$CommonOptions = "--clean --noconfirm -F"
 $IconOption = ""  # $IconOption = "--icon=icon.ico"
 $Platform = "windows"
-$PathSep = ";"
+$PathSep = ":"
 
 if (Test-Path build) { Remove-Item build -Recurse -Force }
 if (Test-Path $BuildDir) { Remove-Item $BuildDir -Recurse -Force }
 New-Item -ItemType Directory -Path "$BuildDir" -Force | Out-Null
 
 $DataOptions = @(
-    "--add-data `"data/posters${PathSep}data/posters`"",
-    "--add-data `"pyproject.toml${PathSep}pyproject.toml`""
+#   "--add-data `"data/posters${PathSep}data/posters`"",
+    "--add-data `"pyproject.toml${PathSep}.`""
 )
 
 $DataOptionString = $DataOptions -join " "

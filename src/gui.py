@@ -69,6 +69,15 @@ async def async_crc32(video_file, loop=None):
     res = f"{crc_value & 0xFFFFFFFF:08x}"
     return res.upper()
 
+def bundle_file(*args):
+    in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+    local_path = Path(".", *args)
+
+    if not local_path.exists() and in_bundle:
+        return Path(sys._MEIPASS, *args)
+
+    return local_path
+
 class Input:
     def __init__(self, layout, label, prop, btn="", btn_connect=None, set=False, width=250):
         self.layout = QHBoxLayout()
@@ -115,9 +124,9 @@ class OnePaceOrganizer(QWidget):
         self.spacer = "------------------------------------------------------------------"
         self.config_file = Path(".", "config.json")
 
-        self.posters_path = Path(".", "data", "posters").resolve()
+        self.posters_path = bundle_file("data", "posters").resolve()
         if not self.posters_path.is_dir():
-            self.posters_path = Path(".", "posters").resolve()
+            self.posters_path = bundle_file("posters").resolve()
 
         self.input_path = ""
         self.output_path = ""
@@ -148,19 +157,11 @@ class OnePaceOrganizer(QWidget):
         self.setMinimumSize(800, 600)
         self.setup_ui()
 
-    def file(self, name):
-        in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
-        local_path = Path(".", name)
-
-        if not local_path.exists() and in_bundle:
-            return Path(sys._MEIPASS, name)
-
-        return local_path
-
     def load_config(self):
-        toml_path = self.file("pyproject.toml")
+        toml_path = bundle_file("pyproject.toml")
         if toml_path.exists():
-            self.version = tomllib.load(toml_path.read_text())["project"]["version"]
+            with toml_path.open(mode="rb") as f:
+                self.version = tomllib.load(f)["project"]["version"]
 
         if self.config_file.exists():
             config = orjson.loads(self.config_file.read_bytes())

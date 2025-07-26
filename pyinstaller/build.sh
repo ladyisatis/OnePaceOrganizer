@@ -5,17 +5,12 @@ set -e
 rm -rf build dist
 mkdir -p dist
 
-COMMON_OPTS="--clean --noconfirm"
+COMMON_OPTS="--clean --noconfirm -F"
 ICON_OPT="" #ICON_OPT="--icon=icon.ico"
+PATH_SEPARATOR=":"
 
-case "$(uname -s)" in
-    Linux*)     PLATFORM=linux; PATH_SEPARATOR=":" ;;
-    Darwin*)    PLATFORM=mac; PATH_SEPARATOR=":" ;;
-    MINGW*|MSYS*|CYGWIN*) PLATFORM=windows; PATH_SEPARATOR=";" ;;
-    *)          echo "Unsupported platform: $(uname -s)"; exit 1 ;;
-esac
-
-DATA_OPT="--add-data data/posters${PATH_SEPARATOR}data/posters --add-data pyproject.toml${PATH_SEPARATOR}pyproject.toml"
+#DATA_OPT="--add-data data/posters${PATH_SEPARATOR}data/posters --add-data pyproject.toml${PATH_SEPARATOR}."
+DATA_OPT="--add-data pyproject.toml${PATH_SEPARATOR}."
 
 poetry run pyinstaller $COMMON_OPTS $ICON_OPT \
   --name OnePaceOrganizer-gui \
