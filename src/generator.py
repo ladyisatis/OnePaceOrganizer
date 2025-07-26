@@ -167,6 +167,15 @@ def update():
                 episode = season
                 season = 0
 
+            if file_path.exists():
+                old_data = {"title": "", "description": "", "manga_chapters": "", "anime_episodes": "", "released": ""}
+
+                with file_path.open(mode='r', encoding='utf-8') as f:
+                    old_data = YamlLoad(stream=f)
+
+                if old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
+                    continue
+
             out = (
                 f"season: {season}\n"
                 f"episode: {episode}\n"
