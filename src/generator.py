@@ -52,6 +52,7 @@ def update():
                     out_seasons[part] = {
                         "saga": row['saga_title'],
                         "title": row['title_en'],
+                        "originaltitle": row['title_en'],
                         "description": row['description_en']
                     }
 
@@ -130,7 +131,7 @@ def update():
                         if len(mkv_crc32_ext) > 0:
                             out_episodes[mkv_crc32_ext] = out_episodes[mkv_crc32]
 
-                        season_eps[f"{season_title} {episode}"] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
+                        season_eps[f"{out_seasons[season]['originaltitle']} {episode}"] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
 
                 with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_DESC_ID}/export?gid=0&format=csv", follow_redirects=True) as resp:
                     reader = CSVReader(resp.iter_lines())
