@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-07-26T22:10:30.765518+00:00",
+  "last_update": "2025-07-26T22:14:40.552816+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -18,191 +18,229 @@
     "1": {
       "saga": "East Blue",
       "title": "Romance Dawn",
+      "originaltitle": "Romance Dawn",
       "description": "Monkey D. Luffy sets out on an adventure to form a crew, find the legendary One Piece, and become the pirate king."
     },
     "2": {
       "saga": "East Blue",
       "title": "Orange Town",
+      "originaltitle": "Orange Town",
       "description": "Luffy and Zoro run afoul of a flashy crew of pirates and their captain, Buggy the Clown. They are joined by a young girl named Nami who helps them navigate this predicament."
     },
     "3": {
       "saga": "East Blue",
       "title": "Syrup Village",
+      "originaltitle": "Syrup Village",
       "description": "Luffy's fledgling pirate crew arrives at the slopes of Syrup Village. There they find a liar and a conspiracy to steal a young lady's fortune."
     },
     "4": {
       "saga": "East Blue",
       "title": "Gaimon",
+      "originaltitle": "Gaimon",
       "description": "With Usopp now on the crew and their new ship, the Going Merry, under their command, the Straw Hats head to an island said to hold a fabled treasure. There they encounter a strange man stuck in a box who has been looking for the same treasure."
     },
     "5": {
       "saga": "East Blue",
       "title": "Baratie",
+      "originaltitle": "Baratie",
       "description": "The Straw Hats head to the ocean-going restaurant, Baratie, with the hopes of recruiting one of their cooks. In the meantime, hungry yet powerful forces gather to lay siege to the restaurant — all while a menacing swordsman from the Grand Line steadily approaches."
     },
     "6": {
       "saga": "East Blue",
       "title": "Arlong Park",
+      "originaltitle": "Arlong Park",
       "description": "Nami's hometown has long been overrun by Arlong and his band of fishmen from the Grand Line. When the Straw Hats arrive, they find that their prospective navigator has left out a few key details about herself."
     },
     "7": {
       "saga": "East Blue",
       "title": "The Adventures of Buggy's Crew",
+      "originaltitle": "The Adventures of Buggy's Crew",
       "description": "Buggy, after being defeated by Luffy, Zoro, and Nami, begins his quest to regain his body parts and his crew, and then he will get his flashy revenge on Luffy."
     },
     "8": {
       "saga": "East Blue",
       "title": "Loguetown",
+      "originaltitle": "Loguetown",
       "description": "The final island before entering the Grand Line: Loguetown. Luffy and his crew drop anchor to stock up, sightsee, and pay their respects to the place where Gold Roger drew his last breath."
     },
     "9": {
       "saga": "Arabasta",
       "title": "Reverse Mountain",
+      "originaltitle": "Reverse Mountain",
       "description": "Reverse Mountain is the entrance to the Grand Line. What await the Straw Hats are impossible water currents, a giant whale, and dubious people going by codenames."
     },
     "11": {
       "saga": "Arabasta",
       "title": "The Trials of Koby-Meppo",
+      "originaltitle": "The Trials of Koby-Meppo",
       "description": "Koby and Helmeppo are new cabin boys for the marines, but they become unwillingly involved in an escape attempt by Morgan. Their bravery will either earn them the respect of their superiors—as well as Vice Admiral Garp—or it will spell their doom."
     },
     "10": {
       "saga": "Arabasta",
       "title": "Whisky Peak",
+      "originaltitle": "Whisky Peak",
       "description": "The first island on the Grand Line is surprisingly welcoming to pirates. But as night falls, a deadly plot unravels."
     },
     "12": {
       "saga": "Arabasta",
       "title": "Little Garden",
+      "originaltitle": "Little Garden",
       "description": "The Straw Hats vow to bring Princess Vivi to Arabasta, and their journey brings them to Little Garden, an island from prehistoria that is home to creatures and people larger than life."
     },
     "13": {
       "saga": "Arabasta",
       "title": "Drum Island",
+      "originaltitle": "Drum Island",
       "description": "When Nami falls ill, the crew makes a detour from Arabasta to seek medical help. They happen upon a winter island inhabited by a distrusting populace and a single doctor with a mysterious reindeer companion."
     },
     "14": {
       "saga": "Arabasta",
       "title": "Arabasta",
+      "originaltitle": "Arabasta",
       "description": "Arabasta teeters on the edge of civil war, and it's up to Princess Vivi and the Straw Hats to stem the rebellion, uncover the plot of Baroque Works, and beat the Warlord Crocodile."
     },
     "15": {
       "saga": "Skypiea",
       "title": "Jaya",
+      "originaltitle": "Jaya",
       "description": "The Straw Hats seek the fabled sky island Skypiea and head to Jaya for information on its whereabouts. Their convictions are tested by the pirates of Mock Town, but not everyone on the island is a hardline skeptic."
     },
     "16": {
       "saga": "Skypiea",
       "title": "Skypiea",
+      "originaltitle": "Skypiea",
       "description": "Arriving at Skypiea, the Straw Hats are instantly met with unfamiliar sights, objects, and customs. What's more, the god of the sky island deems the Blue Sea dwellers to be trespassing and casts his judgment upon them."
     },
     "17": {
       "saga": "Water Seven",
       "title": "Long Ring Long Land",
+      "originaltitle": "Long Ring Long Land",
       "description": "On Long Ring Long Land, the Straw Hats are challenged to a Davy Back Fight. As they dive headfirst into a series of games with serious outcomes, the best the Navy has to offer has meanwhile begun to pay closer attention to certain Straw Hat crewmembers."
     },
     "18": {
       "saga": "Water Seven",
       "title": "Water Seven",
+      "originaltitle": "Water Seven",
       "description": "The Straw Hats make landfall at the glorious city of Water Seven, known worldwide for its unparalleled shipyards. The pirates go to inquire about repairs for their ship, but the city threatens to take their money, their ship, and their crewmates."
     },
     "19": {
       "saga": "Water Seven",
       "title": "Enies Lobby",
+      "originaltitle": "Enies Lobby",
       "description": "In order to free Nico Robin from the clutches of the World Government, the Straw Hats and their allies must invade the judicial island, Enies Lobby, and take on the government's premiere clandestine unit: CP9."
     },
     "20": {
       "saga": "Water Seven",
       "title": "Post-Enies Lobby",
+      "originaltitle": "Post-Enies Lobby",
       "description": "The Straw Hats return to Water Seven after the ordeal at Enies Lobby. While there, they are met by a familial vice admiral, and they await news of their new ship."
     },
     "21": {
       "saga": "Thriller Bark",
       "title": "Thriller Bark",
+      "originaltitle": "Thriller Bark",
       "description": "The Straw Hats' next destination is Fishman Island, but first they must traverse the dreaded Florian Triangle which is known for many eerie and mysterious things such as disappearing crews, conversational skeletons, and a floating island full of zombies and other horrors."
     },
     "22": {
       "saga": "Summit War",
       "title": "Sabaody Archipelago",
+      "originaltitle": "Sabaody Archipelago",
       "description": "The second half of the Grand Line lays just ahead, so the Straw Hats stop at Sabaody Archipelago to plan the way forward. But being so close to the Holy Land and Navy Headquarters, Luffy's crew comes face-to-face with the darkest forces of the World Government."
     },
     "23": {
       "saga": "Summit War",
       "title": "Amazon Lily",
+      "originaltitle": "Amazon Lily",
       "description": "Luffy is separated from his crew, and he finds himself on an unfamiliar island in the middle of the Calm Belt... an island inhabited only by women where men are prohibited from entering."
     },
     "24": {
       "saga": "Summit War",
       "title": "Impel Down",
+      "originaltitle": "Impel Down",
       "description": "Luffy launches a daring rescue mission to break his big brother Ace from the government prison, Impel Down. It's a race to the prison's lowest levels — a literal journey through hell itself."
     },
     "25": {
       "saga": "Summit War",
       "title": "The Adventures of the Straw Hats",
+      "originaltitle": "If You Could Go Anywhere... The Adventures of the Straw Hats",
       "description": "Somewhere in the world... Sanji resists, while Robin meets terrible people. Franky's not himself, and Usopp learns to survive. Chopper avoids becoming food, and Nami reports on the weather. Brook is repaid in underpants, and Zoro... is lost and annoyed."
     },
     "26": {
       "saga": "Summit War",
       "title": "Marineford",
+      "originaltitle": "Marineford",
       "description": "Pirate Whitebeard and his allies on one side; the Navy and its Seven Warlords on the other. At the center of it all: Portgas D. Ace and his unspeakable past and heritage. Luffy races to Ace's execution scaffold as a battle between the world's most powerful people unfolds."
     },
     "27": {
       "saga": "Summit War",
       "title": "Post-War",
+      "originaltitle": "Post-War",
       "description": "The war has taken its toll on the world, and Luffy reminisces about younger days when he first met Ace and became his brother. To become strong enough to withstand the New World, Luffy must make a critical decision for himself and his crew."
     },
     "28": {
       "saga": "Fishman Island",
       "title": "Return to Sabaody",
+      "originaltitle": "Return to Sabaody",
       "description": "Two years have passed since the Straw Hats were forcibly separated, and they reconvene back at Sabaody stronger and even more committed to the journey ahead."
     },
     "29": {
       "saga": "Fishman Island",
       "title": "Fishman Island",
+      "originaltitle": "Fishman Island",
       "description": "The path the to the New World takes the Straw Hats thousands of leagues under the sea to the underwater Fishman Island. However, the island's dark past is reaching a breaking point, and Luffy and his crew are caught in the middle of the conflict."
     },
     "30": {
       "saga": "Dressrosa",
       "title": "Punk Hazard",
+      "originaltitle": "Punk Hazard",
       "description": "The first island of the New World is a strange place covered in flames on one half, and freezing temperatures on the other. What seems at first to be an unlivable place later reveals a laboratory, a maniac scientist, and a certain Warlord of the Sea."
     },
     "31": {
       "saga": "Dressrosa",
       "title": "Dressrosa",
+      "originaltitle": "Dressrosa",
       "description": "Luffy's alliance with Law brings him next to Dressrosa to take down Doflamingo's booming business. But the crazed warlord and self-proclaimed ruler of Dressrosa has control over everyone and everything."
     },
     "32": {
       "saga": "Four Emperors",
       "title": "Zou",
+      "originaltitle": "Zou",
       "description": "Zou cannot be reached by conventional means, nor is it easy to enter once one finds it. Within its secretive walls lie the Mink Tribe, and the Straw Hats soon discover that the people of Zou hold a piece of the puzzle that unlocks the mysteries of the world."
     },
     "33": {
       "saga": "Four Emperors",
       "title": "Whole Cake Island",
+      "originaltitle": "Whole Cake Island",
       "description": "Luffy will not sail the seas without his cook, so he stubbornly goes after Sanji to Whole Cake Island. However, knocking on an emperor's door is easier said than done."
     },
     "34": {
       "saga": "Four Emperors",
       "title": "Reverie",
+      "originaltitle": "Reverie",
       "description": "Every four years, the leaders of the world gather at the Holy Land to discuss a mutually agreed upon path for the government. During this particular Reverie, many parties with their own agendas arrive... and some are uninvited."
     },
     "35": {
       "saga": "Four Emperors",
       "title": "Wano",
+      "originaltitle": "Wano",
       "description": "The Straw Hats finally regroup in Wano to carry out theirs and their allies' ultimate goal: to see to the Emperor Kaido's downfall and restore the Kozuki family to its rightful place of power."
     },
     "36": {
       "saga": "Final Saga",
       "title": "Egghead",
+      "originaltitle": "Egghead",
       "description": "Futuristic tech, giant alien monsters, battle robots, superhuman clones... Who are all these people calling themselves Dr. Vegapunk, and why is the government after one of their own?"
     },
     "98": {
       "saga": "Specials",
       "title": "One Piece Fan Letter",
+      "originaltitle": "One Piece Fan Letter",
       "description": "As the Straw Hat Pirates reunite on the Sabaody Archipelago, the various members of the island are drawn together like pieces of a puzzle, their love of certain members of the crew driving their actions and emotions."
     },
     "0": {
       "saga": "Specials",
       "title": "Specials",
+      "originaltitle": "Specials",
       "description": "Occasionally, the One Pace team likes to have some extra fun, so we made animated specials. See alternative storylines with twists you might not have expected."
     }
   },
@@ -2058,8 +2096,8 @@
     "2BC41092": {
       "season": 25,
       "episode": 1,
-      "title": "",
-      "description": "",
+      "title": "If You Could Go Anywhere... The Adventures of the Straw Hats",
+      "description": "Somewhere in the world... Sanji resists, while Robin meets terrible people. Franky's not himself, and Usopp learns to survive. Chopper avoids becoming food, and Nami reports on the weather. Brook is repaid in underpants, and Zoro... is lost and annoyed.",
       "manga_chapters": "543-560",
       "anime_episodes": "453-456",
       "released": "2024-03-29",
