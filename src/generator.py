@@ -235,9 +235,14 @@ def generate_json():
 
     for episode_yml in episodes_dir.glob('*.yml'):
         key = episode_yml.name.replace('.yml', '')
+
         with episode_yml.open(mode='r', encoding='utf-8') as f:
             episodes[key] = YamlLoad(stream=f)
-    
+
+        if 'reference' in episodes[key]:
+            with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
+                episodes[key] = YamlLoad(stream=f)
+
     out["episodes"] = episodes
 
     with Path(".", "data.json").open(mode='wb') as f:
