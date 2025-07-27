@@ -219,6 +219,9 @@ def update():
         print(traceback.format_exc())
         sys.exit(1)
 
+def sort_dict(d):
+    return {key: d[key] for key in sorted(d.keys())}
+
 def generate_json():
     tvshow_yml = Path(".", "data", "tvshow.yml")
     seasons_yml = Path(".", "data", "seasons.yml")
@@ -245,7 +248,9 @@ def generate_json():
             with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
                 episodes[key] = YamlLoad(stream=f)
 
-    out["episodes"] = episodes
+    out["tvshow"] = sort_dict(out["tvshow"])
+    out["seasons"] = sort_dict(out["seasons"])
+    out["episodes"] = sort_dict(episodes)
 
     old_json = orjson.loads(json_file.read_bytes())
     episodes_changed = not DeepDiff(old_json["episodes"], out["episodes"])
