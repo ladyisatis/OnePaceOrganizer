@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-07-27T22:48:54.350960+00:00",
+  "last_update": "2025-07-27T23:21:17.996173+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -3630,6 +3630,18 @@
         "crc32": "91EEA92E"
       }
     },
+    "9269F40F": {
+      "season": 4,
+      "episode": 1,
+      "title": "You're the Rare Breed",
+      "description": "With Usopp now on the crew and their new ship, the Going Merry, under their command, the Straw Hats head to an island said to hold a fabled treasure. There they encounter a strange man stuck in a box who has been looking for the same treasure.",
+      "manga_chapters": "42, 22",
+      "anime_episodes": "18",
+      "released": "2023-01-28",
+      "hashes": {
+        "crc32": "0C2DBF75"
+      }
+    },
     "92956F40": {
       "season": 26,
       "episode": 1,
@@ -5678,6 +5690,18 @@
       "released": "2024-10-02",
       "hashes": {
         "crc32": "EF447336"
+      }
+    },
+    "EFCC14E1": {
+      "season": 3,
+      "episode": 7,
+      "title": "To the Sea",
+      "description": "The island is saved without any villagers ever knowing what almost befell their home. Kaya, grateful to the Straw Hats for what they did, gifts them something invaluable for sailing the high seas. Meanwhile, one more person joins Luffy's crew.",
+      "manga_chapters": "40-41",
+      "anime_episodes": "17",
+      "released": "2025-07-12",
+      "hashes": {
+        "crc32": "D0A51040"
       }
     },
     "EFF6059A": {
