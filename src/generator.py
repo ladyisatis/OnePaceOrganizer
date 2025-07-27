@@ -188,7 +188,7 @@ def update():
                 with file_path.open(mode='r', encoding='utf-8') as f:
                     old_data = YamlLoad(stream=f)
 
-                if isinstance(old_data["released"], date) or isinstance(released, datetime):
+                if isinstance(old_data["released"], date) or isinstance(old_data["released"], datetime):
                     old_data["released"] = old_data["released"].isoformat()
 
                 if old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
