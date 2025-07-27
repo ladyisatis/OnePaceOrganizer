@@ -224,6 +224,14 @@ def update():
 def sort_dict(d):
     return {key: d[key] for key in sorted(d.keys())}
 
+def dict_changed(old, new):
+    changed = DeepDiff(old, new)
+    for i in ['dictionary_item_added', 'dictionary_item_removed', 'values_changed']:
+        if i in changed:
+            return True
+
+    return False
+
 def generate_json():
     tvshow_yml = Path(".", "data", "tvshow.yml")
     seasons_yml = Path(".", "data", "seasons.yml")
@@ -233,7 +241,7 @@ def generate_json():
     out = {"last_update": datetime.now(timezone.utc).isoformat()}
 
     with tvshow_yml.open(mode='r', encoding='utf-8') as f:
-        out["tvshow"] = sort_dict(YamlLoad(stream=f))
+        out["tvshow"] = YamlLoad(stream=f)
 
     with seasons_yml.open(mode='r', encoding='utf-8') as f:
         out["seasons"] = sort_dict(YamlLoad(stream=f))
@@ -253,9 +261,9 @@ def generate_json():
     out["episodes"] = sort_dict(episodes)
 
     old_json = orjson.loads(json_file.read_bytes())
-    episodes_changed = not DeepDiff(old_json["episodes"], out["episodes"])
-    seasons_changed = not DeepDiff(old_json["seasons"], out["seasons"])
-    tvshow_changed = not DeepDiff(old_json["tvshow"], out["tvshow"])
+    episodes_changed = dict_changed(old_json["episodes"], out["episodes"])
+    seasons_changed = dict_changed(old_json["seasons"], out["seasons"])
+    tvshow_changed = dict_changed(old_json["tvshow"], out["tvshow"])
 
     if episodes_changed or seasons_changed or tvshow_changed:
         with json_file.open(mode='wb') as f:
