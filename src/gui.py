@@ -531,7 +531,6 @@ class OnePaceOrganizer(QWidget):
                     self.plexapi_server = await run_sync(resource.connect)
                     self.plex_config_server_id = resource.clientIdentifier
                     self.plex_config_servers[resource.clientIdentifier]["selected"] = True
-                    break
                 else:
                     self.plex_config_servers[resource.clientIdentifier]["selected"] = False
 
