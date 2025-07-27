@@ -49,6 +49,8 @@ def update():
                         part = 11
                     elif part == 99:
                         part = 0
+                    elif part > 90:
+                        continue
 
                     out_seasons[part] = {
                         "saga": row['saga_title'],
@@ -231,10 +233,10 @@ def generate_json():
     out = {"last_update": datetime.now(timezone.utc).isoformat()}
 
     with tvshow_yml.open(mode='r', encoding='utf-8') as f:
-        out["tvshow"] = YamlLoad(stream=f)
+        out["tvshow"] = sort_dict(YamlLoad(stream=f))
 
     with seasons_yml.open(mode='r', encoding='utf-8') as f:
-        out["seasons"] = YamlLoad(stream=f)
+        out["seasons"] = sort_dict(YamlLoad(stream=f))
 
     episodes = {}
 
@@ -248,8 +250,6 @@ def generate_json():
             with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
                 episodes[key] = YamlLoad(stream=f)
 
-    out["tvshow"] = sort_dict(out["tvshow"])
-    out["seasons"] = sort_dict(out["seasons"])
     out["episodes"] = sort_dict(episodes)
 
     old_json = orjson.loads(json_file.read_bytes())
