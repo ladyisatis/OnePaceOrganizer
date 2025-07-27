@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-07-27T12:10:57.408793+00:00",
+  "last_update": "2025-07-27T22:47:15.912354+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -264,6 +264,7 @@
       "season": 31,
       "episode": 47,
       "title": "Soldier's Conviction",
+      "originaltitle": "Soldier-san's Conviction",
       "description": "Major players in the Marines arrive to search Dressrosa for the Straw Hats, and Rebecca's history is whitewashed with a cover story. Luffy and the others make a mad dash for the east port, but not before finishing up a piece of business.",
       "manga_chapters": "796-797",
       "anime_episodes": "740-742",
@@ -350,7 +351,7 @@
       "title": "Wapol's Omnivorous Hurrah",
       "description": "",
       "manga_chapters": "Covers of 236-262",
-      "anime_episodes": 778,
+      "anime_episodes": "778",
       "released": "2017-02-26",
       "hashes": {
         "crc32": "05BE81E6"
@@ -488,7 +489,7 @@
       "title": "You're the Rare Breed",
       "description": "With Usopp now on the crew and their new ship, the Going Merry, under their command, the Straw Hats head to an island said to hold a fabled treasure. There they encounter a strange man stuck in a box who has been looking for the same treasure.",
       "manga_chapters": "42, 22",
-      "anime_episodes": 18,
+      "anime_episodes": "18",
       "released": "2023-01-28",
       "hashes": {
         "crc32": "0C2DBF75"
@@ -606,6 +607,8 @@
       "season": 5,
       "episode": 3,
       "title": "The Storm",
+      "originaltitle": "Storm",
+      "sorttitle": "Storm",
       "description": "It's revealed that Chef Zeff was once a great pirate known as \"Red Leg\" Zeff, and his fighting spirit is as strong as ever. Meanwhile, Gin explains how his men met disaster in the Grand Line when they ran afoul of a devastatingly strong opponent.",
       "manga_chapters": "47-49",
       "anime_episodes": "23-24",
@@ -833,7 +836,7 @@
       "title": "Pirate Buggy \"the Clown\"",
       "description": "Shockingly, it turns out Captain Buggy and Red-Haired Shanks share a common history. When the bombastic clown rips Shanks' straw hat, Luffy's rage knows no bounds.",
       "manga_chapters": "19-21",
-      "anime_episodes": 8,
+      "anime_episodes": "8",
       "released": "2025-05-09",
       "hashes": {
         "crc32": "1809DA8A"
@@ -1069,7 +1072,7 @@
       "episode": 4,
       "title": "Tsuru Returns the Favor",
       "description": "Luffy and Zoro are stalled by Hawkins, but their fortune looks bright when a woman guides them to a teahouse. There, they find an herbal remedy for the river poison that Otama drank, while old acquaintances look on from a distance.",
-      "manga_chapters": 913,
+      "manga_chapters": "913",
       "anime_episodes": "898-899",
       "released": "2019-10-18",
       "hashes": {
@@ -1165,7 +1168,7 @@
       "episode": 38,
       "title": "Roger's Adventure",
       "description": "Oden visits Wano and sees his retainers for the first time in years, but he immediately returns to the sea and leaves his family behind in their care. After stopping at Zou for the final red poneglyph, the Roger Pirates finally make it to the last island.",
-      "manga_chapters": 967,
+      "manga_chapters": "967",
       "anime_episodes": "967-968",
       "released": "2024-01-26",
       "hashes": {
@@ -1201,8 +1204,8 @@
       "episode": 32,
       "title": "Ultimate",
       "description": "Admiral Issho and Fleet Admiral Sakazuki argue over the abolition of the Seven Warlord system and the alliance between two Emperors. Meanwhile, ex-Fleet Admiral Sengoku teaches the young Marines about the legendary Rocks Pirates.",
-      "manga_chapters": 957,
-      "anime_episodes": 958,
+      "manga_chapters": "957",
+      "anime_episodes": "958",
       "released": "2023-07-08",
       "hashes": {
         "crc32": "29B91F56"
@@ -1213,7 +1216,7 @@
       "episode": 14,
       "title": "Thank You for Loving Me",
       "description": "Ace protects his brother from Akainu but suffers a mortal blow in the process. Jinbe and the Whitebeard Pirates rush to his aid but soon realize he is far beyond help. As Ace takes his final breaths, he imparts a heartfelt message.",
-      "manga_chapters": 574,
+      "manga_chapters": "574",
       "anime_episodes": "483-484",
       "released": "2020-10-07",
       "hashes": {
@@ -1402,8 +1405,8 @@
       "episode": 25,
       "title": "A Gentle Snowfall of Remembrance",
       "description": "Enies Lobby and the buster call fleet are out of sight, but the Going Merry begins to break apart. The Straw Hats are intercepted by Iceburg aboard his company ship and discover how the Merry found her way back to them one last time.",
-      "manga_chapters": 430,
-      "anime_episodes": 312,
+      "manga_chapters": "430",
+      "anime_episodes": "312",
       "released": "2020-08-27",
       "hashes": {
         "crc32": "3251D51B"
@@ -1666,8 +1669,8 @@
       "episode": 24,
       "title": "I Made It Here",
       "description": "Robin deciphers the message of the poneglyph, ending the Shandians' centuries-long task of guarding the golden bell. Before leaving Skypiea, the Straw Hats embark on their promised gold heist, and the people of the sky see them off on their journey.",
-      "manga_chapters": 301,
-      "anime_episodes": 194,
+      "manga_chapters": "301",
+      "anime_episodes": "194",
       "released": "2025-04-26",
       "hashes": {
         "crc32": "3F695862"
@@ -1832,7 +1835,7 @@
       "title": "The Light of Shandora",
       "description": "The flashback of the legend of Mont Blanc Noland and Kalgara the warrior continues with the story of how these two very different men suddenly found friendship... and then lost it just as quickly!",
       "manga_chapters": "290-291",
-      "anime_episodes": 188,
+      "anime_episodes": "188",
       "released": "2025-01-18",
       "hashes": {
         "crc32": "481A9A9D"
@@ -1843,8 +1846,8 @@
       "episode": 13,
       "title": "The Emperor's Crew, The Red Hair Pirates",
       "description": "Eustass \"Captain\" Kid sails in, guns blazing against Elbaph while Shanks of the Red Hair Pirates defends his crew and friends... without an ounce of mercy.",
-      "manga_chapters": 1079,
-      "anime_episodes": 1112,
+      "manga_chapters": "1079",
+      "anime_episodes": "1112",
       "released": "2024-09-06",
       "hashes": {
         "crc32": "482F69B7"
@@ -2222,7 +2225,7 @@
       "title": "Rainbase, the City of Dreams",
       "description": "Luffy's band reaches the city of Rainbase but encounter Smoker and Tashigi. As they defend themselves against both the Marines and Baroque Works' millions, Luffy's party storms Crocodile's Rain Dinners Casino.",
       "manga_chapters": "167-168",
-      "anime_episodes": 105,
+      "anime_episodes": "105",
       "released": "2021-07-06",
       "hashes": {
         "crc32": "58865EA7"
@@ -2293,8 +2296,8 @@
       "episode": 12,
       "title": "Hah",
       "description": "Luffy is sent to a great mine where prisoners must endure harsh, forced labor. There, he has an unexpected reunion. Meanwhile, Okiku rushes to the ruins of Oden Castle to confirm the safety of the Straw Hats and the others.",
-      "manga_chapters": 924,
-      "anime_episodes": 916,
+      "manga_chapters": "924",
+      "anime_episodes": "916",
       "released": "2020-04-01",
       "hashes": {
         "crc32": "5ACE812A"
@@ -2484,6 +2487,7 @@
       "season": 16,
       "episode": 18,
       "title": "On the Front Line of Love's Salvation",
+      "originaltitle": "Rescue on the Front Line of Love",
       "description": "Usopp arrives just in time to save Nami from a lethal thunderbolt, and Sanji stealthily searches for a way to sabotage the ark. Despite being slowed by an arm encased in gold, Luffy races up Giant Jack on a mission to settle the score!",
       "manga_chapters": "283-286",
       "anime_episodes": "185-186",
@@ -2497,7 +2501,7 @@
       "episode": 24,
       "title": "Olin",
       "description": "A very big and hungry visitor arrives at Udon looking for Superstar Queen’s sweet red bean oshiruko, and Rasetsu town is in a full-blown riot with the Straw Hats at the center!",
-      "manga_chapters": 945,
+      "manga_chapters": "945",
       "anime_episodes": "942-944",
       "released": "2022-01-18",
       "hashes": {
@@ -2660,7 +2664,7 @@
       "title": "Pearl",
       "description": "Mihawk departs after defeating Zoro, and Krieg continues his assault on the Baratie. Pearl, one of Krieg's strongest men, goes on the offensive with fiery attacks and multiple shields at his disposal, so Sanji reveals his unique fighting style.",
       "manga_chapters": "53-55",
-      "anime_episodes": 25,
+      "anime_episodes": "25",
       "released": "2023-05-15",
       "hashes": {
         "crc32": "6858E16A"
@@ -2683,7 +2687,7 @@
       "episode": 6,
       "title": "The Will of Ohara",
       "description": "Vegapunk Shaka shares his theory about an ancient kingdom and the Void Century. He also reminisces about the foundation of Dragon's Revolutionary Army. Meanwhile, Luffy and Chopper try to activate the giant robot when something surprising happens.",
-      "manga_chapters": 1066,
+      "manga_chapters": "1066",
       "anime_episodes": "1096-1097",
       "released": "2025-02-07",
       "hashes": {
@@ -2753,7 +2757,7 @@
       "title": "Declaration of War",
       "description": "To prove his undying loyalty to Robin, Luffy makes a defiant statement to the World Government.",
       "manga_chapters": "397-398",
-      "anime_episodes": 278,
+      "anime_episodes": "278",
       "released": "2019-07-25",
       "hashes": {
         "crc32": "6C908F32"
@@ -2837,7 +2841,7 @@
       "title": "The First",
       "description": "Luffy convinces the captive Zoro to join his pirate crew, but they must first defeat the tyrannical Captain Morgan.",
       "manga_chapters": "5-7",
-      "anime_episodes": 3,
+      "anime_episodes": "3",
       "released": "2025-05-03",
       "hashes": {
         "crc32": "6E46167D"
@@ -3101,7 +3105,7 @@
       "title": "Because of a Dream",
       "description": "Sanji continues to battle Pearl, but Gin cleverly holds Chef Zeff hostage, forcing Sanji an impossible situation. Sanji's childhood memories flood his mind, and he reflects on why Zeff means so much to him.",
       "manga_chapters": "56-59",
-      "anime_episodes": 26,
+      "anime_episodes": "26",
       "released": "2023-05-28",
       "hashes": {
         "crc32": "757AF173"
@@ -3383,7 +3387,7 @@
       "title": "Noland the Liar",
       "description": "The Straw Hats meet Montblanc Cricket, whose descendant was none other than Montblanc Noland, an infamous \"liar\" who told of a city of gold on Jaya. Cast out for looking for artifacts from the fabled city, he may just know a way to get to Skypiea.",
       "manga_chapters": "227-228",
-      "anime_episodes": 148,
+      "anime_episodes": "148",
       "released": "2023-08-12",
       "hashes": {
         "crc32": "86DC8F38"
@@ -3407,7 +3411,7 @@
       "title": "The Hundred Million Man",
       "description": "While the Straw Hats are in the forest attempting to catch a south bird, Bellamy and his crew attack Masira, Shoujou, and Cricket and steal every gold artifact they had collected over the years from the salvage work of the Saruyama Alliance.",
       "manga_chapters": "231-232",
-      "anime_episodes": 150,
+      "anime_episodes": "150",
       "released": "2023-09-08",
       "hashes": {
         "crc32": "8783E1B0"
@@ -3430,8 +3434,8 @@
       "episode": 13,
       "title": "The Emperor's Crew, The Red Hair Pirates",
       "description": "Eustass \"Captain\" Kid sails in, guns blazing against Elbaph while Shanks of the Red Hair Pirates defends his crew and friends... without an ounce of mercy.",
-      "manga_chapters": 1079,
-      "anime_episodes": 1112,
+      "manga_chapters": "1079",
+      "anime_episodes": "1112",
       "released": "2024-09-06",
       "hashes": {
         "crc32": 88019227
@@ -3514,7 +3518,7 @@
       "episode": 2,
       "title": "Parallels",
       "description": "Usopp manages to anger the brat daughter of bounty hunter Daddy the Father and finds his own life at stake. When Daddy discovers that Usopp is the son of Red Hair Pirate Yasopp, the only man to beat him, he offers him a risky way out.",
-      "manga_chapters": 97,
+      "manga_chapters": "97",
       "anime_episodes": "48, 50",
       "released": "2020-09-22",
       "hashes": {
@@ -3563,7 +3567,7 @@
       "title": "Enter: Tony Tony Chopper",
       "description": "Enter Chopper: a talking, transforming blue-nosed reindeer who was trained by Dr. Kureha in medicine. The Straw Hats immediately see the positives and want him on their crew, but Chopper must first deal with the monstrous pain in his heart.",
       "manga_chapters": "139-140",
-      "anime_episodes": 84,
+      "anime_episodes": "84",
       "released": "2022-09-26",
       "hashes": {
         "crc32": "902076E8"
@@ -3751,8 +3755,8 @@
       "episode": 13,
       "title": "The Emperor's Crew, The Red Hair Pirates",
       "description": "Eustass \"Captain\" Kid sails in, guns blazing against Elbaph while Shanks of the Red Hair Pirates defends his crew and friends... without an ounce of mercy.",
-      "manga_chapters": 1079,
-      "anime_episodes": 1112,
+      "manga_chapters": "1079",
+      "anime_episodes": "1112",
       "released": "2024-09-06",
       "hashes": {
         "crc32": "97E4F5E3"
@@ -3819,6 +3823,8 @@
       "season": 16,
       "episode": 21,
       "title": "Raigō",
+      "originaltitle": "Raigo",
+      "sorttitle": "Raigo",
       "description": "Mont Blanc Noland's tale ends in tragedy and misunderstanding. In the present, Enel strikes Angel Island with a devastating lightning bolt, and Luffy refuses to halt his climb up the beanstalk until he rings the golden bell!",
       "manga_chapters": "292-295",
       "anime_episodes": "189-190",
@@ -3976,8 +3982,8 @@
       "episode": 2,
       "title": "They Call Him \"Straw Hat\" Luffy",
       "description": "While Alvida and her pirates plunder a cruise ship, they come across a barrel containing a strange boy named Monkey D. Luffy. The timid Koby befriends Luffy, and they share their grand dreams with each other.",
-      "manga_chapters": 2,
-      "anime_episodes": 1,
+      "manga_chapters": "2",
+      "anime_episodes": "1",
       "released": "2025-05-03",
       "hashes": {
         "crc32": "A465972A"
@@ -4355,7 +4361,7 @@
       "title": "Warship Island 01 (April Fools 2025)",
       "description": "",
       "manga_chapters": "",
-      "anime_episodes": 54,
+      "anime_episodes": "54",
       "released": "2025-03-31",
       "hashes": {
         "crc32": "B4925314"
@@ -4367,7 +4373,7 @@
       "title": "People's Dreams",
       "description": "After a one-sided brawl with Bellamy, the Straw Hats meet a black-haired pirate outside the bar who reaffirms their dreams and insists the sky island is real. As they depart for the other side of Jaya, another salvager of the Saruyama Alliance appears.",
       "manga_chapters": "225-226",
-      "anime_episodes": 147,
+      "anime_episodes": "147",
       "released": "2023-03-11",
       "hashes": {
         "crc32": "B4950266"
@@ -4475,7 +4481,7 @@
       "title": "Sir Crocodile, the Pirate",
       "description": "In Arabasta, the hero Crocodile appears and puts a decisive end to a pillaging band of pirates. Meanwhile, Mr. 2 Bon Kurei pays a visit to the newly arrived Straw Hats. When he puts his abilities on display, Vivi notices something shocking.",
       "manga_chapters": "155-157",
-      "anime_episodes": 92,
+      "anime_episodes": "92",
       "released": "2022-05-14",
       "hashes": {
         "crc32": "BB1D093C"
@@ -4738,8 +4744,8 @@
       "episode": 10,
       "title": "Oris Plaza",
       "description": "His adopted son within reach, Whitebeard charges forth, undeterred by the strongest the Marines have to offer. With both sides swinging between victory and defeat, the battlefield plunges into chaos. Then Marco takes to the sky and soars to Ace’s side!",
-      "manga_chapters": 567,
-      "anime_episodes": 476,
+      "manga_chapters": "567",
+      "anime_episodes": "476",
       "released": "2020-10-07",
       "hashes": {
         "crc32": "C65F13AA"
@@ -4823,7 +4829,7 @@
       "title": "Heaven's Gate",
       "description": "The Straw Hats, having used the Knock-Up Stream to fly into the sky, arrive on a white ocean above the clouds. While they marvel at the otherworldly sights, they are attacked by a powerful masked figure, and a mysterious flying knight comes to their aid.",
       "manga_chapters": "237-238",
-      "anime_episodes": 153,
+      "anime_episodes": "153",
       "released": "2023-06-12",
       "hashes": {
         "crc32": "CA5552FC"
@@ -4952,7 +4958,7 @@
       "title": "It Begins",
       "description": "Luffy leads a daring—but foolish—raid on Crocodile’s casino. His poor planning lands him behind bars with Captain Smoker. But more importantly, these actions leave Vivi alone and unprotected.",
       "manga_chapters": "169-170",
-      "anime_episodes": 106,
+      "anime_episodes": "106",
       "released": "2021-07-13",
       "hashes": {
         "crc32": "CFA091A0"
@@ -4976,7 +4982,7 @@
       "title": "To the Sea",
       "description": "The island is saved without any villagers ever knowing what almost befell their home. Kaya, grateful to the Straw Hats for what they did, gifts them something invaluable for sailing the high seas. Meanwhile, one more person joins Luffy's crew.",
       "manga_chapters": "40-41",
-      "anime_episodes": 17,
+      "anime_episodes": "17",
       "released": "2025-07-12",
       "hashes": {
         "crc32": "D0A51040"
@@ -5126,7 +5132,7 @@
       "title": "The Fourth",
       "description": "As the dust of battle settles, the still poisoned Gin decides to go back to the Grand Line with Krieg, and Sanji makes the difficult decision to join Luffy's crew. Suddenly, Yosaku returns with news of where Nami took the Going Merry.",
       "manga_chapters": "67-69",
-      "anime_episodes": 30,
+      "anime_episodes": "30",
       "released": "2023-07-29",
       "hashes": {
         "crc32": "D8C1FD62"
@@ -5162,7 +5168,7 @@
       "title": "Fantasia",
       "description": "In the aftermath of Luffy's epic battle with Enel, sunny skies chase away the storms, and the cloud-dwelling citizens of Angel Island turn their attention to rebuilding their homeland.",
       "manga_chapters": "299-300",
-      "anime_episodes": 193,
+      "anime_episodes": "193",
       "released": "2025-03-01",
       "hashes": {
         "crc32": "D9CD96CA"
@@ -5292,6 +5298,7 @@
       "season": 35,
       "episode": 45,
       "title": "Fighting Music",
+      "originaltitle": "Battle Music",
       "description": "Luffy and Zoro are outed by Scratchman Apoo, and Queen announces that anyone who catches them will get a coveted promotion. Elsewhere, Kin’emon's infiltration strategy evolves while Big Mom's children are greeted by a surprise party crasher.",
       "manga_chapters": "980-981",
       "anime_episodes": "985-988",
@@ -5366,7 +5373,7 @@
       "title": "Let's Eat",
       "description": "Cricket explains how the Straw Hats can ride a dangerous vertical sea current to get to Skypiea. However, they must first catch a south bird to steer them toward the point where the stream will erupt from the ocean.",
       "manga_chapters": "229-230",
-      "anime_episodes": 149,
+      "anime_episodes": "149",
       "released": "2023-08-20",
       "hashes": {
         "crc32": "E468A31D"
@@ -5412,6 +5419,7 @@
       "season": 14,
       "episode": 18,
       "title": "I Will Defeat You",
+      "originaltitle": "I Will Surpass You",
       "description": "Vivi finds the cannon but realizes the bomb can't be stopped so casually. Then Pell swoops in with a decisive, if tragic, solution. The final battle between Luffy and Crocodile, which has both parties driven to their utmost, reaches its conclusion.",
       "manga_chapters": "206-210",
       "anime_episodes": "125-126",
@@ -5425,8 +5433,8 @@
       "episode": 1,
       "title": "Romance Dawn, the Dawn of an Adventure",
       "description": "Influenced by the straw-hat-wearing pirate Red-Haired Shanks, an enthusiastic young boy named Monkey D. Luffy dreams of one day becoming King of the Pirates.",
-      "manga_chapters": 1,
-      "anime_episodes": 312,
+      "manga_chapters": "1",
+      "anime_episodes": "312",
       "released": "2025-05-03",
       "hashes": {
         "crc32": "E5F09F49"
@@ -5497,7 +5505,7 @@
       "episode": 0,
       "title": "Long Ring Long Land 00",
       "description": "",
-      "manga_chapters": 303,
+      "manga_chapters": "303",
       "anime_episodes": "207, 225",
       "released": "2025-05-08",
       "hashes": {
@@ -5570,7 +5578,7 @@
       "title": "Stowaway",
       "description": "The Straw Hats have evaded the Marines, but a new development crops up when a certain stowaway makes her presence on the Going Merry known… and she wants to be part of the crew!",
       "manga_chapters": "217-218",
-      "anime_episodes": 130,
+      "anime_episodes": "130",
       "released": "2024-08-16",
       "hashes": {
         "crc32": "EAA06203"
@@ -5618,7 +5626,7 @@
       "title": "Angel Beach",
       "description": "After bidding farewell to Gan Fall and passing through the gate to Skypiea, the pirates encounter a family of Skypieans: Conis and her father, Pagaya. The two explain the workings of life in the sky and introduce the crew to the different dials.",
       "manga_chapters": "239-240",
-      "anime_episodes": 154,
+      "anime_episodes": "154",
       "released": "2023-06-12",
       "hashes": {
         "crc32": "EB6E8FF5"
@@ -5678,7 +5686,7 @@
       "title": "Gaimon 01 (April Fools 2021)",
       "description": "The Straw Hats venture to the fabled \"Treasure Island\" to discover riches, adventure, and... strange creatures. Oh, and everything is in Klingon for some reason.",
       "manga_chapters": "42, 22",
-      "anime_episodes": 18,
+      "anime_episodes": "18",
       "released": "2021-03-31",
       "hashes": {
         "crc32": "EFF6059A"
@@ -5866,8 +5874,8 @@
       "episode": 31,
       "title": "Big News",
       "description": "The resolution that passed during the Reverie and the incidents surrounding the conference stun people all over the world and corner the Seven Warlords of the Sea. Meanwhile, Captain Koby secretly contacts someone currently in Wano.",
-      "manga_chapters": 956,
-      "anime_episodes": 957,
+      "manga_chapters": "956",
+      "anime_episodes": "957",
       "released": "2023-06-27",
       "hashes": {
         "crc32": "F6C7EB83"
@@ -5945,7 +5953,7 @@
       "title": "The Knock-Up Stream",
       "description": "Luffy returns victorious from his showdown with Bellamy, and the Going Merry has been refit by the Saruyama Alliance to handle its upcoming upward flight. The Straw Hats follow their captive south bird and steel themselves for their journey to the sky.",
       "manga_chapters": "235-236",
-      "anime_episodes": 152,
+      "anime_episodes": "152",
       "released": "2023-09-30",
       "hashes": {
         "crc32": "FA2E5ADD"
