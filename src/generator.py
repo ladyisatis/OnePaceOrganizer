@@ -6,6 +6,7 @@ import httpx
 import io
 import os
 import time
+from deepdiff import DeepDiff
 from csv import DictReader as CSVReader
 from datetime import date, datetime, timezone
 from yaml import dump as YamlDump, safe_load as YamlLoad
@@ -222,6 +223,7 @@ def generate_json():
     tvshow_yml = Path(".", "data", "tvshow.yml")
     seasons_yml = Path(".", "data", "seasons.yml")
     episodes_dir = Path(".", "data", "episodes")
+    json_file = Path(".", "data.json")
 
     out = {"last_update": datetime.now(timezone.utc).isoformat()}
 
@@ -245,8 +247,14 @@ def generate_json():
 
     out["episodes"] = episodes
 
-    with Path(".", "data.json").open(mode='wb') as f:
-        f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2 ))
+    old_json = orjson.loads(json_file.read_bytes())
+    episodes_changed = not DeepDiff(old_json["episodes"], out["episodes"])
+    seasons_changed = not DeepDiff(old_json["seasons"], out["seasons"])
+    tvshow_changed = not DeepDiff(old_json["tvshow"], out["tvshow"])
+
+    if episodes_changed or seasons_changed or tvshow_changed:
+        with json_file.open(mode='wb') as f:
+            f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2 ))
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'update':
