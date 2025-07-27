@@ -179,7 +179,7 @@ def update():
                 episode = season
                 season = 0
 
-            if isinstance(released, datetime.date):
+            if isinstance(released, date) or isinstance(released, datetime):
                 released = released.isoformat()
 
             if file_path.exists():
@@ -188,7 +188,7 @@ def update():
                 with file_path.open(mode='r', encoding='utf-8') as f:
                     old_data = YamlLoad(stream=f)
 
-                if isinstance(old_data["released"], datetime.date):
+                if isinstance(old_data["released"], date):
                     old_data["released"] = old_data["released"].isoformat()
 
                 if old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
@@ -271,7 +271,7 @@ def generate_json():
         if not isinstance(episodes[key]["anime_episodes"], str):
             episodes[key]["anime_episodes"] = str(episodes[key]["anime_episodes"])
 
-        if isinstance(episodes[key]["released"], datetime.date):
+        if isinstance(episodes[key]["released"], date) or isinstance(episodes[key]["released"], datetime):
             episodes[key]["released"] = episodes[key]["released"].isoformat()
 
     out["episodes"] = sort_dict(episodes)
