@@ -126,8 +126,8 @@ def update():
                             "episode": episode,
                             "title": f"{out_seasons[season]['title']} {episode:02d}",
                             "description": "",
-                            "manga_chapters": chapters,
-                            "anime_episodes": anime_episodes,
+                            "manga_chapters": str(chapters),
+                            "anime_episodes": str(anime_episodes),
                             "released": release_date.isoformat()
                         }
 
@@ -171,6 +171,7 @@ def update():
 
             season = data['season']
             episode = data['episode']
+            released = data['released']
 
             if season == 99:
                 season = 0
@@ -178,11 +179,17 @@ def update():
                 episode = season
                 season = 0
 
+            if isinstance(released, datetime.date):
+                released = released.isoformat()
+
             if file_path.exists():
                 old_data = {"title": "", "description": "", "manga_chapters": "", "anime_episodes": "", "released": ""}
 
                 with file_path.open(mode='r', encoding='utf-8') as f:
                     old_data = YamlLoad(stream=f)
+
+                if isinstance(old_data["released"], datetime.date):
+                    old_data["released"] = old_data["released"].isoformat()
 
                 if old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
                     continue
@@ -199,7 +206,7 @@ def update():
                 f"anime_episodes: {data['anime_episodes']}\n"
                 "\n"
                 "# rating: TV-14\n"
-                f"released: {data['released']}\n"
+                f"released: {released}\n"
                 "\n"
                 "hashes:\n"
                 f"  crc32: {crc32}\n"
@@ -257,6 +264,15 @@ def generate_json():
         if 'reference' in episodes[key]:
             with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
                 episodes[key] = YamlLoad(stream=f)
+
+        if not isinstance(episodes[key]["manga_chapters"], str):
+            episodes[key]["manga_chapters"] = str(episodes[key]["manga_chapters"])
+
+        if not isinstance(episodes[key]["anime_episodes"], str):
+            episodes[key]["anime_episodes"] = str(episodes[key]["anime_episodes"])
+
+        if isinstance(episodes[key]["released"], datetime.date):
+            episodes[key]["released"] = episodes[key]["released"].isoformat()
 
     out["episodes"] = sort_dict(episodes)
 
