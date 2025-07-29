@@ -5,6 +5,7 @@ import orjson
 import httpx
 import io
 import os
+import string
 import time
 from deepdiff import DeepDiff
 from csv import DictReader as CSVReader
@@ -13,13 +14,22 @@ from yaml import dump as YamlDump, safe_load as YamlLoad
 from pathlib import Path
 from httpx_retries import RetryTransport, Retry
 
-def unicode_fix(s):
-    s = s.replace("’", "'")
-    s = s.replace("…", "...")
-    s = s.replace("“", '"')
-    s = s.replace("”", '"')
+def escape_char(c):
+    if c == "’":
+        return "'"
+    elif c == "…":
+        return "..."
+    elif c == "“" or c == "”":
+        return '"'
+    elif c in string.printable and ord(c) < 128:
+        return c
+    elif ord(c) <= 0xFFFF:
+        return f'\\u{ord(c):04x}'
+    else:
+        return f'\\U{ord(c):08x}'
 
-    return s.encode('unicode_escape').decode('ascii')
+def unicode_fix(s):
+    return ''.join(escape_char(c) for c in s)
 
 def update():
     GCLOUD_API_KEY=os.environ['GCLOUD_API_KEY'] if 'GCLOUD_API_KEY' in os.environ else ''
@@ -61,9 +71,9 @@ def update():
                         continue
 
                     out_seasons[part] = {
-                        "saga": unicode_fix(row['saga_title']),
-                        "title": unicode_fix(row['title_en']),
-                        "description": unicode_fix(row['description_en'])
+                        "saga": row['saga_title'],
+                        "title": row['title_en'],
+                        "description": row['description_en']
                     }
 
             r = client.get(f"https://sheets.googleapis.com/v4/spreadsheets/{ONE_PACE_EPISODE_GUIDE_ID}?key={GCLOUD_API_KEY}")
@@ -74,7 +84,7 @@ def update():
                 if sheetId == 0:
                     continue
 
-                season_title = unicode_fix(sheet['properties']['title'])
+                season_title = sheet['properties']['title']
 
                 if season_title != out_seasons[season]['title']:
                     out_seasons[season]['originaltitle'] = out_seasons[season]['title']
@@ -134,8 +144,8 @@ def update():
                             "episode": episode,
                             "title": f"{out_seasons[season]['title']} {episode:02d}",
                             "description": "",
-                            "manga_chapters": unicode_fix(str(chapters)),
-                            "anime_episodes": unicode_fix(str(anime_episodes)),
+                            "manga_chapters": str(chapters),
+                            "anime_episodes": str(anime_episodes),
                             "released": release_date.isoformat()
                         }
 
@@ -158,10 +168,10 @@ def update():
                         if 'arc_title' not in row:
                             continue
 
-                        season = unicode_fix(row['arc_title'])
+                        season = row['arc_title']
                         episode = row['arc_part']
-                        title = unicode_fix(row['title_en'])
-                        description = unicode_fix(row['description_en'])
+                        title = row['title_en']
+                        description = row['description_en']
 
                         if season == '' or episode == '' or title == '':
                             continue
@@ -273,33 +283,31 @@ def generate_json():
             with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
                 episodes[key] = YamlLoad(stream=f)
 
-        episodes[key]["title"] = unicode_fix(episodes[key]["title"])
-        episodes[key]["description"] = unicode_fix(episodes[key]["description"])
-
-        if "originaltitle" in episodes[key]:
-            episodes[key]["originaltitle"] = unicode_fix(episodes[key]["originaltitle"])
-
-        if "sorttitle" in episodes[key]:
-            episodes[key]["sorttitle"] = unicode_fix(episodes[key]["sorttitle"])
-
-        if not isinstance(episodes[key]["manga_chapters"], str):
-            episodes[key]["manga_chapters"] = unicode_fix(str(episodes[key]["manga_chapters"]))
-
-        if not isinstance(episodes[key]["anime_episodes"], str):
-            episodes[key]["anime_episodes"] = unicode_fix(str(episodes[key]["anime_episodes"]))
-
-        if isinstance(episodes[key]["released"], date) or isinstance(episodes[key]["released"], datetime):
-            episodes[key]["released"] = episodes[key]["released"].isoformat()
+        for inner_key, val in episodes[key].items():
+            if inner_key == "season" or inner_key == "episode":
+                continue
+            elif isinstance(val, date) or isinstance(val, datetime):
+                episodes[key][inner_key] = val.isoformat()
+            elif isinstance(val, str):
+                episodes[key][inner_key] = unicode_fix(val)
+            elif isinstance(val, int) or isinstance(val, float):
+                episodes[key][inner_key] = str(val)
 
     out["episodes"] = sort_dict(episodes)
 
-    old_json = orjson.loads(json_file.read_bytes())
-    episodes_changed = dict_changed(old_json["episodes"], out["episodes"])
-    seasons_changed = dict_changed(old_json["seasons"], out["seasons"])
-    tvshow_changed = dict_changed(old_json["tvshow"], out["tvshow"])
+    try:
+        old_json = orjson.loads(json_file.read_bytes())
+        episodes_changed = dict_changed(old_json["episodes"], out["episodes"])
+        seasons_changed = dict_changed(old_json["seasons"], out["seasons"])
+        tvshow_changed = dict_changed(old_json["tvshow"], out["tvshow"])
+    except Exception as e:
+        print(f"Warning: {e}")
+        episodes_changed = True
+        seasons_changed = True
+        tvshow_changed = True
 
     if episodes_changed or seasons_changed or tvshow_changed:
-        out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\", b"\\")
+        out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
         json_file.write_bytes(out)
 
 def main():
