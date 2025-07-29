@@ -672,7 +672,7 @@ class OnePaceOrganizer(QWidget):
 
         data_file = Path(".", "data.json")
         data = {}
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(datetime.timezone.utc)
 
         if data_file.exists():
             data = await run_sync(data_file.read_bytes)
@@ -687,7 +687,7 @@ class OnePaceOrganizer(QWidget):
                     self.episodes = data["episodes"] if "episodes" in data else {}
                     return True
 
-            last_update = datetime.datetime.fromtimestamp(data_file.stat().st_mtime)
+            last_update = datetime.datetime.fromtimestamp(data_file.stat().st_mtime).astimezone(datetime.timezone.utc)
             if now - last_update < datetime.timedelta(hours=1):
                 self.tvshow = data["tvshow"] if "tvshow" in data else {}
                 self.seasons = data["seasons"] if "seasons" in data else {}
@@ -1030,14 +1030,23 @@ class OnePaceOrganizer(QWidget):
                     else:
                         plex_episode.editOriginallyAvailable(str(episode_info["released"]))
 
-                manga_anime = ""
-                if episode_info["manga_chapters"] != "" and episode_info["anime_episodes"] != "":
-                    manga_anime = f"Manga Chapter(s): {episode_info['manga_chapters']}\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+                desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
+                manga_str = ""
+                anime_str = ""
 
-                if not "description" in episode_info or episode_info["description"] == "":
-                    description = manga_anime
-                else:
-                    description = f"{episode_info['description']}\n\n{manga_anime}"
+                if episode_info["manga_chapters"] != "":
+                    if desc_str != "":
+                        manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
+                    else:
+                        manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
+
+                if episode_info["anime_episodes"] != "":
+                    if desc_str != "" or manga_str != "":
+                        anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+                    else:
+                        anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
+
+                description = f"{desc_str}{manga_str}{anime_str}"
 
                 plex_episode.editSummary(description)
 
