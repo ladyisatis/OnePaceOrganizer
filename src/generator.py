@@ -18,8 +18,7 @@ def unicode_fix(s):
     s = s.replace("…", "...")
     s = s.replace("“", '"')
     s = s.replace("”", '"')
-    #return s.encode('unicode_escape').decode('ascii').replace("\\\\", "\\")
-    return s
+    return s.encode('unicode_escape').decode('ascii')
 
 def update():
     GCLOUD_API_KEY=os.environ['GCLOUD_API_KEY'] if 'GCLOUD_API_KEY' in os.environ else ''
@@ -299,8 +298,8 @@ def generate_json():
     tvshow_changed = dict_changed(old_json["tvshow"], out["tvshow"])
 
     if episodes_changed or seasons_changed or tvshow_changed:
-        with json_file.open(mode='wb') as f:
-            f.write(orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2 ))
+        out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\", b"\\")
+        json_file.write_bytes(out)
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'update':
