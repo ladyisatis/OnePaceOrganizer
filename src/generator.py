@@ -18,6 +18,7 @@ def unicode_fix(s):
     s = s.replace("…", "...")
     s = s.replace("“", '"')
     s = s.replace("”", '"')
+
     return s.encode('unicode_escape').decode('ascii')
 
 def update():
