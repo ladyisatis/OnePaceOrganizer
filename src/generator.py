@@ -13,6 +13,14 @@ from yaml import dump as YamlDump, safe_load as YamlLoad
 from pathlib import Path
 from httpx_retries import RetryTransport, Retry
 
+def unicode_fix(s):
+    s = s.replace("’", "'")
+    s = s.replace("…", "...")
+    s = s.replace("“", '"')
+    s = s.replace("”", '"')
+    #return s.encode('unicode_escape').decode('ascii').replace("\\\\", "\\")
+    return s
+
 def update():
     GCLOUD_API_KEY=os.environ['GCLOUD_API_KEY'] if 'GCLOUD_API_KEY' in os.environ else ''
     if GCLOUD_API_KEY == "":
@@ -53,9 +61,9 @@ def update():
                         continue
 
                     out_seasons[part] = {
-                        "saga": row['saga_title'],
-                        "title": row['title_en'],
-                        "description": row['description_en']
+                        "saga": unicode_fix(row['saga_title']),
+                        "title": unicode_fix(row['title_en']),
+                        "description": unicode_fix(row['description_en'])
                     }
 
             r = client.get(f"https://sheets.googleapis.com/v4/spreadsheets/{ONE_PACE_EPISODE_GUIDE_ID}?key={GCLOUD_API_KEY}")
@@ -66,7 +74,7 @@ def update():
                 if sheetId == 0:
                     continue
 
-                season_title = sheet['properties']['title']
+                season_title = unicode_fix(sheet['properties']['title'])
 
                 if season_title != out_seasons[season]['title']:
                     out_seasons[season]['originaltitle'] = out_seasons[season]['title']
@@ -126,8 +134,8 @@ def update():
                             "episode": episode,
                             "title": f"{out_seasons[season]['title']} {episode:02d}",
                             "description": "",
-                            "manga_chapters": str(chapters),
-                            "anime_episodes": str(anime_episodes),
+                            "manga_chapters": unicode_fix(str(chapters)),
+                            "anime_episodes": unicode_fix(str(anime_episodes)),
                             "released": release_date.isoformat()
                         }
 
@@ -150,10 +158,10 @@ def update():
                         if 'arc_title' not in row:
                             continue
 
-                        season = row['arc_title']
+                        season = unicode_fix(row['arc_title'])
                         episode = row['arc_part']
-                        title = row['title_en']
-                        description = row['description_en']
+                        title = unicode_fix(row['title_en'])
+                        description = unicode_fix(row['description_en'])
 
                         if season == '' or episode == '' or title == '':
                             continue
@@ -265,11 +273,20 @@ def generate_json():
             with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
                 episodes[key] = YamlLoad(stream=f)
 
+        episodes[key]["title"] = unicode_fix(episodes[key]["title"])
+        episodes[key]["description"] = unicode_fix(episodes[key]["description"])
+
+        if "originaltitle" in episodes[key]:
+            episodes[key]["originaltitle"] = unicode_fix(episodes[key]["originaltitle"])
+
+        if "sorttitle" in episodes[key]:
+            episodes[key]["sorttitle"] = unicode_fix(episodes[key]["sorttitle"])
+
         if not isinstance(episodes[key]["manga_chapters"], str):
-            episodes[key]["manga_chapters"] = str(episodes[key]["manga_chapters"])
+            episodes[key]["manga_chapters"] = unicode_fix(str(episodes[key]["manga_chapters"]))
 
         if not isinstance(episodes[key]["anime_episodes"], str):
-            episodes[key]["anime_episodes"] = str(episodes[key]["anime_episodes"])
+            episodes[key]["anime_episodes"] = unicode_fix(str(episodes[key]["anime_episodes"]))
 
         if isinstance(episodes[key]["released"], date) or isinstance(episodes[key]["released"], datetime):
             episodes[key]["released"] = episodes[key]["released"].isoformat()
