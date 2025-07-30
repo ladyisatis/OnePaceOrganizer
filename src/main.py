@@ -6,6 +6,7 @@ import functools
 import hashlib
 import httpx
 import orjson
+import os
 import plexapi
 import re
 import shutil
@@ -18,6 +19,7 @@ import zlib
 from plexapi.exceptions import TwoFactorRequired as PlexApiTwoFactorRequired, Unauthorized as PlexApiUnauthorized
 from plexapi.myplex import MyPlexAccount
 from pathlib import Path
+from loguru import logger
 from multiprocessing import freeze_support
 
 from prompt_toolkit import PromptSession
@@ -92,6 +94,20 @@ def bundle_file(*args):
 
     return local_path
 
+def get_env(name, default=""):
+    key = f"OPO_{name.upper()}"
+
+    val = os.environ[key] if key in os.environ else default
+    if val == "true":
+        return True
+    elif val == "false":
+        return False
+
+    return val
+
+logger.remove(0)
+logger.add(sink=sys.stderr, level=get_env("log_level", "INFO"))
+
 class OnePaceOrganizer():
     def __init__(self):
         self.tvshow = {}
@@ -99,34 +115,38 @@ class OnePaceOrganizer():
         self.seasons = {}
 
         self.version = "?"
+        self.interactive = get_env("interactive", True)
+
         self.config_file = Path(".", "config.json")
+        self.do_load_config = get_env("load_config", True)
+        self.do_save_config = get_env("save_config", True)
 
         self.posters_path = bundle_file("data", "posters").resolve()
         if not self.posters_path.is_dir():
             self.posters_path = bundle_file("posters").resolve()
 
-        self.input_path = ""
-        self.output_path = ""
+        self.input_path = get_env("input_path")
+        self.output_path = get_env("output_path")
 
         self.plexapi_account = None
         self.plexapi_server = None
-        self.plex_config_enabled = False
-        self.plex_config_url = "http://127.0.0.1:32400"
+        self.plex_config_enabled = get_env("plex_enabled", False)
+        self.plex_config_url = get_env("plex_url", "http://127.0.0.1:32400")
 
         self.plex_config_servers = {}
-        self.plex_config_server_id = ""
+        self.plex_config_server_id = get_env("plex_server")
 
         self.plex_config_libraries = {}
-        self.plex_config_library_key = None
+        self.plex_config_library_key = get_env("plex_library")
 
         self.plex_config_shows = {}
-        self.plex_config_show_guid = None
+        self.plex_config_show_guid = get_env("plex_show")
 
-        self.plex_config_use_token = False
-        self.plex_config_auth_token = ""
-        self.plex_config_username = ""
-        self.plex_config_password = ""
-        self.plex_config_remember = True
+        self.plex_config_use_token = get_env("plex_use_token", False)
+        self.plex_config_auth_token = get_env("plex_auth_token")
+        self.plex_config_username = get_env("plex_username")
+        self.plex_config_password = get_env("plex_password")
+        self.plex_config_remember = get_env("plex_remember", False)
 
         self.load_config()
 
@@ -145,10 +165,16 @@ class OnePaceOrganizer():
         toml_path = bundle_file("pyproject.toml")
         if toml_path.exists():
             with toml_path.open(mode="rb") as f:
-                self.version = tomllib.load(f)["project"]["version"]
+                t = tomllib.load(f)
+                logger.trace(t)
+                self.version = t["project"]["version"]
+
+        if not self.do_load_config:
+            return
 
         if self.config_file.exists():
             config = orjson.loads(self.config_file.read_bytes())
+            logger.trace(config)
 
             self.input_path = Path(config["path_to_eps"]).resolve()
             self.output_path = Path(config["episodes"]).resolve()
@@ -181,6 +207,9 @@ class OnePaceOrganizer():
             self.plex_config_remember = config["plex"]["remember"]
 
     def save_config(self):
+        if not self.do_save_config:
+            return
+
         self.config_file.write_bytes(orjson.dumps({
             "path_to_eps": str(self.input_path),
             "episodes": str(self.output_path),
@@ -202,13 +231,12 @@ class OnePaceOrganizer():
 
     def check_none(self, val):
         if val == None:
-            print("User clicked Cancel")
+            logger.critical("User clicked Cancel")
             sys.exit(1)
 
     async def run(self):
         if self.input_path != "" and self.output_path != "":
             text = (
-                "A prior configuration was found. Do you want to use this?\n\n"
                 f"Path to One Pace Files: {self.input_path}\n"
                 f"Where to Place After Renaming: {self.output_path}\n"
             )
@@ -257,20 +285,33 @@ class OnePaceOrganizer():
                     "Mode: .nfo (Jellyfin)\n"
                 )
 
-            yn = await yes_no_dialog(
-                title=self.window_title,
-                text=text
-            ).run_async()
+            if self.interactive:
+                yn = await yes_no_dialog(
+                    title=self.window_title,
+                    text=f"A prior configuration was found. Do you want to use this?\n\n{text}"
+                ).run_async()
+            else:
+                yn = True
+                for line in text.split("\n"):
+                    logger.info(line)
 
             if yn:
                 if self.plex_config_enabled:
                     logged_in = await self.plex_login()
 
                     if not logged_in:
-                        await self.run_plex_wizard()
+                        if self.interactive:
+                            await self.run_plex_wizard()
+                        else:
+                            logger.critical("All configuration variables have not been set, exiting")
+                            return
 
                 await self.start_process()
                 return
+
+        elif not self.interactive:
+            logger.critical("All configuration variables have not been set, exiting")
+            return
 
         else:
             await message_dialog(
@@ -311,6 +352,9 @@ class OnePaceOrganizer():
         await self.start_process()
 
     async def run_plex_wizard(self):
+        if not self.interactive:
+            return
+
         self.plex_config_use_token = await yes_no_dialog(
             title=self.window_title,
             text='Choose your Plex login method:',
@@ -471,6 +515,7 @@ class OnePaceOrganizer():
             try:
                 self.plexapi_account = await run_sync(MyPlexAccount, token=self.plex_config_auth_token)
             except:
+                logger.debug(traceback.format_exc())
                 self.plexapi_account = None
 
         if self.plexapi_account == None:
@@ -483,19 +528,28 @@ class OnePaceOrganizer():
                     self.plexapi_account = await run_sync(MyPlexAccount, token=self.plex_config_auth_token)
 
                 except PlexApiUnauthorized:
-                    await message_dialog(
-                        title=self.window_title,
-                        text="Invalid Plex account token, please try again."
-                    ).run_async()
+                    logger.debug(traceback.format_exc())
+
+                    if self.interactive:
+                        await message_dialog(
+                            title=self.window_title,
+                            text="Invalid Plex account token, please try again."
+                        ).run_async()
+                    else:
+                        logger.error("Invalid Plex account token, please try again.")
+
                     return False
 
                 except:
                     e = traceback.format_exc()
-                    await message_dialog(
-                        title=self.window_title,
-                        text=f"Unknown error: {e}"
-                    ).run_async()
-                    print(e)
+
+                    if self.interactive:
+                        await message_dialog(
+                            title=self.window_title,
+                            text=f"Unknown error: {e}"
+                        ).run_async()
+
+                    logger.error(e)
                     return False
 
             else:
@@ -508,18 +562,26 @@ class OnePaceOrganizer():
                     )
 
                 except PlexApiTwoFactorRequired:
+                    logger.debug(traceback.format_exc())
                     unauthorized = True
 
                     while unauthorized:
-                        code = await input_dialog(
-                            title=self.window_title,
-                            text="Enter the 2-Factor Authorization Code for your Plex Account:"
-                        ).run_async()
+                        if self.interactive:
+                            code = await input_dialog(
+                                title=self.window_title,
+                                text="Enter the 2-Factor Authorization Code for your Plex Account:"
+                            ).run_async()
 
-                        self.check_none(code)
+                            self.check_none(code)
 
-                        if code == "":
-                            continue
+                            if code == "":
+                                continue
+                        else:
+                            code = get_env("plex_code")
+
+                            if code == "":
+                                logger.trace("plex_code=[blank]")
+                                return False
 
                         try:
                             self.plexapi_account = await run_sync(
@@ -531,20 +593,30 @@ class OnePaceOrganizer():
                             )
                             unauthorized = False
                         except:
-                            await message_dialog(
-                                title=self.window_title,
-                                text="Invalid 2-Factor Auth code, please try again."
-                            ).run_async()
+                            if self.interactive:
+                                await message_dialog(
+                                    title=self.window_title,
+                                    text="Invalid 2-Factor Auth code, please try again."
+                                ).run_async()
+                            else:
+                                logger.error(traceback.format_exc())
+                                return False
 
                 except PlexApiUnauthorized:
+                    logger.trace(traceback.format_exc())
                     return False
 
                 except:
                     e = traceback.format_exc()
-                    await message_dialog(
-                        title=self.window_title,
-                        text=f"Unknown error: {e}"
-                    ).run_async()
+
+                    if self.interactive:
+                        await message_dialog(
+                            title=self.window_title,
+                            text=f"Unknown error: {e}"
+                        ).run_async()
+                    else:
+                        logger.error(f"Unknown error: {e}")
+
                     return False
 
             if self.plex_config_remember:
@@ -566,19 +638,33 @@ class OnePaceOrganizer():
             }
 
             self.plex_config_server_id = resources[0].clientIdentifier
+
+            if not self.interactive:
+                logger.info(f"Connecting to {resources[0].name} ({resources[0].clientIdentifier})")
+
             self.plexapi_server = resources[0].connect()
+
+            if not self.interactive:
+                logger.info("Connected")
 
         else:
             for i, resource in enumerate(resources):
                 selected = self.plex_config_server_id == resource.clientIdentifier
 
+                logger.trace(f"found: {resource.clientIdentifier} ({resource.name}, selected={selected})")
                 self.plex_config_servers[resource.clientIdentifier] = {
                     "name": resource.name,
                     "selected": selected
                 }
 
                 if selected:
+                    if not self.interactive:
+                        logger.info(f"Connecting to {resource.name} ({resource.clientIdentifier})")
+
                     self.plexapi_server = await run_sync(resource.connect)
+
+                    if not self.interactive:
+                        logger.info("Connected")
 
         return True
 
@@ -626,6 +712,9 @@ class OnePaceOrganizer():
         return self.dialog
 
     async def pb_progress(self, val):
+        if not self.interactive:
+            return
+
         val = int(val)
         if val > 100:
             return
@@ -634,38 +723,56 @@ class OnePaceOrganizer():
         await run_sync(self.dialog.invalidate)
 
     async def pb_label(self, text):
+        if not self.interactive:
+            logger.info(text)
+            return
+
         self.dialog_label.text = text
         asyncio.get_event_loop().call_soon_threadsafe(self.log_output.buffer.insert_text, f"{text}\n")
         await run_sync(self.dialog.invalidate)
 
     async def pb_button_text(self, text):
+        if not self.interactive:
+            return
+
         self.button.text = text
         await run_sync(self.dialog.invalidate)
 
     async def pb_log_output(self, val):
+        if not self.interactive:
+            val = val.split("\n")
+            for line in val:
+                logger.info(line)
+            return
+
         asyncio.get_event_loop().call_soon_threadsafe(self.log_output.buffer.insert_text, f"{val}\n")
         await run_sync(self.dialog.invalidate)
 
     async def start_process(self):
-        async with self.pb_lock:
-            self.pb_task = asyncio.create_task(self.progress_dialog().run_async())
+        if self.interactive:
+            async with self.pb_lock:
+                self.pb_task = asyncio.create_task(self.progress_dialog().run_async())
 
         self.process_task = asyncio.create_task(self.start_process_task())
 
         try:
             await self.process_task
 
-            async with self.pb_lock:
-                if self.pb_task:
-                    await self.pb_task
+            if self.interactive:
+                async with self.pb_lock:
+                    if self.pb_task:
+                        await self.pb_task
 
-            if self.dialog.future != None:
-                await run_sync(self.dialog.exit, result=True)
+                if self.dialog.future != None:
+                    await run_sync(self.dialog.exit, result=True)
 
         except asyncio.CancelledError:
-            if self.dialog.future != None:
+            if self.interactive and self.dialog.future != None:
                 await self.pb_label("Cancelled")
                 await self.pb_button_text("Exit")
+
+            elif not self.interactive:
+                logger.warning(traceback.format_exc())
 
     async def start_process_task(self):
         try:
@@ -700,6 +807,7 @@ class OnePaceOrganizer():
         if data_file.exists():
             data = await run_sync(data_file.read_bytes)
             data = await run_sync(orjson.loads, data)
+            logger.trace(data)
 
             if "last_update" in data and data["last_update"] != "":
                 last_update = datetime.datetime.fromisoformat(data["last_update"])
@@ -737,6 +845,8 @@ class OnePaceOrganizer():
                             await run_sync(f.write, chunk)
 
                 data = await run_sync(orjson.loads, data_file.read_bytes())
+                logger.trace(data)
+
                 if len(data) > 0:
                     self.tvshow = data["tvshow"] if "tvshow" in data else {}
                     self.seasons = data["seasons"] if "seasons" in data else {}
@@ -770,6 +880,7 @@ class OnePaceOrganizer():
                 episode_files.append(seasons_yml)
 
             total_files = len(episode_files)
+            logger.trace(episode_files)
 
             if total_files == 0:
                 return False
@@ -781,6 +892,7 @@ class OnePaceOrganizer():
 
                 with file.open(mode='r', encoding='utf-8') as f:
                     parsed = await run_sync(yaml.safe_load, stream=f)
+                    logger.trace(f"{file}: {parsed}")
 
                 if file == tvshow_yml:
                     self.tvshow = parsed
@@ -790,6 +902,7 @@ class OnePaceOrganizer():
 
                 elif "reference" in parsed:
                     ref = parsed["reference"]
+                    logger.debug(f"{crc32}.yml -> {ref}.yml")
 
                     if ref in self.episodes and isinstance(self.episodes[ref], dict):
                         self.episodes[crc32] = self.episodes[ref]
@@ -798,14 +911,18 @@ class OnePaceOrganizer():
                             self.episodes[crc32] = await run_sync(yaml.safe_load, stream=f)
 
                 elif len(crc32) == 8:
+                    logger.debug(f"loaded {crc32}: {parsed}")
                     self.episodes[crc32] = parsed
 
                 else:
                     crc32 = crc32.split("_")[0]
+                    logger.trace(crc32)
 
                     if crc32 in self.episodes and isinstance(self.episodes[crc32], list):
+                        logger.debug(f"add {file} to list {crc32}: {parsed}")
                         self.episodes[crc32].append(parsed)
                     else:
+                        logger.debug(f"create {crc32} as list: {parsed}")
                         self.episodes[crc32] = [parsed]
 
                 await self.pb_progress(int((index + 1 / total_files) * 100))
@@ -829,9 +946,11 @@ class OnePaceOrganizer():
         filelist = []
 
         async for file in glob(self.input_path, "**/*.[mM][kK][vV]"):
+            logger.trace(file)
             filelist.append(file)
 
         async for file in glob(self.input_path, "**/*.[mM][pP]4"):
+            logger.trace(file)
             filelist.append(file)
 
         await self.pb_progress(0)
@@ -839,28 +958,34 @@ class OnePaceOrganizer():
         num_found = 0
         num_calced = 0
         filelist_total = len(filelist)
+        logger.debug(f"{filelist_total} files found")
 
         for index, file in enumerate(filelist):
             match = crc_pattern.search(file.name)
             file_path = file.resolve()
+            logger.debug(f"working: {index}. {file_path}")
 
             if match:
                 crc32 = match.group(1)
                 num_found = num_found + 1
+                logger.debug(f"found: {num_found}. {file} -> {crc32}")
             else:
                 await self.pb_log_output(f"Calculating for {file_path}...")
                 crc32 = await async_crc32(file_path)
                 num_calced = num_calced + 1
+                logger.debug(f"result: {num_calced}. {crc32}")
 
             await self.pb_progress(int((index + 1 / filelist_total) * 100))
 
             if crc32 in self.episodes:
+                logger.trace(f"{crc32}: {file_path}")
                 video_files.append((crc32, file_path))
 
             elif file.suffix.lower() == '.mkv':
                 try:
                     with file_path.open(mode='rb') as f:
                         mkv = await run_sync(enzyme.MKV, f)
+                        logger.trace(mkv)
 
                     if mkv == None or mkv.info == None or mkv.info.title == None or mkv.info.title == "":
                         await self.pb_log_output(f"Skipping {file.name}: Episode metadata missing, infering information from MKV also failed")
@@ -876,11 +1001,13 @@ class OnePaceOrganizer():
                     m_episode = 0
 
                     if match:
+                        logger.trace(match)
                         arc_name = match.group(1).strip()
                         ep_num = int(match.group(2))
 
                         for season, season_info in self.seasons.items():
                             if season_info["title"] == arc_name and crc32 not in self.episodes:
+                                logger.debug(f"found {season_info['title']} -> s{season} e{ep_num}")
                                 m_season = season
                                 m_episode = ep_num
 
@@ -892,6 +1019,7 @@ class OnePaceOrganizer():
                                 self.episodes[crc32] = episode_info
                                 found_existing = True
 
+                        logger.trace(found_existing)
                         if not found_existing:
                             self.episodes[crc32] = {
                                 "season": m_season,
@@ -903,6 +1031,7 @@ class OnePaceOrganizer():
                                 "released": ep_date.isoformat()
                             }
 
+                        logger.debug(f"{crc32}: {file_path}")
                         video_files.append((crc32, file_path))
 
                     else:
@@ -936,10 +1065,10 @@ class OnePaceOrganizer():
         if show.summary != self.tvshow["plot"]:
             show.editSummary(self.tvshow["plot"])
             show.editOriginallyAvailable(self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"])
-            await run_sync(
-                show.uploadPoster,
-                filepath=str(Path(self.posters_path, "tvshow.png").resolve())
-            )
+
+            poster = str(Path(self.posters_path, "tvshow.png").resolve())
+            logger.debug(f"uploading tvshow poster: {poster}")
+            await run_sync(show.uploadPoster, filepath=poster)
 
         if show.contentRating != self.tvshow["rating"]:
             show.editContentRating(self.tvshow["rating"])
@@ -953,6 +1082,7 @@ class OnePaceOrganizer():
 
         for crc32, file_path in video_files:
             episode_info = self.episodes[crc32]
+            logger.debug(f"{crc32}: {episode_info}")
 
             if isinstance(episode_info, list):
                 stop = True
@@ -992,6 +1122,7 @@ class OnePaceOrganizer():
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
 
+            logger.debug(f"move {file_path} -> {new_video_file_path}")
             try:
                 await run_sync(file_path.rename, new_video_file_path)
             except:
@@ -1017,18 +1148,27 @@ class OnePaceOrganizer():
             )
         )
 
+        if self.interactive:
         # New progress bar
-        try:
-            async with self.pb_lock:
-                await self.pb_task
-        except:
-            pass
-        finally:
-            if self.dialog.future != None:
-                await run_sync(self.dialog.exit, result=None)
+            try:
+                async with self.pb_lock:
+                    await self.pb_task
+            except:
+                pass
+            finally:
+                if self.dialog.future != None:
+                    await run_sync(self.dialog.exit, result=None)
 
-        async with self.pb_lock:
-            self.pb_task = asyncio.create_task(self.progress_dialog().run_async())
+            async with self.pb_lock:
+                self.pb_task = asyncio.create_task(self.progress_dialog().run_async())
+        else:
+            wait_secs = float(get_env("plex_wait_secs", "300"))
+
+            logger.warning("-------------------------")
+            logger.warning(f"Sleeping for {int(wait_secs)} secs")
+            logger.warning("-------------------------")
+
+            await asyncio.sleep(wait_secs)
 
         done = []
 
@@ -1036,6 +1176,8 @@ class OnePaceOrganizer():
         await self.pb_label("Setting information for all seasons and episodes...")
 
         for i, item in enumerate(queue):
+            logger.debug(f"{i}. {item[0]} {episode_info}")
+
             new_video_file_path = item[0]
             episode_info = item[1]
 
@@ -1043,6 +1185,8 @@ class OnePaceOrganizer():
 
             if not season in done:
                 done.append(season)
+
+                logger.debug(f"run season check on {season}")
 
                 plex_season = await run_sync(show.season, season=season)
 
@@ -1058,8 +1202,12 @@ class OnePaceOrganizer():
 
                     plex_season.editTitle(new_title)
                     plex_season.editSummary(season_info["description"])
-                    await run_sync(plex_season.uploadPoster, filepath=str(Path(self.posters_path, f"season{season}-poster.png")))
 
+                    poster = str(Path(self.posters_path, f"season{season}-poster.png"))
+                    logger.debug(f"upload s{season} poster: {poster}")
+                    await run_sync(plex_season.uploadPoster, filepath=poster)
+
+            logger.debug(f"checking s{season} e{episode_info['episode']}")
             plex_episode = await run_sync(show.episode, season=season, episode=episode_info["episode"])
 
             if plex_episode.title != episode_info["title"]:
@@ -1232,14 +1380,23 @@ class OnePaceOrganizer():
             ET.SubElement(episodedetails, "episode").text = f"{episode_info['episode']}"
             ET.SubElement(episodedetails, "rating").text = episode_info["rating"] if "rating" in episode_info else self.tvshow["rating"]
 
-            manga_anime = ""
-            if episode_info["manga_chapters"] != "" and episode_info["anime_episodes"] != "":
-                manga_anime = f"Manga Chapter(s): {episode_info['manga_chapters']}\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+            desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
+            manga_str = ""
+            anime_str = ""
 
-            if not "description" in episode_info or episode_info["description"] == "":
-                description = manga_anime
-            else:
-                description = f"{episode_info['description']}\n\n{manga_anime}"
+            if episode_info["manga_chapters"] != "":
+                if desc_str != "":
+                    manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
+                else:
+                    manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
+
+            if episode_info["anime_episodes"] != "":
+                if desc_str != "" or manga_str != "":
+                    anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+                else:
+                    anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
+
+            description = f"{desc_str}{manga_str}{anime_str}"
 
             ET.SubElement(episodedetails, "plot").text = description
 
@@ -1274,7 +1431,7 @@ class OnePaceOrganizer():
         #await self.pb_log_output(self.spacer)
         await self.pb_label(f"Completed: {num_complete} episodes updated, {num_skipped} skipped")
 
-if __name__ == "__main__":
+def main():
     opo = None
 
     try:
@@ -1293,3 +1450,6 @@ if __name__ == "__main__":
     finally:
         if opo != None:
             opo.save_config()
+
+if __name__ == "__main__":
+    main()
