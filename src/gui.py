@@ -893,6 +893,7 @@ class OnePaceOrganizer(QWidget):
         return video_files
 
     async def start_process_plex(self, video_files):
+        self.log_output.append(self.spacer)
         self.progress_bar.setValue(0)
         self.output_path.mkdir(exist_ok=True)
 
@@ -1060,6 +1061,7 @@ class OnePaceOrganizer(QWidget):
         self.log_output.append(f"Completed: {len(done)} seasons updated, {num_complete} episodes updated, {num_skipped} skipped")
 
     async def start_process_jellyfin(self, video_files):
+        self.log_output.append(self.spacer)
         self.progress_bar.setValue(0)
         self.output_path.mkdir(exist_ok=True)
 
@@ -1186,14 +1188,23 @@ class OnePaceOrganizer(QWidget):
             ET.SubElement(episodedetails, "episode").text = f"{episode_info['episode']}"
             ET.SubElement(episodedetails, "rating").text = episode_info["rating"] if "rating" in episode_info else self.tvshow["rating"]
 
-            manga_anime = ""
-            if episode_info["manga_chapters"] != "" and episode_info["anime_episodes"] != "":
-                manga_anime = f"Manga Chapter(s): {episode_info['manga_chapters']}\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+            desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
+            manga_str = ""
+            anime_str = ""
 
-            if not "description" in episode_info or episode_info["description"] == "":
-                description = manga_anime
-            else:
-                description = f"{episode_info['description']}\n\n{manga_anime}"
+            if episode_info["manga_chapters"] != "":
+                if desc_str != "":
+                    manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
+                else:
+                    manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
+
+            if episode_info["anime_episodes"] != "":
+                if desc_str != "" or manga_str != "":
+                    anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+                else:
+                    anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
+
+            description = f"{desc_str}{manga_str}{anime_str}"
 
             ET.SubElement(episodedetails, "plot").text = description
 
