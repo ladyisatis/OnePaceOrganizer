@@ -121,10 +121,6 @@ class OnePaceOrganizer():
         self.do_load_config = get_env("load_config", True)
         self.do_save_config = get_env("save_config", True)
 
-        self.posters_path = bundle_file("data", "posters").resolve()
-        if not self.posters_path.is_dir():
-            self.posters_path = bundle_file("posters").resolve()
-
         self.input_path = get_env("input_path")
         self.output_path = get_env("output_path")
 
@@ -233,6 +229,13 @@ class OnePaceOrganizer():
         if val == None:
             logger.critical("User clicked Cancel")
             sys.exit(1)
+
+    async def find(self, *args):
+        f = bundle_file("data", "posters", *args)
+        if f.exists():
+            return f
+
+        return bundle_file("posters", *args)
 
     async def run(self):
         if self.input_path != "" and self.output_path != "":
@@ -1066,7 +1069,7 @@ class OnePaceOrganizer():
             show.editSummary(self.tvshow["plot"])
             show.editOriginallyAvailable(self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"])
 
-            poster = str(Path(self.posters_path, "tvshow.png").resolve())
+            poster = str(self.find("tvshow.png").resolve())
             logger.debug(f"uploading tvshow poster: {poster}")
             await run_sync(show.uploadPoster, filepath=poster)
 
@@ -1203,15 +1206,59 @@ class OnePaceOrganizer():
                     plex_season.editTitle(new_title)
                     plex_season.editSummary(season_info["description"])
 
-                    poster = str(Path(self.posters_path, f"season{season}-poster.png"))
+                    poster = str(self.find(f"poster-season{season}.png").resolve())
                     logger.debug(f"upload s{season} poster: {poster}")
                     await run_sync(plex_season.uploadPoster, filepath=poster)
 
+                    p = await run_sync(plex_season.posters)
+                    if len(p) > 1:
+                        await run_sync(plex_season.setPoster, p[len(p)-1])
+
             logger.debug(f"checking s{season} e{episode_info['episode']}")
+
             plex_episode = await run_sync(show.episode, season=season, episode=episode_info["episode"])
+            updated = False
+
+            background_art = self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png").resolve()
+            if background_art.exists():
+                has_background = False
+                arts = await run_sync(plex_episode.arts)
+
+                for background in arts:
+                    if (background.provider == None or background.provider == "local") and background.selected:
+                        has_background = True
+                        break
+
+                if not has_background:
+                    logger.debug(f"upload background: {background_art}")
+                    await run_sync(plex_episode.uploadArt, filepath=str(background_art))
+                    updated = True
+
+                    arts = await run_sync(plex_episode.arts)
+                    if len(arts) > 1:
+                        await run_sync(plex_episode.setArt, arts[len(arts)-1])
+
+            poster_art = self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png").resolve()
+            if poster_art.exists():
+                has_poster = False
+                posters = await run_sync(plex_episode.posters)
+
+                for poster in posters:
+                    if (poster.provider == None or poster.provider == "local") and poster.selected:
+                        has_poster = True
+                        break
+
+                if not has_poster:
+                    logger.debug(f"upload poster: {poster_art}")
+                    await run_sync(plex_episode.uploadPoster, filepath=str(poster_art))
+                    updated = True
+
+                    posters = await run_sync(plex_episode.posters)
+                    if len(posters) > 1:
+                        await run_sync(plex_episode.setPoster, posters[len(posters)-1])
 
             if plex_episode.title != episode_info["title"]:
-                await self.pb_log_output("Updating Season: {season} Episode: {episode_info['episode']}")
+                await self.pb_log_output(f"Updating Season: {season} Episode: {episode_info['episode']}")
 
                 plex_episode.editTitle(episode_info["title"])
                 plex_episode.editContentRating(episode_info["rating"] if "rating" in episode_info else self.tvshow["rating"])
@@ -1223,26 +1270,31 @@ class OnePaceOrganizer():
                     else:
                         plex_episode.editOriginallyAvailable(str(episode_info["released"]))
 
-                desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
-                manga_str = ""
-                anime_str = ""
+                updated = True
 
-                if episode_info["manga_chapters"] != "":
-                    if desc_str != "":
-                        manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
-                    else:
-                        manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
+            desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
+            manga_str = ""
+            anime_str = ""
 
-                if episode_info["anime_episodes"] != "":
-                    if desc_str != "" or manga_str != "":
-                        anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
-                    else:
-                        anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
+            if episode_info["manga_chapters"] != "":
+                if desc_str != "":
+                    manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
+                else:
+                    manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
 
-                description = f"{desc_str}{manga_str}{anime_str}"
+            if episode_info["anime_episodes"] != "":
+                if desc_str != "" or manga_str != "":
+                    anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+                else:
+                    anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
 
+            description = f"{desc_str}{manga_str}{anime_str}"
+
+            if plex_episode.description != description:
                 plex_episode.editSummary(description)
+                updated = True
 
+            if updated:
                 num_complete = num_complete + 1
 
             await self.pb_progress(int((i+1 / len(queue)) * 100))
@@ -1274,7 +1326,7 @@ class OnePaceOrganizer():
             for k, v in dict(sorted(self.seasons.items())).items():
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
 
-            src = str(Path(self.posters_path, "tvshow.png").resolve())
+            src = str(self.find("tvshow.png").resolve())
             dst = str(Path(self.output_path, "poster.png").resolve())
 
             await self.pb_log_output(f"Copying {src} to: {dst}")
@@ -1340,7 +1392,7 @@ class OnePaceOrganizer():
                 ET.SubElement(root, "outline").text = season_info["description"]
                 ET.SubElement(root, "seasonnumber").text = f"{season}"
 
-                src = str(Path(self.posters_path, f"season{season}-poster.png").resolve())
+                src = str(self.find(f"poster-season{season}.png").resolve())
                 dst = str(Path(season_path, "poster.png").resolve())
 
                 await self.pb_log_output(f"Copying {src} to: {dst}")
@@ -1371,8 +1423,6 @@ class OnePaceOrganizer():
             safe_title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"])
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
-
-            await self.pb_log_output(f"Moving {file_path.name} to: {new_video_file_path}")
 
             ET.SubElement(episodedetails, "title").text = episode_info["title"]
             ET.SubElement(episodedetails, "showtitle").text = self.tvshow["title"]
@@ -1409,14 +1459,31 @@ class OnePaceOrganizer():
                 ET.SubElement(episodedetails, "premiered").text = date
                 ET.SubElement(episodedetails, "aired").text = date
 
+            ep_poster = self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png").resolve()
+            if ep_poster.exists():
+                ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
+
+                if not ep_poster_new.exists():
+                    await self.pb_log_output(f"Moving {ep_poster} to: {ep_poster_new}")
+
+                    try:
+                        await run_sync(ep_poster.rename, ep_poster_new)
+                    except:
+                        await run_sync(shutil.move, str(ep_poster), str(ep_poster_new))
+
+                    art = ET.SubElement(episodedetails, "art")
+                    ET.SubElement(art, "poster").text = str(ep_poster_new)
+
             ET.indent(episodedetails)
 
-            season_nfo = str(Path(season_path, f"{prefix}{safe_title}.nfo").resolve())
+            episode_nfo = str(Path(season_path, f"{prefix}{safe_title}.nfo").resolve())
             ET.ElementTree(episodedetails).write(
-                season_nfo, 
+                episode_nfo,
                 encoding='utf-8', 
                 xml_declaration=True
             )
+
+            await self.pb_log_output(f"Moving {file_path.name} to: {new_video_file_path}")
 
             try:
                 await run_sync(file_path.rename, new_video_file_path)
