@@ -1069,7 +1069,7 @@ class OnePaceOrganizer():
             show.editSummary(self.tvshow["plot"])
             show.editOriginallyAvailable(self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"])
 
-            poster = str(self.find("tvshow.png").resolve())
+            poster = str((await self.find("tvshow.png")).resolve())
             logger.debug(f"uploading tvshow poster: {poster}")
             await run_sync(show.uploadPoster, filepath=poster)
 
@@ -1206,7 +1206,7 @@ class OnePaceOrganizer():
                     plex_season.editTitle(new_title)
                     plex_season.editSummary(season_info["description"])
 
-                    poster = str(self.find(f"poster-season{season}.png").resolve())
+                    poster = str((await self.find(f"poster-season{season}.png")).resolve())
                     logger.debug(f"upload s{season} poster: {poster}")
                     await run_sync(plex_season.uploadPoster, filepath=poster)
 
@@ -1219,7 +1219,7 @@ class OnePaceOrganizer():
             plex_episode = await run_sync(show.episode, season=season, episode=episode_info["episode"])
             updated = False
 
-            background_art = self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png").resolve()
+            background_art = (await self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
             if background_art.exists():
                 has_background = False
                 arts = await run_sync(plex_episode.arts)
@@ -1238,7 +1238,7 @@ class OnePaceOrganizer():
                     if len(arts) > 1:
                         await run_sync(plex_episode.setArt, arts[len(arts)-1])
 
-            poster_art = self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png").resolve()
+            poster_art = (await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
             if poster_art.exists():
                 has_poster = False
                 posters = await run_sync(plex_episode.posters)
@@ -1326,7 +1326,7 @@ class OnePaceOrganizer():
             for k, v in dict(sorted(self.seasons.items())).items():
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
 
-            src = str(self.find("tvshow.png").resolve())
+            src = str((await self.find("tvshow.png")).resolve())
             dst = str(Path(self.output_path, "poster.png").resolve())
 
             await self.pb_log_output(f"Copying {src} to: {dst}")
@@ -1392,7 +1392,7 @@ class OnePaceOrganizer():
                 ET.SubElement(root, "outline").text = season_info["description"]
                 ET.SubElement(root, "seasonnumber").text = f"{season}"
 
-                src = str(self.find(f"poster-season{season}.png").resolve())
+                src = str((await self.find(f"poster-season{season}.png")).resolve())
                 dst = str(Path(season_path, "poster.png").resolve())
 
                 await self.pb_log_output(f"Copying {src} to: {dst}")
@@ -1459,7 +1459,7 @@ class OnePaceOrganizer():
                 ET.SubElement(episodedetails, "premiered").text = date
                 ET.SubElement(episodedetails, "aired").text = date
 
-            ep_poster = self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png").resolve()
+            ep_poster = (await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
             if ep_poster.exists():
                 ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
 
