@@ -229,7 +229,7 @@ def update():
                                 if _s != "0" and _s in mkv_titles and _e in mkv_titles[_s]:
                                     _origtitle = mkv_titles[_s][_e]
 
-                                    if title != _origtitle:
+                                    if title.lower() != _origtitle.lower():
                                         out_episodes[crc32]["originaltitle"] = _origtitle
 
                             except:
@@ -293,7 +293,7 @@ def update():
                 out = out.replace("{originaltitle}", "# originaltitle: \n", 1)
 
             if data['title'].startswith('The '):
-                out = out.replace("{sorttitle}", YamlDump({"sorttitle": data['sorttitle']}, allow_unicode=True), 1)
+                out = out.replace("{sorttitle}", YamlDump({"sorttitle": data['title'].replace('The ', '', 1)}, allow_unicode=True), 1)
             else:
                 out = out.replace("{sorttitle}", "# sorttitle: \n", 1)
 
