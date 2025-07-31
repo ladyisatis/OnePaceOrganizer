@@ -1,0 +1,50 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Run build script
+        shell: pwsh
+        run: .\scripts\build.ps1
+
+      - name: Prepare the .zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path data\posters -DestinationPath posters.zip
+          New-Item -ItemType Directory -Path temp_zip
+          Copy-Item dist\OnePaceOrganizer-cli.exe -Destination temp_zip
+          Copy-Item dist\OnePaceOrganizer-gui.exe -Destination temp_zip
+          Copy-Item -Recurse data\posters -Destination temp_zip\posters
+          Compress-Archive -Path temp_zip\* -DestinationPath OnePaceOrganizer-win-x64.zip
+          Remove-Item -Recurse -Force temp_zip
+          Rename-Item dist\OnePaceOrganizer-cli.exe OnePaceOrganizer-cli-win-x64.exe
+          Rename-Item dist\OnePaceOrganizer-gui.exe OnePaceOrganizer-gui-win-x64.exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            dist/OnePaceOrganizer-cli-win-x64.exe
+            dist/OnePaceOrganizer-gui-win-x64.exe
+            posters.zip
+            OnePaceOrganizer-win-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
