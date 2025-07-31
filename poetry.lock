@@ -347,6 +347,18 @@ files = [
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
 
 [[package]]
+name = "javaproperties"
+version = "0.8.2"
+description = "Read & write Java .properties files"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "javaproperties-0.8.2-py3-none-any.whl", hash = "sha256:30141f83c45b574e204ee8170071535815994f468726813ec90f2d7f9fa6e7c1"},
+    {file = "javaproperties-0.8.2.tar.gz", hash = "sha256:f780d17ca12d57da58519dcf9d821cbcdb6f98a8b5af661013e31a5050c59a0f"},
+]
+
+[[package]]
 name = "loguru"
 version = "0.7.3"
 description = "Python logging made (stupidly) simple"
@@ -843,4 +855,4 @@ dev = ["black (>=19.3b0) ; python_version >= \"3.6\"", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "11dbba92a830ce6355a0a1bded665ac64611932450d8da5c809ae58b8b227f8b"
+content-hash = "11644b0c130c3f6a071e20907ddae9e58e71a9c8114243e4d1cec8e913b2e3d4"

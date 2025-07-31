@@ -3,6 +3,7 @@ import re
 import sys
 import orjson
 import httpx
+import javaproperties
 import io
 import os
 import string
@@ -52,6 +53,43 @@ def update():
         spreadsheet = {"sheets": []}
 
         with httpx.Client(transport=RetryTransport(retry=retry)) as client:
+            title_props = None
+            mkv_titles = {}
+
+            try:
+                resp = httpx.get("https://raw.githubusercontent.com/one-pace/one-pace-public-subtitles/refs/heads/main/main/title.properties", follow_redirects=True)
+                title_props = javaproperties.loads(resp.text)
+
+            except Exception as e:
+                print(f"Skipping title.properties parsing ({e})")
+
+            if isinstance(title_props, dict):
+                pattern = re.compile(r"^(?P<arc>[a-z]+)(?:_[0-9]+)?_(?P<num>\d+)\.eptitle$")
+                arc_name_to_id = {}
+
+                for k, v in title_props.items():
+                    match = pattern.match(k)
+                    if not match:
+                        continue
+
+                    arc_name = match.group("arc")
+                    ep_num = f"{int(match.group("num"))}"
+
+                    if arc_name not in arc_name_to_id:
+                        if arc_name == "loguetown":
+                            arc_name_to_id["adv_buggy"] = {}
+                        elif arc_name == "littlegarden":
+                            arc_name_to_id["trials_koby"] = {}
+                        elif arc_name == "marineford":
+                            arc_name_to_id["adv_strawhats"] = {}
+
+                        arc_id = f"{len(arc_name_to_id)}"
+                        arc_name_to_id[arc_name] = arc_id
+                        mkv_titles[arc_id] = {}
+
+                    arc_id = arc_name_to_id[arc_name]
+                    mkv_titles[arc_id][ep_num] = v
+
             with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_DESC_ID}/export?gid=2010244982&format=csv", follow_redirects=True) as resp:
                 reader = CSVReader(resp.iter_lines())
 
@@ -184,6 +222,19 @@ def update():
                             out_episodes[crc32]["title"] = title
                             out_episodes[crc32]["description"] = description
 
+                            try:
+                                _s = f"{out_episodes[crc32]['season']}"
+                                _e = f"{out_episodes[crc32]['episode']}"
+
+                                if _s != "0" and _s in mkv_titles and _e in mkv_titles[_s]:
+                                    _origtitle = mkv_titles[_s][_e]
+
+                                    if title != _origtitle:
+                                        out_episodes[crc32]["originaltitle"] = _origtitle
+
+                            except:
+                                print(traceback.format_exc())
+
         for crc32, data in out_episodes.items():
             file_path = Path(".", "data", "episodes", f"{crc32}.yml")
 
@@ -209,15 +260,15 @@ def update():
                 if isinstance(old_data["released"], date) or isinstance(old_data["released"], datetime):
                     old_data["released"] = old_data["released"].isoformat()
 
-                if old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
-                    continue
+                #if 'originaltitle' not in data or (old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]):
+                #    continue
 
             out = (
                 f"season: {season}\n"
                 f"episode: {episode}\n"
                 "\n"
                 "{title}"
-                "# originaltitle: \n"
+                "{originaltitle}"
                 "# sorttitle: \n"
                 "{description}"
                 f"manga_chapters: {data['manga_chapters']}\n"
@@ -232,6 +283,12 @@ def update():
             )
 
             # attempt to bypass some unicode nonsense
+
+            if 'originaltitle' in data and data['originaltitle'] != "":
+                out = out.replace("{originaltitle}", YamlDump({"originaltitle": data['originaltitle']}, allow_unicode=True), 1)
+            else:
+                out = out.replace("{originaltitle}", "# originaltitle: \n", 1)
+
             out = out.replace("{title}", YamlDump({"title": data['title']}, allow_unicode=True), 1)
             out = out.replace("{description}", YamlDump({"description": data['description']}, allow_unicode=True), 1)
 
