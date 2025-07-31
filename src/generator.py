@@ -260,8 +260,8 @@ def update():
                 if isinstance(old_data["released"], date) or isinstance(old_data["released"], datetime):
                     old_data["released"] = old_data["released"].isoformat()
 
-                #if 'originaltitle' not in data or (old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]):
-                #    continue
+                if old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
+                    continue
 
             out = (
                 f"season: {season}\n"
@@ -269,7 +269,7 @@ def update():
                 "\n"
                 "{title}"
                 "{originaltitle}"
-                "# sorttitle: \n"
+                "{sorttitle}\n"
                 "{description}"
                 f"manga_chapters: {data['manga_chapters']}\n"
                 f"anime_episodes: {data['anime_episodes']}\n"
@@ -288,6 +288,11 @@ def update():
                 out = out.replace("{originaltitle}", YamlDump({"originaltitle": data['originaltitle']}, allow_unicode=True), 1)
             else:
                 out = out.replace("{originaltitle}", "# originaltitle: \n", 1)
+
+            if data['title'].startswith('The '):
+                out = out.replace("{sorttitle}", YamlDump({"sorttitle": data['sorttitle']}, allow_unicode=True), 1)
+            else:
+                out = out.replace("{sorttitle}", "# sorttitle: \n", 1)
 
             out = out.replace("{title}", YamlDump({"title": data['title']}, allow_unicode=True), 1)
             out = out.replace("{description}", YamlDump({"description": data['description']}, allow_unicode=True), 1)
