@@ -257,6 +257,9 @@ def update():
                 with file_path.open(mode='r', encoding='utf-8') as f:
                     old_data = YamlLoad(stream=f)
 
+                if "reference" in old_data:
+                    continue
+
                 if isinstance(old_data["released"], date) or isinstance(old_data["released"], datetime):
                     old_data["released"] = old_data["released"].isoformat()
 
