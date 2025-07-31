@@ -1132,7 +1132,7 @@ class OnePaceOrganizer(QWidget):
             for k, v in dict(sorted(self.seasons.items())).items():
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
 
-            src = str(self.find("tvshow.png").resolve())
+            src = str((await self.find("tvshow.png")).resolve())
             dst = str(Path(self.output_path, "poster.png").resolve())
 
             self.log_output.append(f"Copying {src} to: {dst}")
@@ -1198,7 +1198,7 @@ class OnePaceOrganizer(QWidget):
                 ET.SubElement(root, "outline").text = season_info["description"]
                 ET.SubElement(root, "seasonnumber").text = f"{season}"
 
-                src = str(self.find(f"poster-season{season}.png").resolve())
+                src = str((await self.find(f"poster-season{season}.png")).resolve())
                 dst = str(Path(season_path, "poster.png").resolve())
 
                 self.log_output.append(f"Copying {src} to: {dst}")
@@ -1267,7 +1267,7 @@ class OnePaceOrganizer(QWidget):
                 ET.SubElement(episodedetails, "premiered").text = date
                 ET.SubElement(episodedetails, "aired").text = date
 
-            ep_poster = self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png").resolve()
+            ep_poster = (await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
             if ep_poster.exists():
                 ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
 
