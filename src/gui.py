@@ -784,7 +784,7 @@ class OnePaceOrganizer(QWidget):
                     else:
                         self.episodes[crc32] = [parsed]
 
-                self.progress_bar.setValue(int((index + 1 / total_files) * 100))
+                self.progress_bar.setValue(int(((index + 1) / total_files) * 100))
 
             self.progress_bar.setValue(100)
 
@@ -828,7 +828,7 @@ class OnePaceOrganizer(QWidget):
                 crc32 = await async_crc32(file_path)
                 num_calced = num_calced + 1
 
-            self.progress_bar.setValue(int((index + 1 / filelist_total) * 100))
+            self.progress_bar.setValue(int(((index + 1) / filelist_total) * 100))
 
             if crc32 in self.episodes:
                 video_files.append((crc32, file_path))
@@ -1104,7 +1104,7 @@ class OnePaceOrganizer(QWidget):
             if updated:
                 num_complete = num_complete + 1
 
-            self.progress_bar.setValue(int((i+1 / len(queue)) * 100))
+            self.progress_bar.setValue(int(((i+1) / len(queue)) * 100))
 
         self.progress_bar.setValue(100)
 

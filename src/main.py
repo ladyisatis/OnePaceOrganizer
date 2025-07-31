@@ -928,7 +928,7 @@ class OnePaceOrganizer():
                         logger.debug(f"create {crc32} as list: {parsed}")
                         self.episodes[crc32] = [parsed]
 
-                await self.pb_progress(int((index + 1 / total_files) * 100))
+                await self.pb_progress(int(((index + 1) / total_files) * 100))
 
             await self.pb_progress(100)
 
@@ -978,7 +978,7 @@ class OnePaceOrganizer():
                 num_calced = num_calced + 1
                 logger.debug(f"result: {num_calced}. {crc32}")
 
-            await self.pb_progress(int((index + 1 / filelist_total) * 100))
+            await self.pb_progress(int(((index + 1) / filelist_total) * 100))
 
             if crc32 in self.episodes:
                 logger.trace(f"{crc32}: {file_path}")
@@ -1297,7 +1297,7 @@ class OnePaceOrganizer():
             if updated:
                 num_complete = num_complete + 1
 
-            await self.pb_progress(int((i+1 / len(queue)) * 100))
+            await self.pb_progress(int(((i+1) / len(queue)) * 100))
 
         await self.pb_progress(100)
         #await self.pb_log_output(self.spacer)
