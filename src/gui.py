@@ -1324,5 +1324,5 @@ if __name__ == "__main__":
         QMessageBox.critical(None, f"One Pace Organizer", traceback.format_exc())
 
     finally:
-        if 'opo' in locals():
+        if 'opo' in locals() and opo.input_path is not None and opo.input_path != "" and opo.output_path is not None and opo.output_path != "":
             opo.save_config()

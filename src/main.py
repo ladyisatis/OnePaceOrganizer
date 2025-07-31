@@ -325,24 +325,28 @@ class OnePaceOrganizer():
         if self.input_path == "":
             self.input_path = str(Path(".", "in").resolve())
 
-        self.input_path = Path(await input_dialog(
+        self.input_path = await input_dialog(
             title=self.window_title,
             text='Directory of unsorted One Pace .mkv/mp4 files:',
             default=self.input_path
-        ).run_async()).resolve()
+        ).run_async()
 
         self.check_none(self.input_path)
+
+        self.input_path = self.input_path.resolve()
 
         if self.output_path == "":
             self.output_path = str(Path(".", "out").resolve())
         
-        self.output_path = Path(await input_dialog(
+        self.output_path = await input_dialog(
             title=self.window_title,
             text='Move the sorted/renamed files to:',
             default=self.output_path
-        ).run_async()).resolve()
+        ).run_async()
 
         self.check_none(self.output_path)
+
+        self.output_path = self.output_path.resolve()
 
         self.plex_config_enabled = await yes_no_dialog(
             title=self.window_title,
@@ -1516,7 +1520,7 @@ def main():
         print(traceback.format_exc())
 
     finally:
-        if opo != None:
+        if opo is not None and opo.input_path is not None and str(opo.input_path) != "" and opo.output_path is not None and str(opo.output_path) != "":
             opo.save_config()
 
 if __name__ == "__main__":
