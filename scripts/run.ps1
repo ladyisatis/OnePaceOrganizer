@@ -1,8 +1,8 @@
-$ErrorActionPreference = "Stop"
-
-param(
+param (
     [string]$mode = "gui"
 )
+
+$ErrorActionPreference = "Stop"
 
 try {
     $pythonVersion = & python --version 2>$null
@@ -15,7 +15,7 @@ try {
 if (-Not (Test-Path venv)) {
     & python -m venv venv
     & .\venv\Scripts\Activate.ps1
-    & .\venv\Scripts\pip.exe install --upgrade pip setuptools
+    & .\venv\Scripts\python.exe -m pip install --upgrade pip setuptools
     pip install poetry
     poetry install --no-interaction --no-root
     deactivate
