@@ -418,7 +418,7 @@ class OnePaceOrganizer(QWidget):
             self.plex_token.prop.setEnabled(False)
 
             try:
-                self.plexapi_account = await run_sync(MyPlexAccount, token=token)
+                self.plexapi_account = await run_sync(MyPlexAccount, token=self.plex_token.prop.text())
 
             except PlexApiUnauthorized:
                 QMessageBox.warning(None, f"One Pace Organizer v{self.version}", "Invalid Plex account token, please try again.")
@@ -764,7 +764,7 @@ class OnePaceOrganizer(QWidget):
                 elif file == seasons_yml:
                     self.seasons = parsed
 
-                elif "reference" in parsed:
+                elif isinstance(parsed, dict) and "reference" in parsed:
                     ref = parsed["reference"]
 
                     if ref in self.episodes and isinstance(self.episodes[ref], dict):
@@ -1273,7 +1273,7 @@ class OnePaceOrganizer(QWidget):
                 ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
 
                 if not ep_poster_new.exists():
-                    await self.pb_log_output(f"Moving {ep_poster} to: {ep_poster_new}")
+                    self.log_output.append(f"Moving {ep_poster} to: {ep_poster_new}")
 
                     try:
                         await run_sync(ep_poster.rename, ep_poster_new)
@@ -1324,4 +1324,5 @@ if __name__ == "__main__":
         QMessageBox.critical(None, f"One Pace Organizer", traceback.format_exc())
 
     finally:
-        opo.save_config()
+        if 'opo' in locals():
+            opo.save_config()

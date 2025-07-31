@@ -226,7 +226,7 @@ class OnePaceOrganizer():
         }, option=orjson.OPT_NON_STR_KEYS ))
 
     def check_none(self, val):
-        if val == None:
+        if val is None:
             logger.critical("User clicked Cancel")
             sys.exit(1)
 
@@ -645,7 +645,7 @@ class OnePaceOrganizer():
             if not self.interactive:
                 logger.info(f"Connecting to {resources[0].name} ({resources[0].clientIdentifier})")
 
-            self.plexapi_server = resources[0].connect()
+            self.plexapi_server = await run_sync(resources[0].connect)
 
             if not self.interactive:
                 logger.info("Connected")
@@ -834,20 +834,21 @@ class OnePaceOrganizer():
             await self.pb_log_output(f"Downloading: {url}")
 
             try:
-                client = httpx.AsyncClient()
-                data_file = Path(".", "data.json")
+                async with httpx.AsyncClient() as client:
+                    data_file = Path(".", "data.json")
 
-                with data_file.open(mode='w') as f:
-                    async with client.stream('GET', url, follow_redirects=True) as resp:
-                        #clen = int(resp.headers['Content-Length'])
-                        #dl_len = 0
+                    with data_file.open(mode='w') as f:
+                        async with client.stream('GET', url, follow_redirects=True) as resp:
+                            #clen = int(resp.headers['Content-Length'])
+                            #dl_len = 0
 
-                        async for chunk in resp.aiter_bytes():
-                            #dl_len = dl_len + len(chunk)
-                            #await self.pb_progress(int((dl_len / clen) * 100))
-                            await run_sync(f.write, chunk)
+                            async for chunk in resp.aiter_bytes():
+                                #dl_len = dl_len + len(chunk)
+                                #await self.pb_progress(int((dl_len / clen) * 100))
+                                await run_sync(f.write, chunk)
 
-                data = await run_sync(orjson.loads, data_file.read_bytes())
+                data = await run_sync(data_file.read_bytes)
+                data = await run_sync(orjson.loads, data)
                 logger.trace(data)
 
                 if len(data) > 0:
@@ -1179,7 +1180,7 @@ class OnePaceOrganizer():
         await self.pb_label("Setting information for all seasons and episodes...")
 
         for i, item in enumerate(queue):
-            logger.debug(f"{i}. {item[0]} {episode_info}")
+            logger.debug(f"{i}. {item[0]}")
 
             new_video_file_path = item[0]
             episode_info = item[1]
@@ -1201,7 +1202,7 @@ class OnePaceOrganizer():
                 new_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
 
                 if plex_season.title != new_title or plex_season.summary != season_info["description"]:
-                    await self.pb_log_output("Updating Season: {new_title}")
+                    await self.pb_log_output(f"Updating Season: {new_title}")
 
                     plex_season.editTitle(new_title)
                     plex_season.editSummary(season_info["description"])
