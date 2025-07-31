@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-07-31T04:09:00.935745+00:00",
+  "last_update": "2025-07-31T04:17:40.192085+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -230,11 +230,14 @@
     "00EB6532": {
       "season": 14,
       "episode": 2,
-      "title": "Landfall in Alabasta",
+      "title": "Landfall in Arabasta",
       "description": "The Merry makes landfall at Arabasta's port town, and while the rest of the Straw Hats wisely don disguises, Luffy runs afoul of an old foe. However, a chance reunion with a flame-wielding member of Luffy's family might just be the saving grace he needs!",
       "manga_chapters": "157-159",
       "anime_episodes": "93-95",
-      "released": "2023-06-05"
+      "released": "2023-06-05",
+      "hashes": {
+        "crc32": "E4BA97D6"
+      }
     },
     "0144BBBA": {
       "season": 35,
@@ -5454,8 +5457,7 @@
     "E4BA97D6": {
       "season": 14,
       "episode": 2,
-      "title": "Landfall in Alabasta",
-      "originaltitle": "Landfall in Arabasta",
+      "title": "Landfall in Arabasta",
       "description": "The Merry makes landfall at Arabasta's port town, and while the rest of the Straw Hats wisely don disguises, Luffy runs afoul of an old foe. However, a chance reunion with a flame-wielding member of Luffy's family might just be the saving grace he needs!",
       "manga_chapters": "157-159",
       "anime_episodes": "93-95",
