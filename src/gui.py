@@ -126,6 +126,7 @@ class OnePaceOrganizer(QWidget):
 
         self.input_path = Path(".", "in").resolve()
         self.output_path = Path(".", "out").resolve()
+        self.move_after_sort = True
 
         self.plexapi_account = None
         self.plexapi_server = None
@@ -157,45 +158,69 @@ class OnePaceOrganizer(QWidget):
         toml_path = bundle_file("pyproject.toml")
         if toml_path.exists():
             with toml_path.open(mode="rb") as f:
-                self.version = tomllib.load(f)["project"]["version"]
+                t = tomllib.load(f)
+                self.version = t["project"]["version"]
 
         if self.config_file.exists():
             config = orjson.loads(self.config_file.read_bytes())
 
-            self.input_path = Path(config["path_to_eps"]).resolve()
-            self.output_path = Path(config["episodes"]).resolve()
+            if "path_to_eps" in config:
+                self.input_path = Path(config["path_to_eps"]).resolve()
 
-            self.plex_config_enabled = config["plex"]["enabled"]
-            self.plex_config_url = config["plex"]["url"]
+            if "episodes" in config:
+                self.output_path = Path(config["episodes"]).resolve()
 
-            self.plex_config_servers = config["plex"]["servers"]
-            for server_id, item in self.plex_config_servers.items():
-                if item["selected"]:
-                    self.plex_config_server_id = server_id
-                    break
+            if "move_after_sort" in config:
+                self.move_after_sort = config["move_after_sort"]
 
-            self.plex_config_libraries = config["plex"]["libraries"]
-            for library_key, item in self.plex_config_libraries.items():
-                if item["selected"]:
-                    self.plex_config_library_key = library_key
-                    break
+            if "plex" in config:
+                if "enabled" in config["plex"]:
+                    self.plex_config_enabled = config["plex"]["enabled"]
 
-            self.plex_config_shows = config["plex"]["shows"]
-            for show_guid, item in self.plex_config_shows.items():
-                if item["selected"]:
-                    self.plex_config_show_guid = show_guid
-                    break
+                if "url" in config["plex"]:
+                    self.plex_config_url = config["plex"]["url"]
 
-            self.plex_config_use_token = config["plex"]["use_token"]
-            self.plex_config_auth_token = config["plex"]["token"]
-            self.plex_config_username = config["plex"]["username"]
-            self.plex_config_password = config["plex"]["password"]
-            self.plex_config_remember = config["plex"]["remember"]
+                if "servers" in config["plex"] and isinstance(config["plex"]["servers"], dict):
+                    self.plex_config_servers = config["plex"]["servers"]
+                    for server_id, item in self.plex_config_servers.items():
+                        if item["selected"]:
+                            self.plex_config_server_id = server_id
+                            break
+
+                if "libraries" in config["plex"] and isinstance(config["plex"]["libraries"], dict):
+                    self.plex_config_libraries = config["plex"]["libraries"]
+                    for library_key, item in self.plex_config_libraries.items():
+                        if item["selected"]:
+                            self.plex_config_library_key = library_key
+                            break
+
+                if "shows" in config["plex"] and isinstance(config["plex"]["shows"], dict):
+                    self.plex_config_shows = config["plex"]["shows"]
+                    for show_guid, item in self.plex_config_shows.items():
+                        if item["selected"]:
+                            self.plex_config_show_guid = show_guid
+                            break
+
+                if "use_token" in config["plex"]:
+                    self.plex_config_use_token = config["plex"]["use_token"]
+
+                if "token" in config["plex"]:
+                    self.plex_config_auth_token = config["plex"]["token"]
+
+                if "username" in config["plex"]:
+                    self.plex_config_username = config["plex"]["username"]
+
+                if "password" in config["plex"]:
+                    self.plex_config_password = config["plex"]["password"]
+
+                if "remember" in config["plex"]:
+                    self.plex_config_remember = config["plex"]["remember"]
 
     def save_config(self):
         self.config_file.write_bytes(orjson.dumps({
             "path_to_eps": str(self.input_path),
             "episodes": str(self.output_path),
+            "move_after_sort": self.move_after_sort,
             "plex": {
                 "enabled": self.plex_config_enabled,
                 "url": self.plex_config_url,
@@ -225,9 +250,10 @@ class OnePaceOrganizer(QWidget):
         self.input.prop.setText(str(self.input_path))
         self.input.prop.setPlaceholderText(str(Path(".", "in").resolve()))
 
+        _output_label_txt = "Move" if self.move_after_sort else "Copy"
         self.output = Input(
             layout,
-            "Move the sorted/renamed files to:",
+            f"{_output_label_txt} the sorted and renamed files to:",
             QLineEdit(),
             btn="Browse...",
             btn_connect=self.browse_output_folder
@@ -311,6 +337,11 @@ class OnePaceOrganizer(QWidget):
         if not self.plex_config_enabled:
             self.plex_group.hide()
 
+        self.move_copy = Input(layout, "Action after Sorting/Renaming:", QComboBox())
+        self.move_copy.prop.addItems(["Move (recommended)", "Copy"])
+        self.move_copy.prop.setCurrentIndex(0 if self.move_after_sort else 1)
+        self.move_copy.prop.currentTextChanged.connect(self.set_action)
+
         self.start_button = QPushButton("Start")
         self.start_button.clicked.connect(lambda: asyncio.create_task(self.start_process()))
         self.start_button.setEnabled(self.plex_config_enabled == False)
@@ -366,6 +397,11 @@ class OnePaceOrganizer(QWidget):
     def set_method(self, text):
         self.plex_config_enabled = text == "Plex"
         self.plex_group.setVisible(self.plex_config_enabled)
+
+    def set_action(self, text):
+        self.move_after_sort = text == "Move (recommended)"
+        _output_label_txt = "Move" if self.move_after_sort else "Copy"
+        self.output.label.setText(f"{_output_label_txt} the sorted and renamed files to:")
 
     def switch_plex_method(self, text):
         self.plex_config_use_token = text == "Authentication Token"
@@ -968,10 +1004,7 @@ class OnePaceOrganizer(QWidget):
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
 
-            try:
-                await run_sync(file_path.rename, new_video_file_path)
-            except:
-                await run_sync(shutil.move, str(file_path), str(new_video_file_path))
+            await run_sync(shutil.move if self.move_after_sort else shutil.copy2, str(file_path), str(new_video_file_path))
 
             queue.append((new_video_file_path, episode_info))
 
@@ -1231,7 +1264,7 @@ class OnePaceOrganizer(QWidget):
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
 
-            self.log_output.append(f"Creating metadata and moving {file_path.name} to: {new_video_file_path}")
+            self.log_output.append(f"Creating metadata and {'moving' if self.move_after_sort else 'copying'} {file_path.name} to: {new_video_file_path}")
 
             ET.SubElement(episodedetails, "title").text = episode_info["title"]
             ET.SubElement(episodedetails, "showtitle").text = self.tvshow["title"]
@@ -1273,12 +1306,12 @@ class OnePaceOrganizer(QWidget):
                 ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
 
                 if not ep_poster_new.exists():
-                    self.log_output.append(f"Moving {ep_poster} to: {ep_poster_new}")
-
-                    try:
-                        await run_sync(ep_poster.rename, ep_poster_new)
-                    except:
+                    if self.move_after_sort:
+                        self.log_output.append(f"Moving {ep_poster} to: {ep_poster_new}")
                         await run_sync(shutil.move, str(ep_poster), str(ep_poster_new))
+                    else:
+                        self.log_output.append(f"Copying {ep_poster} to: {ep_poster_new}")
+                        await run_sync(shutil.copy2, str(ep_poster), str(ep_poster_new))
 
                     art = ET.SubElement(episodedetails, "art")
                     ET.SubElement(art, "poster").text = str(ep_poster_new)
@@ -1292,10 +1325,7 @@ class OnePaceOrganizer(QWidget):
                 xml_declaration=True
             )
 
-            try:
-                await run_sync(file_path.rename, new_video_file_path)
-            except:
-                await run_sync(shutil.move, str(file_path), str(new_video_file_path))
+            await run_sync(shutil.move if self.move_after_sort else shutil.copy2, str(file_path), str(new_video_file_path))
 
             i = i + 1
             num_complete = num_complete + 1

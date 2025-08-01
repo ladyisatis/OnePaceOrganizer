@@ -120,6 +120,7 @@ class OnePaceOrganizer():
         self.config_file = Path(".", "config.json")
         self.do_load_config = get_env("load_config", True)
         self.do_save_config = get_env("save_config", True)
+        self.move_after_sort = get_env("move_after_sort", True)
 
         self.input_path = get_env("input_path")
         self.output_path = get_env("output_path")
@@ -172,35 +173,57 @@ class OnePaceOrganizer():
             config = orjson.loads(self.config_file.read_bytes())
             logger.trace(config)
 
-            self.input_path = Path(config["path_to_eps"]).resolve()
-            self.output_path = Path(config["episodes"]).resolve()
+            if "path_to_eps" in config:
+                self.input_path = Path(config["path_to_eps"]).resolve()
 
-            self.plex_config_enabled = config["plex"]["enabled"]
-            self.plex_config_url = config["plex"]["url"]
+            if "episodes" in config:
+                self.output_path = Path(config["episodes"]).resolve()
 
-            self.plex_config_servers = config["plex"]["servers"]
-            for server_id, item in self.plex_config_servers.items():
-                if item["selected"]:
-                    self.plex_config_server_id = server_id
-                    break
+            if "move_after_sort" in config:
+                self.move_after_sort = config["move_after_sort"]
 
-            self.plex_config_libraries = config["plex"]["libraries"]
-            for library_key, item in self.plex_config_libraries.items():
-                if item["selected"]:
-                    self.plex_config_library_key = library_key
-                    break
+            if "plex" in config:
+                if "enabled" in config["plex"]:
+                    self.plex_config_enabled = config["plex"]["enabled"]
 
-            self.plex_config_shows = config["plex"]["shows"]
-            for show_guid, item in self.plex_config_shows.items():
-                if item["selected"]:
-                    self.plex_config_show_guid = show_guid
-                    break
+                if "url" in config["plex"]:
+                    self.plex_config_url = config["plex"]["url"]
 
-            self.plex_config_use_token = config["plex"]["use_token"]
-            self.plex_config_auth_token = config["plex"]["token"]
-            self.plex_config_username = config["plex"]["username"]
-            self.plex_config_password = config["plex"]["password"]
-            self.plex_config_remember = config["plex"]["remember"]
+                if "servers" in config["plex"] and isinstance(config["plex"]["servers"], dict):
+                    self.plex_config_servers = config["plex"]["servers"]
+                    for server_id, item in self.plex_config_servers.items():
+                        if item["selected"]:
+                            self.plex_config_server_id = server_id
+                            break
+
+                if "libraries" in config["plex"] and isinstance(config["plex"]["libraries"], dict):
+                    self.plex_config_libraries = config["plex"]["libraries"]
+                    for library_key, item in self.plex_config_libraries.items():
+                        if item["selected"]:
+                            self.plex_config_library_key = library_key
+                            break
+
+                if "shows" in config["plex"] and isinstance(config["plex"]["shows"], dict):
+                    self.plex_config_shows = config["plex"]["shows"]
+                    for show_guid, item in self.plex_config_shows.items():
+                        if item["selected"]:
+                            self.plex_config_show_guid = show_guid
+                            break
+
+                if "use_token" in config["plex"]:
+                    self.plex_config_use_token = config["plex"]["use_token"]
+
+                if "token" in config["plex"]:
+                    self.plex_config_auth_token = config["plex"]["token"]
+
+                if "username" in config["plex"]:
+                    self.plex_config_username = config["plex"]["username"]
+
+                if "password" in config["plex"]:
+                    self.plex_config_password = config["plex"]["password"]
+
+                if "remember" in config["plex"]:
+                    self.plex_config_remember = config["plex"]["remember"]
 
     def save_config(self):
         if not self.do_save_config:
@@ -209,6 +232,7 @@ class OnePaceOrganizer():
         self.config_file.write_bytes(orjson.dumps({
             "path_to_eps": str(self.input_path),
             "episodes": str(self.output_path),
+            "move_after_sort": self.move_after_sort,
             "plex": {
                 "enabled": self.plex_config_enabled,
                 "url": self.plex_config_url,
@@ -227,7 +251,7 @@ class OnePaceOrganizer():
 
     def check_none(self, val):
         if val is None:
-            logger.critical("User clicked Cancel")
+            print("User clicked Cancel")
             sys.exit(1)
 
     async def find(self, *args):
@@ -242,6 +266,7 @@ class OnePaceOrganizer():
             text = (
                 f"Path to One Pace Files: {self.input_path}\n"
                 f"Where to Place After Renaming: {self.output_path}\n"
+                f"Action after Sorting: {'Move' if self.move_after_sort else 'Copy'}\n"
             )
 
             if self.plex_config_enabled:
@@ -289,10 +314,18 @@ class OnePaceOrganizer():
                 )
 
             if self.interactive:
-                yn = await yes_no_dialog(
+                yn = await button_dialog(
                     title=self.window_title,
-                    text=f"A prior configuration was found. Do you want to use this?\n\n{text}"
+                    text=f"A prior configuration was found. Do you want to use this?\n\n{text}",
+                    buttons=[
+                        ("Yes", True),
+                        ("No", False),
+                        ("Exit", None)
+                    ]
                 ).run_async()
+
+                if yn == None:
+                    sys.exit(0)
             else:
                 yn = True
                 for line in text.split("\n"):
@@ -347,6 +380,13 @@ class OnePaceOrganizer():
         self.check_none(self.output_path)
 
         self.output_path = Path(self.output_path).resolve()
+
+        self.move_after_sort = await yes_no_dialog(
+            title=self.window_title,
+            text='What should be done with the One Pace video files after renaming? (Recommended: Move)',
+            yes_text='Move',
+            no_text='Copy'
+        ).run_async()
 
         self.plex_config_enabled = await yes_no_dialog(
             title=self.window_title,
@@ -1086,7 +1126,7 @@ class OnePaceOrganizer():
         num_complete = 0
         num_skipped = 0
 
-        await self.pb_label("Moving the video files...")
+        await self.pb_label("Processing the video files...")
 
         for crc32, file_path in video_files:
             episode_info = self.episodes[crc32]
@@ -1130,11 +1170,12 @@ class OnePaceOrganizer():
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
 
-            logger.debug(f"move {file_path} -> {new_video_file_path}")
-            try:
-                await run_sync(file_path.rename, new_video_file_path)
-            except:
+            if self.move_after_sort:
+                logger.debug(f"Move {file_path} -> {new_video_file_path}")
                 await run_sync(shutil.move, str(file_path), str(new_video_file_path))
+            else:
+                logger.debug(f"Copy {file_path} -> {new_video_file_path}")
+                await run_sync(shutil.copy2, str(file_path), str(new_video_file_path))
 
             queue.append((new_video_file_path, episode_info))
 
@@ -1149,9 +1190,9 @@ class OnePaceOrganizer():
             (
                 f"All of the One Pace files have been created in:\n"
                 f"{str(self.output_path)}\n\n"
-                f"Please move the\"{self.output_path.name}\" folder to the Plex library folder you've selected, "
-                "and make sure that it appears in Plex. Seasons and episodes will temporarily "
-                "have incorrect information, and the next step will correct them.\n\n"
+                f"Please move the \"{self.output_path.name}\" folder to the Plex library folder you've selected,\n"
+                "and make sure that it appears in Plex. Seasons and episodes will temporarily have incorrect\n"
+                "information, and the next step will correct them.\n\n"
                 "Click OK once this has been done and you can see the One Pace video files in Plex."
             )
         )
@@ -1469,12 +1510,12 @@ class OnePaceOrganizer():
                 ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
 
                 if not ep_poster_new.exists():
-                    await self.pb_log_output(f"Moving {ep_poster} to: {ep_poster_new}")
-
-                    try:
-                        await run_sync(ep_poster.rename, ep_poster_new)
-                    except:
+                    if self.move_after_sort:
+                        await self.pb_log_output(f"Moving {ep_poster} to: {ep_poster_new}")
                         await run_sync(shutil.move, str(ep_poster), str(ep_poster_new))
+                    else:
+                        await self.pb_log_output(f"Copying {ep_poster} to: {ep_poster_new}")
+                        await run_sync(shutil.copy2, str(ep_poster), str(ep_poster_new))
 
                     art = ET.SubElement(episodedetails, "art")
                     ET.SubElement(art, "poster").text = str(ep_poster_new)
@@ -1488,12 +1529,12 @@ class OnePaceOrganizer():
                 xml_declaration=True
             )
 
-            await self.pb_log_output(f"Moving {file_path.name} to: {new_video_file_path}")
-
-            try:
-                await run_sync(file_path.rename, new_video_file_path)
-            except:
-                await run_sync(shutil.move, str(file_path), str(new_video_file_path))
+            if self.move_after_sort:
+                await self.pb_log_output(f"Moving {file_path.name} to: {new_video_file_path}")
+                await run_sync(shutil.move, str(ep_poster), str(ep_poster_new))
+            else:
+                await self.pb_log_output(f"Copying {file_path.name} to: {new_video_file_path}")
+                await run_sync(shutil.copy2, str(ep_poster), str(ep_poster_new))
 
             i = i + 1
             num_complete = num_complete + 1
