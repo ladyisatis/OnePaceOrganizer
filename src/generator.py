@@ -8,6 +8,7 @@ import io
 import os
 import string
 import time
+from loguru import logger
 from deepdiff import DeepDiff
 from csv import DictReader as CSVReader
 from datetime import date, datetime, timezone, timedelta
@@ -37,7 +38,7 @@ def unicode_fix(s):
 def update():
     GCLOUD_API_KEY=os.environ['GCLOUD_API_KEY'] if 'GCLOUD_API_KEY' in os.environ else ''
     if GCLOUD_API_KEY == "":
-        print("Skipping: GCLOUD_API_KEY is empty")
+        logger.critical("Skipping: GCLOUD_API_KEY is empty")
         return
 
     ONE_PACE_EPISODE_GUIDE_ID="1HQRMJgu_zArp-sLnvFMDzOyjdsht87eFLECxMK858lA"
@@ -61,12 +62,14 @@ def update():
             title_props = None
             mkv_titles = {}
 
+            logger.info("--------------------------")
+
             try:
                 resp = httpx.get("https://raw.githubusercontent.com/one-pace/one-pace-public-subtitles/refs/heads/main/main/title.properties", follow_redirects=True)
                 title_props = javaproperties.loads(resp.text)
 
-            except Exception as e:
-                print(f"Skipping title.properties parsing ({e})")
+            except:
+                logger.warning(f"Skipping title.properties parsing\n{traceback.format_exc()}")
 
             if isinstance(title_props, dict):
                 pattern = re.compile(r"^(?P<arc>[a-z]+)(?:_[0-9]+)?_(?P<num>\d+)\.eptitle$")
@@ -92,8 +95,14 @@ def update():
                         arc_name_to_id[arc_name] = arc_id
                         mkv_titles[arc_id] = {}
 
+                        logger.success(f"{arc_id}. {arc_name}")
+
                     arc_id = arc_name_to_id[arc_name]
                     mkv_titles[arc_id][ep_num] = v
+
+                    logger.success(f"-- {ep_num}. {v}")
+
+            logger.info("--------------------------")
 
             with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_DESC_ID}/export?gid=2010244982&format=csv", follow_redirects=True) as resp:
                 reader = CSVReader(resp.iter_lines())
@@ -120,7 +129,11 @@ def update():
                         "description": row['description_en']
                     }
 
+                    logger.success(f"{part}. {title}")
+
                     season_to_num[title] = part
+
+            logger.info("--------------------------")
 
             r = client.get(f"https://sheets.googleapis.com/v4/spreadsheets/{ONE_PACE_EPISODE_GUIDE_ID}?key={GCLOUD_API_KEY}")
             spreadsheet = orjson.loads(r.content)
@@ -132,10 +145,14 @@ def update():
 
                 season_title = sheet['properties']['title']
 
+                logger.success(f"{season}. {season_title} ({sheetId})")
+
                 if season_title != out_seasons[season]['title']:
                     out_seasons[season]['originaltitle'] = out_seasons[season]['title']
                     out_seasons[season]['title'] = season_title
                     season_to_num[season_title] = season
+
+                    logger.info(f"-- Renaming to: {out_seasons[season]['title']}")
 
                 with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_GUIDE_ID}/export?gid={sheetId}&format=csv", follow_redirects=True) as resp:
                     reader = CSVReader(resp.iter_lines())
@@ -158,8 +175,10 @@ def update():
                             continue
 
                         if id == '' or chapters == '' or anime_episodes == '' or release_date == '' or mkv_crc32 == '':
-                            print(f"Skipping: {row} (no data)")
+                            logger.warning(f"Skipping: {row} (no data)")
                             continue
+
+                        logger.success(f"-- {id}")
 
                         match = re.search(PATTERN_END_NUMBER, id)
                         if match:
@@ -183,7 +202,7 @@ def update():
                             if len(release_date_group) == 3:
                                 release_date = date(int(release_date_group[0]), int(release_date_group[1]), int(release_date_group[2]))
                             else:
-                                print(f"Skipping: {row} (invalid release date)")
+                                logger.warning(f"Skipping: {row} (invalid release date)")
                                 continue
 
                         out_episodes[mkv_crc32] = {
@@ -197,6 +216,7 @@ def update():
                         }
 
                         if len(mkv_crc32_ext) > 0:
+                            logger.info(f"-- Aliasing {mkv_crc32_ext} -> {mkv_crc32}")
                             out_episodes[mkv_crc32_ext] = out_episodes[mkv_crc32]
 
                         key = f"{out_seasons[season]['originaltitle']} {episode}" if 'originaltitle' in out_seasons[season] else f"{out_seasons[season]['title']} {episode}"
@@ -209,29 +229,34 @@ def update():
                             season_eps[key] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
 
             if ONE_PACE_RSS_FEED != '':
+                logger.info("--------------------------")
+
                 try:
                     r = client.get(ONE_PACE_RSS_FEED)
                     title_pattern = re.compile(PATTERN_TITLE, re.IGNORECASE)
                     now = datetime.now().astimezone(timezone.utc)
 
                     for i, item in enumerate(RSSParser.parse(r.text).channel.items):
-                        if not item.title or not item.title.content or item.title.content == "":
-                            continue
-
-                        if i == 5:
+                        if i == 10:
                             break
+
+                        if not item.title or not item.title.content or item.title.content == "":
+                            logger.warning(f"Skipping: {item}")
+                            continue
 
                         match = title_pattern.match(item.title.content)
                         if not match:
-                            print(f"Skipping: {item.title.content} (title does not match)")
+                            logger.warning(f"Skipping: {item.title.content} (title does not match)")
                             continue
 
                         arc_name, ep_num, extra, crc32 = match.groups()
                         if Path(".", "data", "episodes", f"{crc32}.yml").exists():
+                            logger.warning(f"Skipping: {item.title.content} (crc32 file exists)")
                             continue
 
                         pub_date = datetime.strptime(item.pub_date.content, "%a, %d %b %Y %H:%M:%S %z")
                         if now - pub_date > timedelta(hours=24):
+                            logger.warning(f"Skipping: {item.title.content} (more than 24 hours)")
                             continue
 
                         r = httpx.get(item.guid.content)
@@ -249,16 +274,18 @@ def update():
 
                         if arc_name in season_to_num:
                             ep_num = int(ep_num)
+                            released = (pub_date.isoformat().split("T"))[0]
+                            t = f"{arc_name} {ep_num:02d}"
 
                             if crc32 not in out_episodes:
                                 out_episodes[crc32] = {
                                     "season": season_to_num[arc_name],
                                     "episode": ep_num,
-                                    "title": f"{arc_name} {ep_num:02d}",
+                                    "title": t,
                                     "description": "",
                                     "manga_chapters": chs,
                                     "anime_episodes": eps,
-                                    "released": (pub_date.isoformat().split("T"))[0]
+                                    "released": released
                                 }
 
                             key = f"{arc_name} {ep_num}"
@@ -267,11 +294,15 @@ def update():
                             else:
                                 season_eps[key] = [crc32]
 
+                            logger.success(f"Added S{season_to_num[arc_name]}E{ep_num:02d} from RSS ({t}, {released})")
+
                         else:
-                            print(f"Skipping: {item.title.content} (arc {arc_name} not found)")
+                            logger.warning(f"Skipping: {item.title.content} (arc {arc_name} not found)")
 
                 except:
-                    print(traceback.format_exc())
+                    logger.error(f"Skipping RSS parsing\n{traceback.format_exc()}")
+
+            logger.info("--------------------------")
 
             with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_DESC_ID}/export?gid=0&format=csv", follow_redirects=True) as resp:
                 reader = CSVReader(resp.iter_lines())
@@ -290,7 +321,10 @@ def update():
 
                     key = f"{season} {episode}"
                     if key not in season_eps:
+                        logger.warning(f"Skipping: {key} (not found)")
                         continue
+
+                    logger.info(f"{key}: Adding {len(season_eps[key])} episodes")
 
                     for crc32 in season_eps[key]:
                         out_episodes[crc32]["title"] = title
@@ -307,7 +341,9 @@ def update():
                                     out_episodes[crc32]["originaltitle"] = _origtitle
 
                         except:
-                            print(traceback.format_exc())
+                            logger.error(f"Skipping: {key}\n{traceback.format_exc()}")
+
+        logger.info("--------------------------")
 
         for crc32, data in out_episodes.items():
             file_path = Path(".", "data", "episodes", f"{crc32}.yml")
@@ -377,12 +413,16 @@ def update():
             with file_path.open(mode='w') as f:
                 f.write(out)
 
+            logger.success(f"Wrote episode to {file_path}")
+
         season_path = Path(".", "data", "seasons.yml")
         with season_path.open(mode='w') as f:
             YamlDump(data=out_seasons, stream=f, allow_unicode=True, sort_keys=False)
 
+        logger.success(f"Wrote seasons to {season_path}")
+
     except:
-        print(traceback.format_exc())
+        logger.critical(f"Uncaught Exception\n{traceback.format_exc()}")
         sys.exit(1)
 
 def sort_dict(d):
