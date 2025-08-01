@@ -10,10 +10,12 @@ import string
 import time
 from deepdiff import DeepDiff
 from csv import DictReader as CSVReader
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timezone, timedelta
 from yaml import dump as YamlDump, safe_load as YamlLoad
 from pathlib import Path
 from httpx_retries import RetryTransport, Retry
+from rss_parser import RSSParser
+from bs4 import BeautifulSoup
 
 def escape_char(c):
     if c == "’":
@@ -40,13 +42,16 @@ def update():
 
     ONE_PACE_EPISODE_GUIDE_ID="1HQRMJgu_zArp-sLnvFMDzOyjdsht87eFLECxMK858lA"
     ONE_PACE_EPISODE_DESC_ID="1M0Aa2p5x7NioaH9-u8FyHq6rH3t5s6Sccs8GoC6pHAM"
+    ONE_PACE_RSS_FEED=os.environ['ONE_PACE_RSS_FEED'] if 'ONE_PACE_RSS_FEED' in os.environ else ''
 
     PATTERN_END_NUMBER = r'(\d+)'
     PATTERN_CHAPTER_EPISODE = r'\b\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*\b'
+    PATTERN_TITLE = r'\[One Pace\]\[\d+(?:[-,]\d+)*\]\s+(.+?)\s+(\d{2,})\s*(\w+)?\s*\[\d+p\]\[([A-Fa-f0-9]{8})\]\.mkv'
 
     out_seasons = {}
     out_episodes = {}
     season_eps = {}
+    season_to_num = {}
 
     try:
         retry = Retry(total=999, backoff_factor=0.5)
@@ -98,6 +103,7 @@ def update():
                         continue
 
                     part = int(row['part'])
+                    title = row['title_en']
 
                     if part == 11:
                         part = 10
@@ -110,9 +116,11 @@ def update():
 
                     out_seasons[part] = {
                         "saga": row['saga_title'],
-                        "title": row['title_en'],
+                        "title": title,
                         "description": row['description_en']
                     }
+
+                    season_to_num[title] = part
 
             r = client.get(f"https://sheets.googleapis.com/v4/spreadsheets/{ONE_PACE_EPISODE_GUIDE_ID}?key={GCLOUD_API_KEY}")
             spreadsheet = orjson.loads(r.content)
@@ -127,6 +135,7 @@ def update():
                 if season_title != out_seasons[season]['title']:
                     out_seasons[season]['originaltitle'] = out_seasons[season]['title']
                     out_seasons[season]['title'] = season_title
+                    season_to_num[season_title] = season
 
                 with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_GUIDE_ID}/export?gid={sheetId}&format=csv", follow_redirects=True) as resp:
                     reader = CSVReader(resp.iter_lines())
@@ -199,41 +208,106 @@ def update():
                         else:
                             season_eps[key] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
 
-                with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_DESC_ID}/export?gid=0&format=csv", follow_redirects=True) as resp:
-                    reader = CSVReader(resp.iter_lines())
+            if ONE_PACE_RSS_FEED != '':
+                try:
+                    r = client.get(ONE_PACE_RSS_FEED)
+                    title_pattern = re.compile(PATTERN_TITLE, re.IGNORECASE)
+                    now = datetime.now().astimezone(timezone.utc)
 
-                    for row in reader:
-                        if 'arc_title' not in row:
+                    for i, item in enumerate(RSSParser.parse(r.text).channel.items):
+                        if not item.title or not item.title.content or item.title.content == "":
                             continue
 
-                        season = row['arc_title']
-                        episode = row['arc_part']
-                        title = row['title_en']
-                        description = row['description_en']
+                        if i == 5:
+                            break
 
-                        if season == '' or episode == '' or title == '':
+                        match = title_pattern.match(item.title.content)
+                        if not match:
+                            print(f"Skipping: {item.title.content} (title does not match)")
                             continue
 
-                        key = f"{season} {episode}"
-                        if key not in season_eps:
+                        arc_name, ep_num, extra, crc32 = match.groups()
+                        if Path(".", "data", "episodes", f"{crc32}.yml").exists():
                             continue
 
-                        for crc32 in season_eps[key]:
-                            out_episodes[crc32]["title"] = title
-                            out_episodes[crc32]["description"] = description
+                        pub_date = datetime.strptime(item.pub_date.content, "%a, %d %b %Y %H:%M:%S %z")
+                        if now - pub_date > timedelta(hours=24):
+                            continue
 
-                            try:
-                                _s = f"{out_episodes[crc32]['season']}"
-                                _e = f"{out_episodes[crc32]['episode']}"
+                        r = httpx.get(item.guid.content)
+                        div = BeautifulSoup(r.text, 'html.parser').find('div', { 'class': 'panel-body', 'id': 'torrent-description' })
+                        desc = div.get_text(strip=True).split("\n") if div else []
 
-                                if _s != "0" and _s in mkv_titles and _e in mkv_titles[_s]:
-                                    _origtitle = mkv_titles[_s][_e]
+                        chs = ""
+                        eps = ""
 
-                                    if title.lower() != _origtitle.lower():
-                                        out_episodes[crc32]["originaltitle"] = _origtitle
+                        for d in desc:
+                            if d.startswith("Chapters: "):
+                                chs = d.replace("Chapters: ", "")
+                            elif d.startswith("Episodes: "):
+                                eps = d.replace("Episodes: ", "")
 
-                            except:
-                                print(traceback.format_exc())
+                        if arc_name in season_to_num:
+                            ep_num = int(ep_num)
+
+                            if crc32 not in out_episodes:
+                                out_episodes[crc32] = {
+                                    "season": season_to_num[arc_name],
+                                    "episode": ep_num,
+                                    "title": f"{arc_name} {ep_num:02d}",
+                                    "description": "",
+                                    "manga_chapters": chs,
+                                    "anime_episodes": eps,
+                                    "released": (pub_date.isoformat().split("T"))[0]
+                                }
+
+                            key = f"{arc_name} {ep_num}"
+                            if key in season_eps:
+                                season_eps[key].append(crc32)
+                            else:
+                                season_eps[key] = [crc32]
+
+                        else:
+                            print(f"Skipping: {item.title.content} (arc {arc_name} not found)")
+
+                except:
+                    print(traceback.format_exc())
+
+            with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_DESC_ID}/export?gid=0&format=csv", follow_redirects=True) as resp:
+                reader = CSVReader(resp.iter_lines())
+
+                for row in reader:
+                    if 'arc_title' not in row:
+                        continue
+
+                    season = row['arc_title']
+                    episode = row['arc_part']
+                    title = row['title_en']
+                    description = row['description_en']
+
+                    if season == '' or episode == '' or title == '':
+                        continue
+
+                    key = f"{season} {episode}"
+                    if key not in season_eps:
+                        continue
+
+                    for crc32 in season_eps[key]:
+                        out_episodes[crc32]["title"] = title
+                        out_episodes[crc32]["description"] = description
+
+                        try:
+                            _s = f"{out_episodes[crc32]['season']}"
+                            _e = f"{out_episodes[crc32]['episode']}"
+
+                            if _s != "0" and _s in mkv_titles and _e in mkv_titles[_s]:
+                                _origtitle = mkv_titles[_s][_e]
+
+                                if title.lower() != _origtitle.lower():
+                                    out_episodes[crc32]["originaltitle"] = _origtitle
+
+                        except:
+                            print(traceback.format_exc())
 
         for crc32, data in out_episodes.items():
             file_path = Path(".", "data", "episodes", f"{crc32}.yml")

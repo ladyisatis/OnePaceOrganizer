@@ -48,6 +48,7 @@ jobs:
       - name: Run metadata updater
         env:
           GCLOUD_API_KEY: ${{ secrets.GCLOUD_API_KEY }}
+          ONE_PACE_RSS_FEED: ${{ secrets.ONE_PACE_RSS_FEED }}
         run: |
           poetry run python src/generator.py update
           poetry run python src/generator.py json
