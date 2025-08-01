@@ -161,15 +161,15 @@ def update():
                         if 'MKV CRC32' not in row:
                             continue
 
-                        id = row['One Pace Episode'] if 'One Pace Episode' in row else ''
+                        id = row['One Pace Episode'].strip() if 'One Pace Episode' in row else ''
                         if id == '' and ' One Pace Episode' in row:
-                            id = row[' One Pace Episode']
+                            id = row[' One Pace Episode'].strip()
 
-                        chapters = row['Chapters'] if 'Chapters' in row else ''
-                        anime_episodes = row['Episodes'] if 'Episodes' in row else ''
-                        release_date = row['Release Date'] if 'Release Date' in row else ''
-                        mkv_crc32 = row['MKV CRC32'] if 'MKV CRC32' in row else ''
-                        mkv_crc32_ext = row['MKV CRC32 (Extended)'] if 'MKV CRC32 (Extended)' in row else ''
+                        chapters = row['Chapters'].strip() if 'Chapters' in row else ''
+                        anime_episodes = row['Episodes'].strip() if 'Episodes' in row else ''
+                        release_date = row['Release Date'].strip() if 'Release Date' in row else ''
+                        mkv_crc32 = row['MKV CRC32'].strip() if 'MKV CRC32' in row else ''
+                        mkv_crc32_ext = row['MKV CRC32 (Extended)'].strip() if 'MKV CRC32 (Extended)' in row else ''
 
                         if mkv_crc32 == '':
                             continue
