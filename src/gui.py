@@ -124,8 +124,8 @@ class OnePaceOrganizer(QWidget):
         self.spacer = "------------------------------------------------------------------"
         self.config_file = Path(".", "config.json")
 
-        self.input_path = ""
-        self.output_path = ""
+        self.input_path = Path(".", "in")
+        self.output_path = Path(".", "out")
 
         self.plexapi_account = None
         self.plexapi_server = None
