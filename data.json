@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-08-01T07:13:51.335171+00:00",
+  "last_update": "2025-08-02T00:11:49.487324+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -4632,6 +4632,18 @@
       "released": "2013-03-29",
       "hashes": {
         "crc32": "BD7169C3"
+      }
+    },
+    "BE634289": {
+      "season": 5,
+      "episode": 1,
+      "title": "Enter: Sanji",
+      "description": "The Straw Hats happen across Zoro's former partners, Yosaku and Johnny, whose dietary dilemma reminds the pirates they still need a cook on their ship. Thus, they set sail for the sea restaurant Baratie, hoping to snag a chef.",
+      "manga_chapters": "42-44",
+      "anime_episodes": "19-21",
+      "released": "2025-08-01",
+      "hashes": {
+        "crc32": "BE634289"
       }
     },
     "BE72EB0E": {
