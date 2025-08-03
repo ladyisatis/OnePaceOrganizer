@@ -1411,7 +1411,7 @@ class OnePaceOrganizer(QWidget):
                 xml_declaration=True
             )
 
-            self.move_file(file_path, new_video_file_path)
+            await self.move_file(file_path, new_video_file_path)
 
             i = i + 1
             num_complete = num_complete + 1
