@@ -1031,10 +1031,12 @@ class OnePaceOrganizer(QWidget):
             show.editSummary(self.tvshow["plot"])
             show.editOriginallyAvailable(self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"])
 
-            await run_sync(
-                show.uploadPoster,
-                filepath=str((await self.find("tvshow.png")).resolve())
-            )
+            tvshow = (await self.find("tvshow.png")).resolve()
+            if tvshow.is_file():
+                await run_sync(
+                    show.uploadPoster,
+                    filepath=str(tvshow)
+                )
 
         if show.contentRating != self.tvshow["rating"]:
             show.editContentRating(self.tvshow["rating"])
@@ -1134,11 +1136,13 @@ class OnePaceOrganizer(QWidget):
                     plex_season.editTitle(new_title)
                     plex_season.editSummary(season_info["description"])
 
-                    await run_sync(plex_season.uploadPoster, filepath=str((await self.find(f"poster-season{season}.png")).resolve()))
+                    _poster = (await self.find(f"poster-season{season}.png")).resolve()
+                    if _poster.is_file():
+                        await run_sync(plex_season.uploadPoster, filepath=str(_poster))
 
-                    p = await run_sync(plex_season.posters)
-                    if len(p) > 1:
-                        await run_sync(plex_season.setPoster, p[len(p)-1])
+                        p = await run_sync(plex_season.posters)
+                        if len(p) > 1:
+                            await run_sync(plex_season.setPoster, p[len(p)-1])
 
             plex_episode = await run_sync(show.episode, season=season, episode=episode_info["episode"])
             updated = False
@@ -1248,14 +1252,15 @@ class OnePaceOrganizer(QWidget):
             for k, v in dict(sorted(self.seasons.items())).items():
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
 
-            src = str((await self.find("tvshow.png")).resolve())
-            dst = str(Path(self.output_path, "poster.png").resolve())
+            src = (await self.find("tvshow.png")).resolve()
+            if src.is_file():
+                dst = str(Path(self.output_path, "poster.png").resolve())
 
-            self.log_output.append(f"Copying {src} to: {dst}")
-            await run_sync(shutil.copy, src, dst)
+                self.log_output.append(f"Copying {str(src)} to: {dst}")
+                await run_sync(shutil.copy, str(src), dst)
 
-            art = ET.SubElement(root, "art")
-            ET.SubElement(art, "poster").text = dst
+                art = ET.SubElement(root, "art")
+                ET.SubElement(art, "poster").text = dst
 
             ET.indent(root)
 
@@ -1314,14 +1319,15 @@ class OnePaceOrganizer(QWidget):
                 ET.SubElement(root, "outline").text = season_info["description"]
                 ET.SubElement(root, "seasonnumber").text = f"{season}"
 
-                src = str((await self.find(f"poster-season{season}.png")).resolve())
-                dst = str(Path(season_path, "poster.png").resolve())
+                src = (await self.find(f"poster-season{season}.png")).resolve()
+                if src.is_file():
+                    dst = str(Path(season_path, "poster.png").resolve())
 
-                self.log_output.append(f"Copying {src} to: {dst}")
-                await run_sync(shutil.copy, src, dst)
+                    self.log_output.append(f"Copying {str(src)} to: {dst}")
+                    await run_sync(shutil.copy, str(src), dst)
 
-                art = ET.SubElement(root, "art")
-                ET.SubElement(art, "poster").text = dst
+                    art = ET.SubElement(root, "art")
+                    ET.SubElement(art, "poster").text = dst
 
                 ET.indent(root)
                 tree = ET.ElementTree(root)
