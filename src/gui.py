@@ -19,7 +19,7 @@ import zlib
 
 from plexapi.exceptions import TwoFactorRequired as PlexApiTwoFactorRequired, Unauthorized as PlexApiUnauthorized
 from plexapi.myplex import MyPlexAccount
-from pathlib import Path
+from pathlib import Path, UnsupportedOperation
 from multiprocessing import freeze_support
 
 from PySide6.QtWidgets import (
@@ -128,9 +128,9 @@ class OnePaceOrganizer(QWidget):
         self.spacer = "------------------------------------------------------------------"
         self.config_file = Path(".", "config.json")
 
-        self.input_path = Path(".", "in").resolve()
-        self.output_path = Path(".", "out").resolve()
-        self.move_after_sort = True
+        self.input_path = ""
+        self.output_path = ""
+        self.file_action = 0
 
         self.plexapi_account = None
         self.plexapi_server = None
@@ -175,7 +175,10 @@ class OnePaceOrganizer(QWidget):
                 self.output_path = Path(config["episodes"]).resolve()
 
             if "move_after_sort" in config:
-                self.move_after_sort = config["move_after_sort"]
+                self.file_action = 0 if config["move_after_sort"] else 1
+
+            if "file_action" in config:
+                self.file_action = config["file_action"]
 
             if "plex" in config:
                 if "enabled" in config["plex"]:
@@ -224,7 +227,7 @@ class OnePaceOrganizer(QWidget):
         self.config_file.write_bytes(orjson.dumps({
             "path_to_eps": str(self.input_path),
             "episodes": str(self.output_path),
-            "move_after_sort": self.move_after_sort,
+            "file_action": self.file_action,
             "plex": {
                 "enabled": self.plex_config_enabled,
                 "url": self.plex_config_url,
@@ -254,7 +257,12 @@ class OnePaceOrganizer(QWidget):
         self.input.prop.setText(str(self.input_path))
         self.input.prop.setPlaceholderText(str(Path(".", "in").resolve()))
 
-        _output_label_txt = "Move" if self.move_after_sort else "Copy"
+        _output_label_txt = "Move"
+        if self.file_action == 1:
+            _output_label_txt = "Copy"
+        elif self.file_action == 2:
+            _output_label_txt = "Symlink"
+
         self.output = Input(
             layout,
             f"{_output_label_txt} the sorted and renamed files to:",
@@ -342,9 +350,9 @@ class OnePaceOrganizer(QWidget):
             self.plex_group.hide()
 
         self.move_copy = Input(layout, "Action after Sorting/Renaming:", QComboBox())
-        self.move_copy.prop.addItems(["Move (recommended)", "Copy"])
-        self.move_copy.prop.setCurrentIndex(0 if self.move_after_sort else 1)
-        self.move_copy.prop.currentTextChanged.connect(self.set_action)
+        self.move_copy.prop.addItems(["Move (recommended)", "Copy", "Symlink"])
+        self.move_copy.prop.setCurrentIndex(self.file_action)
+        self.move_copy.prop.currentIndexChanged.connect(self.set_action)
 
         self.start_button = QPushButton("Start")
         self.start_button.clicked.connect(lambda: asyncio.create_task(self.start_process()))
@@ -402,10 +410,16 @@ class OnePaceOrganizer(QWidget):
         self.plex_config_enabled = text == "Plex"
         self.plex_group.setVisible(self.plex_config_enabled)
 
-    def set_action(self, text):
-        self.move_after_sort = text == "Move (recommended)"
-        _output_label_txt = "Move" if self.move_after_sort else "Copy"
+    def set_action(self, index):
+        if index == 1:
+            _output_label_txt = "Copy"
+        elif index == 2:
+            _output_label_txt = "Symlink"
+        else:
+            output_label_txt = "Move"
+
         self.output.label.setText(f"{_output_label_txt} the sorted and renamed files to:")
+        self.file_action = index
 
     def switch_plex_method(self, text):
         self.plex_config_use_token = text == "Authentication Token"
@@ -975,6 +989,29 @@ class OnePaceOrganizer(QWidget):
 
         return video_files
 
+    async def move_file(self, src, dst):
+        try:
+            if self.file_action == 1: #Copy
+                await run_sync(shutil.copy2, str(src), str(dst))
+            elif self.file_action == 2: #Symlink
+                await run_sync(dst.symlink_to, src)
+            else: #Move, or other
+                await run_sync(shutil.move, str(src), str(dst))
+
+        except UnsupportedOperation:
+            self.log_output.append("Aborting: failed due to an 'UnsupportedOperation' error. If you're on Windows, " +
+                "and have chosen the symlink option, you may need administrator privileges.")
+            return False
+
+        except OSError as e:
+            self.log_output.append(f"Aborting due to {e} (check that you have permission to write here)")
+            return False
+
+        except Exception as e:
+            self.log_output.append(f"Aborting due to unknown error: {traceback.format_exc()}")
+
+        return True
+
     async def start_process_plex(self, video_files):
         self.log_output.append(self.spacer)
         self.progress_bar.setValue(0)
@@ -1048,7 +1085,8 @@ class OnePaceOrganizer(QWidget):
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
 
-            await run_sync(shutil.move if self.move_after_sort else shutil.copy2, str(file_path), str(new_video_file_path))
+            if not await self.move_file(file_path, new_video_file_path):
+                return
 
             queue.append((new_video_file_path, episode_info))
 
@@ -1308,7 +1346,13 @@ class OnePaceOrganizer(QWidget):
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
 
-            self.log_output.append(f"Creating metadata and {'moving' if self.move_after_sort else 'copying'} {file_path.name} to: {new_video_file_path}")
+            _action = "moving"
+            if self.file_action == 1:
+                _action = "copying"
+            elif self.file_action == 2:
+                _action = "symlinking"
+
+            self.log_output.append(f"Creating metadata and {_action} {file_path.name} to: {new_video_file_path}")
 
             ET.SubElement(episodedetails, "title").text = episode_info["title"]
             ET.SubElement(episodedetails, "showtitle").text = self.tvshow["title"]
@@ -1350,12 +1394,10 @@ class OnePaceOrganizer(QWidget):
                 ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
 
                 if not ep_poster_new.exists():
-                    if self.move_after_sort:
-                        self.log_output.append(f"Moving {ep_poster} to: {ep_poster_new}")
-                        await run_sync(shutil.move, str(ep_poster), str(ep_poster_new))
-                    else:
-                        self.log_output.append(f"Copying {ep_poster} to: {ep_poster_new}")
-                        await run_sync(shutil.copy2, str(ep_poster), str(ep_poster_new))
+                    self.log_output.append(f"{ep_poster} -> {ep_poster_new}")
+
+                    if not await self.move_file(ep_poster, ep_poster_new):
+                        return
 
                     art = ET.SubElement(episodedetails, "art")
                     ET.SubElement(art, "poster").text = str(ep_poster_new)
@@ -1369,7 +1411,7 @@ class OnePaceOrganizer(QWidget):
                 xml_declaration=True
             )
 
-            await run_sync(shutil.move if self.move_after_sort else shutil.copy2, str(file_path), str(new_video_file_path))
+            self.move_file(file_path, new_video_file_path)
 
             i = i + 1
             num_complete = num_complete + 1

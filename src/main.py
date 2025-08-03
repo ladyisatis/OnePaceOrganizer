@@ -20,7 +20,7 @@ import zlib
 
 from plexapi.exceptions import TwoFactorRequired as PlexApiTwoFactorRequired, Unauthorized as PlexApiUnauthorized
 from plexapi.myplex import MyPlexAccount
-from pathlib import Path
+from pathlib import Path, UnsupportedOperation
 from loguru import logger
 from multiprocessing import freeze_support
 
@@ -124,7 +124,7 @@ class OnePaceOrganizer():
         self.config_file = Path(".", "config.json")
         self.do_load_config = get_env("load_config", True)
         self.do_save_config = get_env("save_config", True)
-        self.move_after_sort = get_env("move_after_sort", True)
+        self.file_action = get_env("file_action", True)
         self.workers = int(get_env("workers", max(8, os.process_cpu_count())))
 
         self.input_path = get_env("input_path")
@@ -185,7 +185,10 @@ class OnePaceOrganizer():
                 self.output_path = Path(config["episodes"]).resolve()
 
             if "move_after_sort" in config:
-                self.move_after_sort = config["move_after_sort"]
+                self.file_action = 0 if config["move_after_sort"] else 1
+            
+            if "file_action" in config:
+                self.file_action = config["file_action"]
 
             if "plex" in config:
                 if "enabled" in config["plex"]:
@@ -237,7 +240,7 @@ class OnePaceOrganizer():
         self.config_file.write_bytes(orjson.dumps({
             "path_to_eps": str(self.input_path),
             "episodes": str(self.output_path),
-            "move_after_sort": self.move_after_sort,
+            "file_action": self.file_action,
             "plex": {
                 "enabled": self.plex_config_enabled,
                 "url": self.plex_config_url,
@@ -266,12 +269,38 @@ class OnePaceOrganizer():
 
         return bundle_file("posters", *args)
 
+    async def move_file(self, src, dst):
+        try:
+            if self.file_action == 1: #Copy
+                await run_sync(shutil.copy2, str(src), str(dst))
+            elif self.file_action == 2: #Symlink
+                await run_sync(dst.symlink_to, src)
+            else: #Move, or other
+                await run_sync(shutil.move, str(src), str(dst))
+
+        except UnsupportedOperation:
+            return "Aborting: failed due to an 'UnsupportedOperation' error. If you're on Windows, and have chosen the symlink option, you may need administrator privileges."
+
+        except OSError as e:
+            return f"Aborting due to {e} (check that you have permission to write here)"
+
+        except Exception as e:
+            return f"Aborting due to unknown error: {traceback.format_exc()}"
+
+        return ""
+
     async def run(self):
         if self.input_path != "" and self.output_path != "":
+            _action = "Move"
+            if self.file_action == 1:
+                _action = "Copy"
+            elif self.file_action == 2:
+                _action = "Symlink"
+
             text = (
                 f"Path to One Pace Files: {self.input_path}\n"
                 f"Where to Place After Renaming: {self.output_path}\n"
-                f"Action after Sorting: {'Move' if self.move_after_sort else 'Copy'}\n"
+                f"Action after Sorting: {_action}\n"
             )
 
             if self.plex_config_enabled:
@@ -386,11 +415,15 @@ class OnePaceOrganizer():
 
         self.output_path = Path(self.output_path).resolve()
 
-        self.move_after_sort = await yes_no_dialog(
+        self.file_action = await radiolist_dialog(
             title=self.window_title,
-            text='What should be done with the One Pace video files after renaming? (Recommended: Move)',
-            yes_text='Move',
-            no_text='Copy'
+            text="What should be done with the One Pace video files after sorting?",
+            values=[
+                (0, "Move (recommended)"),
+                (1, "Copy"),
+                (2, "Symlink")
+            ],
+            default=self.file_action
         ).run_async()
 
         self.plex_config_enabled = await yes_no_dialog(
@@ -1208,12 +1241,10 @@ class OnePaceOrganizer():
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
 
-            if self.move_after_sort:
-                logger.debug(f"Move {file_path} -> {new_video_file_path}")
-                await run_sync(shutil.move, str(file_path), str(new_video_file_path))
-            else:
-                logger.debug(f"Copy {file_path} -> {new_video_file_path}")
-                await run_sync(shutil.copy2, str(file_path), str(new_video_file_path))
+            _res = await self.move_file(file_path, new_video_file_path)
+            if _res != "":
+                self.pb_log_output(f"\n{_res}")
+                return
 
             queue.append((new_video_file_path, episode_info))
 
@@ -1548,12 +1579,12 @@ class OnePaceOrganizer():
                 ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
 
                 if not ep_poster_new.exists():
-                    if self.move_after_sort:
-                        await self.pb_log_output(f"Moving {ep_poster} to: {ep_poster_new}")
-                        await run_sync(shutil.move, str(ep_poster), str(ep_poster_new))
-                    else:
-                        await self.pb_log_output(f"Copying {ep_poster} to: {ep_poster_new}")
-                        await run_sync(shutil.copy2, str(ep_poster), str(ep_poster_new))
+                    await self.pb_log_output(f"{ep_poster} -> {ep_poster_new}")
+
+                    _res = await self.move_file(ep_poster, ep_poster_new)
+                    if _res != "":
+                        await self.pb_log_output(f"\n{_res}")
+                        return
 
                     art = ET.SubElement(episodedetails, "art")
                     ET.SubElement(art, "poster").text = str(ep_poster_new)
@@ -1567,12 +1598,12 @@ class OnePaceOrganizer():
                 xml_declaration=True
             )
 
-            if self.move_after_sort:
-                await self.pb_log_output(f"Moving {file_path.name} to: {new_video_file_path}")
-                await run_sync(shutil.move, str(file_path), str(new_video_file_path))
-            else:
-                await self.pb_log_output(f"Copying {file_path.name} to: {new_video_file_path}")
-                await run_sync(shutil.copy2, str(file_path), str(new_video_file_path))
+            await self.pb_log_output(f"{file_path.name} -> {new_video_file_path}")
+
+            _res = await self.move_file(file_path, new_video_file_path)
+            if _res != "":
+                await self.pb_log_output(f"\n{_res}")
+                return
 
             i = i + 1
             num_complete = num_complete + 1
