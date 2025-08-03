@@ -849,7 +849,6 @@ class OnePaceOrganizer():
     async def cache_episode_data(self):
         data_file = Path(".", "data.json")
         data = {}
-        now = datetime.datetime.now(tz=datetime.UTC)
 
         if data_file.exists():
             await self.pb_label("Checking episode metadata file (data.json)...")
@@ -859,20 +858,19 @@ class OnePaceOrganizer():
             logger.trace(data)
 
             if "last_update" in data and data["last_update"] != "":
-                last_update = datetime.datetime.fromisoformat(data["last_update"])
+                now = datetime.datetime.now(tz=datetime.UTC)
+                last_update_remote = datetime.datetime.fromisoformat(data["last_update"])
+                last_update_local = datetime.datetime.fromtimestamp(data_file.stat().st_mtime, tz=datetime.UTC)
 
-                if now - last_update < datetime.timedelta(hours=12):
+                if now - last_update_remote < datetime.timedelta(hours=12):
                     self.tvshow = data["tvshow"] if "tvshow" in data else {}
                     self.seasons = data["seasons"] if "seasons" in data else {}
                     self.episodes = data["episodes"] if "episodes" in data else {}
-                    return True
 
-            last_update = datetime.datetime.fromtimestamp(data_file.stat().st_mtime, tz=datetime.UTC)
-            if now - last_update < datetime.timedelta(hours=1):
-                self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                self.seasons = data["seasons"] if "seasons" in data else {}
-                self.episodes = data["episodes"] if "episodes" in data else {}
-                return True
+                elif now - last_update_local < datetime.timedelta(hours=1):
+                    self.tvshow = data["tvshow"] if "tvshow" in data else {}
+                    self.seasons = data["seasons"] if "seasons" in data else {}
+                    self.episodes = data["episodes"] if "episodes" in data else {}
 
         yml_loaded = await self.cache_yml()
 
@@ -909,6 +907,38 @@ class OnePaceOrganizer():
 
         return len(self.tvshow) > 0 and len(self.seasons) > 0 and len(self.episodes) > 0
 
+    async def process_yml_metadata(self, file, crc32):
+        with file.open(mode='r', encoding='utf-8') as f:
+            parsed = await run_sync(yaml.safe_load, stream=f)
+            logger.trace(f"{file}: {parsed}")
+
+        if not isinstance(parsed, dict):
+            return None
+
+        if "reference" in parsed:
+            ref = parsed["reference"].upper()
+            logger.debug(f"{crc32}.yml -> {ref}.yml")
+
+            if ref in self.episodes and isinstance(self.episodes[ref], dict):
+                return self.episodes[ref]
+            else:
+                return await self.process_metadata(Path(file.parent, f"{ref}.yml"), ref)
+
+        if "_" in crc32:
+            crc32 = crc32.split("_")[0]
+
+            if crc32 in self.episodes and isinstance(self.episodes[crc32], list):
+                new_list = [item for item in self.episodes[crc32]]
+                new_list.append(parsed)
+                logger.debug(f"add {file} to list {crc32}: {new_list}")
+                return new_list
+
+            logger.debug(f"create {crc32} as list: {parsed}")
+            return [parsed]
+
+        logger.debug(f"loaded {crc32}: {parsed}")
+        return parsed
+
     async def cache_yml(self):
         try:
             data_folder = Path(".", "data")
@@ -940,42 +970,20 @@ class OnePaceOrganizer():
             await self.pb_progress(0)
 
             for index, file in enumerate(episode_files):
-                crc32 = file.name.replace(".yml", "")
-
-                with file.open(mode='r', encoding='utf-8') as f:
-                    parsed = await run_sync(yaml.safe_load, stream=f)
-                    logger.trace(f"{file}: {parsed}")
-
                 if file == tvshow_yml:
-                    self.tvshow = parsed
+                    with file.open(mode='r', encoding='utf-8') as f:
+                        self.tvshow = await run_sync(yaml.safe_load, stream=f)
 
                 elif file == seasons_yml:
-                    self.seasons = parsed
-
-                elif "reference" in parsed:
-                    ref = parsed["reference"]
-                    logger.debug(f"{crc32}.yml -> {ref}.yml")
-
-                    if ref in self.episodes and isinstance(self.episodes[ref], dict):
-                        self.episodes[crc32] = self.episodes[ref]
-                    else:
-                        with Path(file.parent, f"{ref}.yml").open(mode='r', encoding='utf-8') as f:
-                            self.episodes[crc32] = await run_sync(yaml.safe_load, stream=f)
-
-                elif len(crc32) == 8:
-                    logger.debug(f"loaded {crc32}: {parsed}")
-                    self.episodes[crc32] = parsed
+                    with file.open(mode='r', encoding='utf-8') as f:
+                        self.seasons = await run_sync(yaml.safe_load, stream=f)
 
                 else:
-                    crc32 = crc32.split("_")[0]
-                    logger.trace(crc32)
+                    crc32 = file.name.replace(".yml", "")
+                    result = await self.process_yml_metadata(file, crc32)
 
-                    if crc32 in self.episodes and isinstance(self.episodes[crc32], list):
-                        logger.debug(f"add {file} to list {crc32}: {parsed}")
-                        self.episodes[crc32].append(parsed)
-                    else:
-                        logger.debug(f"create {crc32} as list: {parsed}")
-                        self.episodes[crc32] = [parsed]
+                    if result is not None:
+                        self.episodes[crc32] = result
 
                 await self.pb_progress(int(((index + 1) / total_files) * 100))
 
