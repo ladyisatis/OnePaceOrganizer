@@ -74,6 +74,20 @@ def _crc32_worker(video_file):
     res = f"{crc_value & 0xFFFFFFFF:08x}"
     return (video_file, "", res.upper())
 
+async def compare_file(file1, file2):
+    with file1.open(mode='rb') as f1, file2.open(mode='rb') as f2:
+        while True:
+            c1 = await run_sync(f1.read, 65536)
+            c2 = await run_sync(f2.read, 65536)
+
+            if not c1 and not c2:
+                break
+
+            if c1 != c2:
+                return False
+
+    return True
+
 def bundle_file(*args):
     in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
     local_path = Path(".", *args)
@@ -1009,6 +1023,12 @@ class OnePaceOrganizer(QWidget):
 
     async def move_file(self, src, dst):
         try:
+            if dst.exists():
+                if await compare_file(src, dst):
+                    return ""
+                else:
+                    dst.unlink(missing_ok=True)
+
             if self.file_action == 1: #Copy
                 await run_sync(shutil.copy2, str(src), str(dst))
             elif self.file_action == 2: #Symlink
@@ -1029,6 +1049,7 @@ class OnePaceOrganizer(QWidget):
 
         except Exception as e:
             self.log_output.append(f"Aborting due to unknown error: {traceback.format_exc()}")
+            return False
 
         return True
 
@@ -1439,7 +1460,8 @@ class OnePaceOrganizer(QWidget):
                 xml_declaration=True
             )
 
-            await self.move_file(file_path, new_video_file_path)
+            if not await self.move_file(file_path, new_video_file_path):
+                return
 
             i = i + 1
             num_complete = num_complete + 1
