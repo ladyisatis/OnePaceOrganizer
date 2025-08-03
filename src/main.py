@@ -1499,10 +1499,10 @@ class OnePaceOrganizer():
                 stop = True
 
                 for v in episode_info:
-                    if not "hashes" in episode_info or not "blake2" in episode_info["hashes"] or episode_info["hashes"]["blake2"] == "":
+                    if not "hashes" in v or not "blake2" in v["hashes"] or v["hashes"]["blake2"] == "":
                         await self.pb_log_output(f"Skipping {file_path.name}: Blake2s 16-character hash is required but not provided")
 
-                    elif await async_blake2s_16(file_path) == episode_info["hashes"]["blake2"]:
+                    elif await async_blake2s_16(file_path) == v["hashes"]["blake2"]:
                         stop = False
                         episode_info = v
                         break
