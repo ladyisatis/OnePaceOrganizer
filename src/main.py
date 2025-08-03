@@ -1,4 +1,5 @@
 import asyncio
+import concurrent.futures
 import datetime
 import enzyme
 import xml.etree.ElementTree as ET
@@ -73,17 +74,19 @@ async def async_blake2s_16(video_file, loop=None):
     res = (await run_sync(h.hex_digest, loop=loop))[:16]
     return res.lower()
 
-async def async_crc32(video_file, loop=None):
-    if loop == None:
-        loop = asyncio.get_event_loop()
-
+def _crc32_worker(video_file):
     crc_value = 0
 
-    async for chunk in read_chunks(video_file, loop):
-        crc_value = await run_sync(zlib.crc32, chunk, crc_value, loop=loop)
+    try:
+        with Path(video_file).open(mode='rb') as f:
+            while chunk := f.read(1024 * 1024):
+                crc_value = zlib.crc32(chunk, crc_value)
+
+    except Exception as e:
+        return (video_file, str(e), "")
 
     res = f"{crc_value & 0xFFFFFFFF:08x}"
-    return res.upper()
+    return (video_file, "", res.upper())
 
 def bundle_file(*args):
     in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
@@ -121,6 +124,7 @@ class OnePaceOrganizer():
         self.do_load_config = get_env("load_config", True)
         self.do_save_config = get_env("save_config", True)
         self.move_after_sort = get_env("move_after_sort", True)
+        self.workers = int(get_env("workers", os.process_cpu_count()))
 
         self.input_path = get_env("input_path")
         self.output_path = get_env("output_path")
@@ -872,7 +876,7 @@ class OnePaceOrganizer():
                 self.episodes = data["episodes"] if "episodes" in data else {}
                 return True
 
-        if yml_loaded == False or len(self.tvshow) == 0 or len(self.seasons) == 0 or len(self.episodes) == 0:
+        if yml_loaded == False and len(self.episodes) == 0:
             url = "https://raw.githubusercontent.com/ladyisatis/onepaceorganizer/refs/heads/main/data.json"
 
             await self.pb_log_output(f"Downloading: {url}")
@@ -899,7 +903,7 @@ class OnePaceOrganizer():
                     self.tvshow = data["tvshow"] if "tvshow" in data else {}
                     self.seasons = data["seasons"] if "seasons" in data else {}
                     self.episodes = data["episodes"] if "episodes" in data else {}
-      
+
             except:
                 await self.pb_log_output.append(f"Unable to download new metadata: {traceback.format_exc()}")
 
@@ -913,7 +917,7 @@ class OnePaceOrganizer():
             if not episodes_folder.is_dir():
                 return False
 
-            await self.pb_label("data/episodes folder detected, loading metadata from folder")
+            await self.pb_label(f"{episodes_folder} detected, loading metadata from folder")
 
             episode_files = []
             async for file in glob(episodes_folder, "*.yml"):
@@ -1006,37 +1010,48 @@ class OnePaceOrganizer():
         num_found = 0
         num_calced = 0
         filelist_total = len(filelist)
+        results = []
         logger.debug(f"{filelist_total} files found")
 
-        for index, file in enumerate(filelist):
-            match = crc_pattern.search(file.name)
-            file_path = file.resolve()
-            logger.debug(f"working: {index}. {file_path}")
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            tasks = []
+            loop = asyncio.get_event_loop()
 
-            if match:
-                crc32 = match.group(1)
-                num_found = num_found + 1
-                logger.debug(f"found: {num_found}. {file} -> {crc32}")
-            else:
-                await self.pb_log_output(f"Calculating for {file_path}...")
-                crc32 = await async_crc32(file_path)
-                num_calced = num_calced + 1
-                logger.debug(f"result: {num_calced}. {crc32}")
+            for file in filelist:
+                match = crc_pattern.search(file.name)
+                if match:
+                    num_found = num_found + 1
+                    results.append((match.group(1), file.resolve()))
+                else:
+                    await self.pb_log_output(f"Calculating CRC32 for {file}...")
+                    tasks.append(loop.run_in_executor(executor, _crc32_worker, str(file.resolve())))
 
-            await self.pb_progress(int(((index + 1) / filelist_total) * 100))
+            if len(tasks) > 0:
+                async for result in asyncio.as_completed(tasks):
+                    file, error, crc32 = await result
+                    file = Path(file).resolve()
 
-            if crc32 in self.episodes:
-                logger.trace(f"{crc32}: {file_path}")
-                video_files.append((crc32, file_path))
+                    if error != "":
+                        await self.pb_log_output(f"Unable to calculate {file.name}: {error}")
+                    else:
+                        await self.pb_log_output(f"{file}: {crc32}")
+                        results.append((crc32, file))
+                        num_calced = num_calced + 1
 
-            elif file.suffix.lower() == '.mkv':
+        for index, info in enumerate(results):
+            if info[0] in self.episodes:
+                video_files.append(info)
+
+            elif info[1].suffix.lower() == '.mkv':
+                crc32, file_path = info
+
                 try:
                     with file_path.open(mode='rb') as f:
                         mkv = await run_sync(enzyme.MKV, f)
                         logger.trace(mkv)
 
                     if mkv == None or mkv.info == None or mkv.info.title == None or mkv.info.title == "":
-                        await self.pb_log_output(f"Skipping {file.name}: Episode metadata missing, infering information from MKV also failed")
+                        await self.pb_log_output(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
                         continue
 
                     title = mkv.info.title.split(" - ")
@@ -1079,17 +1094,18 @@ class OnePaceOrganizer():
                                 "released": ep_date.isoformat()
                             }
 
-                        logger.debug(f"{crc32}: {file_path}")
-                        video_files.append((crc32, file_path))
+                        video_files.append(info)
 
                     else:
-                        await self.pb_log_output(f"Skipping {file.name}: Episode metadata missing, infering information from MKV also failed")
+                        await self.pb_log_output(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
 
                 except:
-                    await self.pb_log_output(f"Skipping {file.name}: Episode metadata missing, infering information from MKV also failed")
+                    await self.pb_log_output(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
 
             else:
-                await self.pb_log_output(f"Skipping {file.name}: Episode metadata missing")
+                await self.pb_log_output(f"Skipping {info[0].name}: Episode metadata missing")
+
+            await self.pb_progress(int(((index + 1) / filelist_total) * 100))
 
         await self.pb_progress(100)
         await self.pb_label(f"Found: {num_found}, Calculated: {num_calced}, Total: {filelist_total}")

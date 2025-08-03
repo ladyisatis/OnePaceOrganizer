@@ -57,17 +57,19 @@ async def async_blake2s_16(video_file, loop=None):
     res = (await run_sync(h.hex_digest, loop=loop))[:16]
     return res.lower()
 
-async def async_crc32(video_file, loop=None):
-    if loop == None:
-        loop = asyncio.get_event_loop()
-
+def _crc32_worker(video_file):
     crc_value = 0
 
-    async for chunk in read_chunks(video_file, loop):
-        crc_value = await run_sync(zlib.crc32, chunk, crc_value, loop=loop)
+    try:
+        with Path(video_file).open(mode='rb') as f:
+            while chunk := f.read(1024 * 1024):
+                crc_value = zlib.crc32(chunk, crc_value)
+
+    except Exception as e:
+        return (video_file, str(e), "")
 
     res = f"{crc_value & 0xFFFFFFFF:08x}"
-    return res.upper()
+    return (video_file, "", res.upper())
 
 def bundle_file(*args):
     in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
@@ -850,32 +852,47 @@ class OnePaceOrganizer(QWidget):
 
         num_found = 0
         num_calced = 0
+        results = []
         filelist_total = len(filelist)
 
-        for index, file in enumerate(filelist):
-            match = crc_pattern.search(file.name)
-            file_path = file.resolve()
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            tasks = []
+            loop = asyncio.get_event_loop()
 
-            if match:
-                crc32 = match.group(1)
-                num_found = num_found + 1
-            else:
-                self.log_output.append(f"Calculating for {file_path}...")
-                crc32 = await async_crc32(file_path)
-                num_calced = num_calced + 1
+            for file in filelist:
+                match = crc_pattern.search(file.name)
+                if match:
+                    num_found = num_found + 1
+                    results.append((match.group(1), file.resolve()))
+                else:
+                    self.log_output.append(f"Calculating CRC32 for: {file}...")
+                    tasks.append(loop.run_in_executor(executor, _crc32_worker, str(file.resolve())))
 
-            self.progress_bar.setValue(int(((index + 1) / filelist_total) * 100))
+            if len(tasks) > 0:
+                async for result in asyncio.as_completed(tasks):
+                    file, error, crc32 = await result
+                    file = Path(file).resolve()
 
-            if crc32 in self.episodes:
-                video_files.append((crc32, file_path))
+                    if error != "":
+                        self.log_output.append(f"Unable to calculate {file.name}: {error}")
+                    else:
+                        self.log_output.append(f"Complete: {file.name} ({crc32})")
+                        results.append((crc32, file))
+                        num_calced = num_calced + 1
 
-            elif file.suffix.lower() == '.mkv':
+        for index, info in enumerate(results):
+            if info[0] in self.episodes:
+                video_files.append(info)
+
+            elif info[1].suffix.lower() == '.mkv':
+                crc32, file_path = info
+
                 try:
                     with file_path.open(mode='rb') as f:
                         mkv = await run_sync(enzyme.MKV, f)
 
                     if mkv == None or mkv.info == None or mkv.info.title == None or mkv.info.title == "":
-                        self.log_output.append(f"Skipping {file.name}: Episode metadata missing, infering information from MKV also failed")
+                        self.log_output.append(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
                         continue
 
                     title = mkv.info.title.split(" - ")
@@ -915,16 +932,18 @@ class OnePaceOrganizer(QWidget):
                                 "released": ep_date.isoformat()
                             }
 
-                        video_files.append((crc32, file_path))
+                        video_files.append(info)
 
                     else:
-                        self.log_output.append(f"Skipping {file.name}: Episode metadata missing, infering information from MKV also failed")
+                        self.log_output.append(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
 
                 except:
-                    self.log_output.append(f"Skipping {file.name}: Episode metadata missing, infering information from MKV also failed")
+                    self.log_output.append(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
 
             else:
-                self.log_output.append(f"Skipping {file.name}: Episode metadata missing")
+                self.log_output.append(f"Skipping {info[1].name}: Episode metadata missing")
+
+            self.progress_bar.setValue(int(((index + 1) / filelist_total) * 100))
 
         self.progress_bar.setValue(100)
         self.log_output.append(f"Found: {num_found}, Calculated: {num_calced}, Total: {filelist_total}")
