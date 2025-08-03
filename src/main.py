@@ -125,7 +125,7 @@ class OnePaceOrganizer():
         self.config_file = Path(".", "config.json")
         self.do_load_config = get_env("load_config", True)
         self.do_save_config = get_env("save_config", True)
-        self.file_action = get_env("file_action", True)
+        self.file_action = int(get_env("file_action", 0))
         self.workers = int(get_env("workers", max(8, os.process_cpu_count())))
 
         self.input_path = get_env("input_path")
@@ -276,6 +276,8 @@ class OnePaceOrganizer():
                 await run_sync(shutil.copy2, str(src), str(dst))
             elif self.file_action == 2: #Symlink
                 await run_sync(dst.symlink_to, src)
+            elif self.file_action == 3: #Hardlink
+                await run_sync(dst.hardlink_to, src)
             else: #Move, or other
                 await run_sync(shutil.move, str(src), str(dst))
 
@@ -297,6 +299,8 @@ class OnePaceOrganizer():
                 _action = "Copy"
             elif self.file_action == 2:
                 _action = "Symlink"
+            elif self.file_action == 3:
+                _action = "Hardlink"
 
             text = (
                 f"Path to One Pace Files: {self.input_path}\n"
@@ -436,7 +440,8 @@ class OnePaceOrganizer():
             values=[
                 (0, "Move (recommended)"),
                 (1, "Copy"),
-                (2, "Symlink")
+                (2, "Symlink"),
+                (3, "Hardlink")
             ],
             default=self.file_action
         ).run_async()

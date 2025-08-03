@@ -264,6 +264,8 @@ class OnePaceOrganizer(QWidget):
             _output_label_txt = "Copy"
         elif self.file_action == 2:
             _output_label_txt = "Symlink"
+        elif self.file_action == 3:
+            _output_label_txt = "Hardlink"
 
         self.output = Input(
             layout,
@@ -352,7 +354,7 @@ class OnePaceOrganizer(QWidget):
             self.plex_group.hide()
 
         self.move_copy = Input(layout, "Action after Sorting/Renaming:", QComboBox())
-        self.move_copy.prop.addItems(["Move (recommended)", "Copy", "Symlink"])
+        self.move_copy.prop.addItems(["Move (recommended)", "Copy", "Symlink", "Hardlink"])
         self.move_copy.prop.setCurrentIndex(self.file_action)
         self.move_copy.prop.currentIndexChanged.connect(self.set_action)
 
@@ -413,12 +415,13 @@ class OnePaceOrganizer(QWidget):
         self.plex_group.setVisible(self.plex_config_enabled)
 
     def set_action(self, index):
+        _output_label_txt = "Move"
         if index == 1:
             _output_label_txt = "Copy"
         elif index == 2:
             _output_label_txt = "Symlink"
-        else:
-            output_label_txt = "Move"
+        elif index == 3:
+            _output_label_txt = "Hardlink"
 
         self.output.label.setText(f"{_output_label_txt} the sorted and renamed files to:")
         self.file_action = index
@@ -1010,6 +1013,8 @@ class OnePaceOrganizer(QWidget):
                 await run_sync(shutil.copy2, str(src), str(dst))
             elif self.file_action == 2: #Symlink
                 await run_sync(dst.symlink_to, src)
+            elif self.file_action == 3: #Hardlink
+                await run_sync(dst.hardlink_to, src)
             else: #Move, or other
                 await run_sync(shutil.move, str(src), str(dst))
 
@@ -1372,6 +1377,8 @@ class OnePaceOrganizer(QWidget):
                 _action = "copying"
             elif self.file_action == 2:
                 _action = "symlinking"
+            elif self.file_action == 3:
+                _action = "hardlinking"
 
             self.log_output.append(f"Creating metadata and {_action} {file_path.name} to: {new_video_file_path}")
 
