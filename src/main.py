@@ -72,7 +72,7 @@ async def async_blake2s_16(video_file, loop=None):
     async for chunk in read_chunks(video_file, loop):
         await run_sync(h.update, chunk, loop=loop)
 
-    res = (await run_sync(h.hex_digest, loop=loop))[:16]
+    res = (await run_sync(h.hexdigest, loop=loop))[:16]
     return res.lower()
 
 def _crc32_worker(video_file):
@@ -904,7 +904,7 @@ class OnePaceOrganizer():
                     self.episodes = data["episodes"] if "episodes" in data else {}
 
             except:
-                await self.pb_log_output.append(f"Unable to download new metadata: {traceback.format_exc()}")
+                await self.pb_log_output(f"Unable to download new metadata: {traceback.format_exc()}")
 
         return len(self.tvshow) > 0 and len(self.seasons) > 0 and len(self.episodes) > 0
 
@@ -1174,10 +1174,10 @@ class OnePaceOrganizer():
                 stop = True
 
                 for v in episode_info:
-                    if "hashes" not in episode_info or "blake2" not in episode_info["hashes"] or not episode_info["hashes"]["blake2"]:
+                    if "hashes" not in v or "blake2" not in v["hashes"] or not v["hashes"]["blake2"]:
                         await self.pb_log_output(f"Skipping {file_path.name}: Blake2s 16-character hash is required but not provided")
 
-                    elif await async_blake2s_16(file_path) == episode_info["hashes"]["blake2"]:
+                    elif await async_blake2s_16(file_path) == v["hashes"]["blake2"]:
                         stop = False
                         episode_info = v
                         break
