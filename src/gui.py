@@ -704,7 +704,7 @@ class OnePaceOrganizer(QWidget):
 
                 answer = QMessageBox.question(
                     None,
-                    self.window_title,
+                    f"One Pace Organizer v{self.version}",
                     "The posters folder is missing. Do you want to download the posters.zip file that contains the folder?"
                 )
 
