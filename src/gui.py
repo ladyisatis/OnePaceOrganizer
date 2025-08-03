@@ -708,15 +708,13 @@ class OnePaceOrganizer(QWidget):
             self.start_button.setEnabled(True)
 
     async def cache_episode_data(self):
-        yml_loaded = await self.cache_yml()
-
-        self.log_output.append("Checking episode metadata file (data.json)...")
-
         data_file = Path(".", "data.json")
         data = {}
         now = datetime.datetime.now(tz=datetime.UTC)
 
         if data_file.exists():
+            self.log_output.append("Checking episode metadata file (data.json)...")
+
             data = await run_sync(data_file.read_bytes)
             data = await run_sync(orjson.loads, data)
 
@@ -735,6 +733,8 @@ class OnePaceOrganizer(QWidget):
                 self.seasons = data["seasons"] if "seasons" in data else {}
                 self.episodes = data["episodes"] if "episodes" in data else {}
                 return True
+
+        yml_loaded = await self.cache_yml()
 
         if yml_loaded == False or len(self.tvshow) == 0 or len(self.seasons) == 0 or len(self.episodes) == 0:
             url = "https://raw.githubusercontent.com/ladyisatis/onepaceorganizer/refs/heads/main/data.json"
