@@ -6,6 +6,7 @@ import functools
 import hashlib
 import httpx
 import orjson
+import os
 import plexapi
 import re
 import shutil
@@ -848,14 +849,14 @@ class OnePaceOrganizer(QWidget):
         async for file in glob(self.input_path, "**/*.[mM][pP]4"):
             filelist.append(file)
 
-        self.progress_bar.setValue(0)
-
         num_found = 0
         num_calced = 0
         results = []
         filelist_total = len(filelist)
 
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        workers = max(8, os.process_cpu_count())
+
+        with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
             tasks = []
             loop = asyncio.get_event_loop()
 
@@ -865,20 +866,32 @@ class OnePaceOrganizer(QWidget):
                     num_found = num_found + 1
                     results.append((match.group(1), file.resolve()))
                 else:
-                    self.log_output.append(f"Calculating CRC32 for: {file}...")
                     tasks.append(loop.run_in_executor(executor, _crc32_worker, str(file.resolve())))
 
             if len(tasks) > 0:
-                async for result in asyncio.as_completed(tasks):
-                    file, error, crc32 = await result
-                    file = Path(file).resolve()
+                self.progress_bar.setValue(0)
+                self.log_output.append(f"Calculating CRC32 for {len(tasks)} file(s)...")
 
-                    if error != "":
-                        self.log_output.append(f"Unable to calculate {file.name}: {error}")
-                    else:
-                        self.log_output.append(f"Complete: {file.name} ({crc32})")
-                        results.append((crc32, file))
-                        num_calced = num_calced + 1
+                try:
+                    i = 0
+                    async for result in asyncio.as_completed(tasks):
+                        file, error, crc32 = await result
+                        file = Path(file).resolve()
+
+                        if error != "":
+                            self.log_output.append(f"Unable to calculate {file.name}: {error}")
+                        else:
+                            self.log_output.append(f"Complete: {file.name} ({crc32})")
+                            results.append((crc32, file))
+                            num_calced = num_calced + 1
+
+                        i = i + 1
+                        self.progress_bar.setValue(int((i / len(tasks)) * 100))
+
+                except asyncio.CancelledError:
+                    executor.shutdown(wait=False, cancel_futures=True)
+
+        self.progress_bar.setValue(0)
 
         for index, info in enumerate(results):
             if info[0] in self.episodes:

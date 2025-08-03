@@ -124,7 +124,7 @@ class OnePaceOrganizer():
         self.do_load_config = get_env("load_config", True)
         self.do_save_config = get_env("save_config", True)
         self.move_after_sort = get_env("move_after_sort", True)
-        self.workers = int(get_env("workers", os.process_cpu_count()))
+        self.workers = int(get_env("workers", max(8, os.process_cpu_count())))
 
         self.input_path = get_env("input_path")
         self.output_path = get_env("output_path")
@@ -1005,15 +1005,13 @@ class OnePaceOrganizer():
             logger.trace(file)
             filelist.append(file)
 
-        await self.pb_progress(0)
-
         num_found = 0
         num_calced = 0
         filelist_total = len(filelist)
         results = []
         logger.debug(f"{filelist_total} files found")
 
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=self.workers) as executor:
             tasks = []
             loop = asyncio.get_event_loop()
 
@@ -1023,20 +1021,33 @@ class OnePaceOrganizer():
                     num_found = num_found + 1
                     results.append((match.group(1), file.resolve()))
                 else:
-                    await self.pb_log_output(f"Calculating CRC32 for {file}...")
+                    logger.debug(f"calculate: {file}")
                     tasks.append(loop.run_in_executor(executor, _crc32_worker, str(file.resolve())))
 
             if len(tasks) > 0:
-                async for result in asyncio.as_completed(tasks):
-                    file, error, crc32 = await result
-                    file = Path(file).resolve()
+                await self.pb_progress(0)
+                await self.pb_log_output(f"Calculating CRC32 for {len(tasks)} file(s)...")
 
-                    if error != "":
-                        await self.pb_log_output(f"Unable to calculate {file.name}: {error}")
-                    else:
-                        await self.pb_log_output(f"{file}: {crc32}")
-                        results.append((crc32, file))
-                        num_calced = num_calced + 1
+                try:
+                    i = 0
+                    async for result in asyncio.as_completed(tasks):
+                        file, error, crc32 = await result
+                        file = Path(file).resolve()
+
+                        if error != "":
+                            await self.pb_log_output(f"Unable to calculate {file.name}: {error}")
+                        else:
+                            await self.pb_log_output(f"{file.name}: {crc32}")
+                            results.append((crc32, file))
+                            num_calced = num_calced + 1
+
+                        i = i + 1
+                        await self.pb_progress(int((i / len(tasks)) * 100))
+
+                except asyncio.CancelledError:
+                    executor.shutdown(wait=False, cancel_futures=True)
+
+        await self.pb_progress(0)
 
         for index, info in enumerate(results):
             if info[0] in self.episodes:
