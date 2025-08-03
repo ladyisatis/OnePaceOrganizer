@@ -1566,10 +1566,10 @@ class OnePaceOrganizer():
 
             if self.move_after_sort:
                 await self.pb_log_output(f"Moving {file_path.name} to: {new_video_file_path}")
-                await run_sync(shutil.move, str(file_path.name), str(new_video_file_path))
+                await run_sync(shutil.move, str(file_path), str(new_video_file_path))
             else:
                 await self.pb_log_output(f"Copying {file_path.name} to: {new_video_file_path}")
-                await run_sync(shutil.copy2, str(file_path.name), str(new_video_file_path))
+                await run_sync(shutil.copy2, str(file_path), str(new_video_file_path))
 
             i = i + 1
             num_complete = num_complete + 1
