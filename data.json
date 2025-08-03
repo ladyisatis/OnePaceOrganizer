@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-08-02T00:11:49.487324+00:00",
+  "last_update": "2025-08-03T05:30:25.016205+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -1090,6 +1090,18 @@
       "released": "2023-10-28",
       "hashes": {
         "crc32": "236CCF51"
+      }
+    },
+    "2388DB63": {
+      "season": 2,
+      "episode": 1,
+      "title": "Enter: Nami",
+      "description": "Nami, a street-smart girl who loves money and tangerines, makes Luffy's acquaintance. To save herself and steal a map to the Grand Line, she tricks Luffy into allowing her to turn him over to the infamous pirate Buggy the Clown.",
+      "manga_chapters": "8-11",
+      "anime_episodes": "4-6",
+      "released": "2025-04-11",
+      "hashes": {
+        "crc32": "C23AC8D3"
       }
     },
     "23CF2FA6": {
@@ -3470,6 +3482,18 @@
         "crc32": "85AD9C81"
       }
     },
+    "86CC0CCF": {
+      "season": 2,
+      "episode": 2,
+      "title": "Treasure",
+      "description": "Luffy meets a small dog guarding his late master's store. Meanwhile, Beast Tamer Mohji, Cabaji the Acrobat, and the lion Richie show up in the streets of Orange Town to get revenge for Captain Buggy's humiliating loss.",
+      "manga_chapters": "12-19",
+      "anime_episodes": "6-7",
+      "released": "2025-04-25",
+      "hashes": {
+        "crc32": "D7327225"
+      }
+    },
     "86DC8F38": {
       "season": 15,
       "episode": 4,
@@ -4693,6 +4717,18 @@
       "released": "2025-01-11",
       "hashes": {
         "crc32": "C060DA73"
+      }
+    },
+    "C0A5D51D": {
+      "season": 2,
+      "episode": 3,
+      "title": "Pirate Buggy \"the Clown\"",
+      "description": "Shockingly, it turns out Captain Buggy and Red-Haired Shanks share a common history. When the bombastic clown rips Shanks' straw hat, Luffy's rage knows no bounds.",
+      "manga_chapters": "19-21",
+      "anime_episodes": "8",
+      "released": "2025-05-09",
+      "hashes": {
+        "crc32": "1809DA8A"
       }
     },
     "C0B33E05": {
