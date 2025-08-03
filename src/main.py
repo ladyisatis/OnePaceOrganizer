@@ -1592,8 +1592,11 @@ def main():
     except asyncio.CancelledError:
         pass
 
+    except KeyboardInterrupt:
+        sys.exit(1)
+
     except Exception:
-        print(traceback.format_exc())
+        logger.critical(traceback.format_exc())
 
     finally:
         if opo is not None and opo.input_path is not None and str(opo.input_path) != "" and opo.output_path is not None and str(opo.output_path) != "":
