@@ -866,7 +866,7 @@ class OnePaceOrganizer(QWidget):
 
         workers = max(8, os.process_cpu_count())
 
-        with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             tasks = []
             loop = asyncio.get_event_loop()
 
