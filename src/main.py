@@ -1020,7 +1020,7 @@ class OnePaceOrganizer():
         results = []
         logger.debug(f"{filelist_total} files found")
 
-        with concurrent.futures.ProcessPoolExecutor(max_workers=self.workers) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
             tasks = []
             loop = asyncio.get_event_loop()
 
