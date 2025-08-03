@@ -14,6 +14,7 @@ import shutil
 import sys
 import tomllib
 import traceback
+import webbrowser
 import yaml
 import zlib
 
@@ -127,6 +128,7 @@ class OnePaceOrganizer(QWidget):
         self.version = "?"
         self.spacer = "------------------------------------------------------------------"
         self.config_file = Path(".", "config.json")
+        self.has_asked_posters = False
 
         self.input_path = ""
         self.output_path = ""
@@ -694,6 +696,19 @@ class OnePaceOrganizer(QWidget):
 
     async def start_process(self):
         try:
+            if not self.has_asked_posters and not Path(".", "data", "posters").is_dir() and not Path(".", "posters").is_dir():
+                self.has_asked_posters = True
+
+                answer = QMessageBox.question(
+                    None,
+                    self.window_title,
+                    "The posters folder is missing. Do you want to download the posters.zip file that contains the folder?"
+                )
+
+                if answer == QMessageBox.StandardButton.Yes:
+                    webbrowser.open_new_tab("https://github.com/ladyisatis/OnePaceOrganizer/releases/latest")
+                    return
+
             self.start_button.setEnabled(False)
 
             self.input_path = Path(self.input.prop.text()).resolve()
@@ -1443,7 +1458,7 @@ if __name__ == "__main__":
         pass
 
     except Exception:
-        QMessageBox.critical(None, f"One Pace Organizer", traceback.format_exc())
+        QMessageBox.critical(None, "One Pace Organizer", traceback.format_exc())
 
     finally:
         if 'opo' in locals() and opo.input_path is not None and opo.input_path != "" and opo.output_path is not None and opo.output_path != "":

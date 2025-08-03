@@ -15,6 +15,7 @@ import shutil
 import sys
 import tomllib
 import traceback
+import webbrowser
 import yaml
 import zlib
 
@@ -388,6 +389,20 @@ class OnePaceOrganizer():
                 title=self.window_title,
                 text='Make sure to create a folder that has all of the One Pace video\nfiles! The next step will ask for the path to that directory.'
             ).run_async()
+
+            if not Path(".", "data", "posters").is_dir() and not Path(".", "posters").is_dir():
+                yn = await yes_no_dialog(
+                    title=self.window_title,
+                    text="The posters folder is missing. Do you want to download the posters.zip file that contains the folder?"
+                ).run_async()
+
+                if yn:
+                    url = "https://github.com/ladyisatis/OnePaceOrganizer/releases/latest"
+                    if not webbrowser.open_new_tab(url):
+                        await message_box(
+                            title=self.window_title,
+                            text=f"Unable to open browser, please head to:\n{url}\nand download posters.zip."
+                        ).run_async()
 
         if self.input_path == "":
             self.input_path = Path(".", "in").resolve()
