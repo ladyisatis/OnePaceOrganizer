@@ -10,6 +10,7 @@ import orjson
 import os
 import plexapi
 import re
+import signal
 import shutil
 import sys
 import tomllib
@@ -1053,7 +1054,9 @@ class OnePaceOrganizer():
                         await self.pb_progress(int((i / len(tasks)) * 100))
 
                 except asyncio.CancelledError:
-                    executor.shutdown(wait=False, cancel_futures=True)
+                    for task in tasks:
+                        if not task.done():
+                            task.cancel()
 
         await self.pb_progress(0)
 

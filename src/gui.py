@@ -898,7 +898,9 @@ class OnePaceOrganizer(QWidget):
                         self.progress_bar.setValue(int((i / len(tasks)) * 100))
 
                 except asyncio.CancelledError:
-                    executor.shutdown(wait=False, cancel_futures=True)
+                    for task in tasks:
+                        if not task.done():
+                            task.cancel()
 
         self.progress_bar.setValue(0)
 
