@@ -745,7 +745,7 @@ class OnePaceOrganizer(QWidget):
                 # AsyncClient would be more straightforward but
                 # "QAsyncioEventLoop.getaddrinfo() is not implemented yet"
                 resp = await run_sync(httpx.get, url, follow_redirects=True)
-                if len(resp) == 0:
+                if len(resp.content) == 0:
                     return False
 
                 data = await run_sync(orjson.loads, resp.content)
