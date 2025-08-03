@@ -713,7 +713,7 @@ class OnePaceOrganizer(QWidget):
 
         data_file = Path(".", "data.json")
         data = {}
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(tz=datetime.UTC)
 
         if data_file.exists():
             data = await run_sync(data_file.read_bytes)
@@ -728,7 +728,7 @@ class OnePaceOrganizer(QWidget):
                     self.episodes = data["episodes"] if "episodes" in data else {}
                     return True
 
-            last_update = datetime.datetime.fromtimestamp(data_file.stat().st_mtime).astimezone(datetime.timezone.utc)
+            last_update = datetime.datetime.fromtimestamp(data_file.stat().st_mtime, tz=datetime.UTC)
             if now - last_update < datetime.timedelta(hours=1):
                 self.tvshow = data["tvshow"] if "tvshow" in data else {}
                 self.seasons = data["seasons"] if "seasons" in data else {}
