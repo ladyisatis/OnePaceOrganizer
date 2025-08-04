@@ -1025,7 +1025,7 @@ class OnePaceOrganizer(QWidget):
         try:
             if dst.exists():
                 if await compare_file(src, dst):
-                    return ""
+                    return True #skip
                 else:
                     dst.unlink(missing_ok=True)
 
