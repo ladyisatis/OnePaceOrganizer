@@ -1284,10 +1284,9 @@ class OnePaceOrganizer():
 
             _res = await self.move_file(file_path, new_video_file_path)
             if _res != "":
-                self.pb_log_output(f"\n{_res}")
-                return
-
-            queue.append((new_video_file_path, episode_info))
+                await self.pb_log_output(_res)
+            else:
+                queue.append((new_video_file_path, episode_info))
 
             i = i + 1
             await self.pb_progress(int((i / len(video_files)) * 100))
@@ -1487,14 +1486,14 @@ class OnePaceOrganizer():
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
 
             src = (await self.find("tvshow.png")).resolve()
-            if src.is_file():
-                dst = str(Path(self.output_path, "poster.png").resolve())
+            dst = Path(self.output_path, "poster.png").resolve()
 
-                await self.pb_log_output(f"Copying {str(src)} to: {dst}")
-                await run_sync(shutil.copy, str(src), dst)
+            if src.is_file() and not dst.exists():
+                await self.pb_log_output(f"Copying {str(src)} to: {str(dst)}")
+                await run_sync(shutil.copy, str(src), str(dst))
 
                 art = ET.SubElement(root, "art")
-                ET.SubElement(art, "poster").text = dst
+                ET.SubElement(art, "poster").text = str(dst)
 
             ET.indent(root)
 
@@ -1554,14 +1553,14 @@ class OnePaceOrganizer():
                 ET.SubElement(root, "seasonnumber").text = f"{season}"
 
                 src = (await self.find(f"poster-season{season}.png")).resolve()
-                if src.is_file():
-                    dst = str(Path(season_path, "poster.png").resolve())
+                dst = Path(season_path, "poster.png").resolve()
 
-                    await self.pb_log_output(f"Copying {str(src)} to: {dst}")
-                    await run_sync(shutil.copy, str(src), dst)
+                if src.is_file() and not dst.exists():
+                    await self.pb_log_output(f"Copying {str(src)} to: {str(dst)}")
+                    await run_sync(shutil.copy, str(src), str(dst))
 
                     art = ET.SubElement(root, "art")
-                    ET.SubElement(art, "poster").text = dst
+                    ET.SubElement(art, "poster").text = str(dst)
 
                 ET.indent(root)
                 tree = ET.ElementTree(root)
@@ -1630,11 +1629,10 @@ class OnePaceOrganizer():
 
                     _res = await self.move_file(ep_poster, ep_poster_new)
                     if _res != "":
-                        await self.pb_log_output(f"\n{_res}")
-                        return
-
-                    art = ET.SubElement(episodedetails, "art")
-                    ET.SubElement(art, "poster").text = str(ep_poster_new)
+                        await self.pb_log_output(_res)
+                    else:
+                        art = ET.SubElement(episodedetails, "art")
+                        ET.SubElement(art, "poster").text = str(ep_poster_new)
 
             ET.indent(episodedetails)
 
@@ -1649,11 +1647,12 @@ class OnePaceOrganizer():
 
             _res = await self.move_file(file_path, new_video_file_path)
             if _res != "":
-                await self.pb_log_output(f"\n{_res}")
-                return
+                await self.pb_log_output(_res)
+                num_skipped = num_skipped + 1
+            else:
+                num_complete = num_complete + 1
 
             i = i + 1
-            num_complete = num_complete + 1
             await self.pb_progress(int((i / len(video_files)) * 100))
 
         await self.pb_progress(100)

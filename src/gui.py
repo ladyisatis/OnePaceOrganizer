@@ -1128,10 +1128,8 @@ class OnePaceOrganizer(QWidget):
 
             new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
 
-            if not await self.move_file(file_path, new_video_file_path):
-                return
-
-            queue.append((new_video_file_path, episode_info))
+            if await self.move_file(file_path, new_video_file_path):
+                queue.append((new_video_file_path, episode_info))
 
             i = i + 1
             self.progress_bar.setValue(int((i / len(video_files)) * 100))
@@ -1294,11 +1292,14 @@ class OnePaceOrganizer(QWidget):
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
 
             src = (await self.find("tvshow.png")).resolve()
-            if src.is_file():
-                dst = str(Path(self.output_path, "poster.png").resolve())
+            dst = Path(self.output_path, "poster.png").resolve()
 
-                self.log_output.append(f"Copying {str(src)} to: {dst}")
-                await run_sync(shutil.copy, str(src), dst)
+            if src.is_file() and not dst.exists():
+                src = str(src)
+                dst = str(dst)
+
+                self.log_output.append(f"Copying {src} to: {dst}")
+                await run_sync(shutil.copy, src, dst)
 
                 art = ET.SubElement(root, "art")
                 ET.SubElement(art, "poster").text = dst
@@ -1326,10 +1327,10 @@ class OnePaceOrganizer(QWidget):
                 stop = True
 
                 for v in episode_info:
-                    if not "hashes" in episode_info or not "blake2" in episode_info["hashes"] or episode_info["hashes"]["blake2"] == "":
+                    if not "hashes" in v or not "blake2" in v["hashes"] or v["hashes"]["blake2"] == "":
                         self.log_output.append(f"Skipping {file_path.name}: Blake2s 16-character hash is required but not provided")
 
-                    elif await async_blake2s_16(file_path) == episode_info["hashes"]["blake2"]:
+                    elif await async_blake2s_16(file_path) == v["hashes"]["blake2"]:
                         stop = False
                         episode_info = v
                         break
@@ -1361,11 +1362,14 @@ class OnePaceOrganizer(QWidget):
                 ET.SubElement(root, "seasonnumber").text = f"{season}"
 
                 src = (await self.find(f"poster-season{season}.png")).resolve()
-                if src.is_file():
-                    dst = str(Path(season_path, "poster.png").resolve())
+                dst = Path(season_path, "poster.png").resolve()
 
-                    self.log_output.append(f"Copying {str(src)} to: {dst}")
-                    await run_sync(shutil.copy, str(src), dst)
+                if src.is_file() and not dst.exists():
+                    src = str(src)
+                    dst = str(dst)
+
+                    self.log_output.append(f"Copying {src} to: {dst}")
+                    await run_sync(shutil.copy, src, dst)
 
                     art = ET.SubElement(root, "art")
                     ET.SubElement(art, "poster").text = dst
@@ -1445,11 +1449,9 @@ class OnePaceOrganizer(QWidget):
                 if not ep_poster_new.exists():
                     self.log_output.append(f"{ep_poster} -> {ep_poster_new}")
 
-                    if not await self.move_file(ep_poster, ep_poster_new):
-                        return
-
-                    art = ET.SubElement(episodedetails, "art")
-                    ET.SubElement(art, "poster").text = str(ep_poster_new)
+                    if await self.move_file(ep_poster, ep_poster_new):
+                        art = ET.SubElement(episodedetails, "art")
+                        ET.SubElement(art, "poster").text = str(ep_poster_new)
 
             ET.indent(episodedetails)
 
@@ -1460,11 +1462,12 @@ class OnePaceOrganizer(QWidget):
                 xml_declaration=True
             )
 
-            if not await self.move_file(file_path, new_video_file_path):
-                return
+            if await self.move_file(file_path, new_video_file_path):
+                num_complete = num_complete + 1
+            else:
+                num_skipped = num_skipped + 1
 
             i = i + 1
-            num_complete = num_complete + 1
             self.progress_bar.setValue(int((i / len(video_files)) * 100))
 
         self.progress_bar.setValue(100)
