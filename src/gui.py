@@ -1327,7 +1327,7 @@ class OnePaceOrganizer(QWidget):
 
             if dst.is_file():
                 art = ET.SubElement(root, "art")
-                ET.SubElement(art, "poster").text = dst
+                ET.SubElement(art, "poster").text = str(dst)
 
             ET.indent(root)
 
@@ -1404,7 +1404,7 @@ class OnePaceOrganizer(QWidget):
 
                 if dst.is_file():
                     art = ET.SubElement(root, "art")
-                    ET.SubElement(art, "poster").text = dst
+                    ET.SubElement(art, "poster").text = str(dst)
 
                 ET.indent(root)
                 tree = ET.ElementTree(root)
