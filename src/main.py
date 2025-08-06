@@ -92,11 +92,11 @@ def _crc32_worker(video_file):
 async def compare_file(file1, file2):
     with file1.open(mode='rb') as f1, file2.open(mode='rb') as f2:
         while True:
-            c1 = await run_sync(f1.read, 65536)
-            c2 = await run_sync(f2.read, 65536)
+            c1 = await run_sync(f1.read, 131072)
+            c2 = await run_sync(f2.read, 131072)
 
-            if not c1 or not c2:
-                break
+            if not c1 and not c2:
+                return True
 
             if c1 != c2:
                 return False
