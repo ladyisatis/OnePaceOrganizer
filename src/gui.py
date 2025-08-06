@@ -88,14 +88,17 @@ async def compare_file(file1, file2):
 
     return True
 
-def bundle_file(*args):
-    in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
-    local_path = Path(".", *args)
+async def download(url, out):
+    base_url = "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/"
 
-    if not local_path.exists() and in_bundle:
-        return Path(sys._MEIPASS, *args)
+    if not isinstance(out, Path):
+        out = Path(out)
 
-    return local_path
+    if not out.parent.is_dir():
+        out.parent.mkdir(exist_ok=True)
+
+    resp = await run_sync(httpx.get, f"{base_url}{url}", follow_redirects=True)
+    await run_sync(out.write_bytes, resp.content)
 
 class Input:
     def __init__(self, layout, label, prop, btn="", btn_connect=None, set=False, width=250):
@@ -142,11 +145,11 @@ class OnePaceOrganizer(QWidget):
         self.version = "?"
         self.spacer = "------------------------------------------------------------------"
         self.config_file = Path(".", "config.json")
-        self.has_asked_posters = False
 
         self.input_path = ""
         self.output_path = ""
         self.file_action = 0
+        self.fetch_posters = True
 
         self.plexapi_account = None
         self.plexapi_server = None
@@ -175,7 +178,9 @@ class OnePaceOrganizer(QWidget):
         self.setup_ui()
 
     def load_config(self):
-        toml_path = bundle_file("pyproject.toml")
+        in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+        toml_path = Path(sys._MEIPASS, 'pyproject.toml') if in_bundle else Path('.', 'pyproject.toml')
+
         if toml_path.exists():
             with toml_path.open(mode="rb") as f:
                 t = tomllib.load(f)
@@ -195,6 +200,9 @@ class OnePaceOrganizer(QWidget):
 
             if "file_action" in config:
                 self.file_action = config["file_action"]
+
+            if "fetch_posters" in config:
+                self.fetch_posters = config["fetch_posters"]
 
             if "plex" in config:
                 if "enabled" in config["plex"]:
@@ -244,6 +252,7 @@ class OnePaceOrganizer(QWidget):
             "path_to_eps": str(self.input_path),
             "episodes": str(self.output_path),
             "file_action": self.file_action,
+            "fetch_posters": self.fetch_posters,
             "plex": {
                 "enabled": self.plex_config_enabled,
                 "url": self.plex_config_url,
@@ -448,11 +457,11 @@ class OnePaceOrganizer(QWidget):
         self.plex_password.setVisible(self.plex_config_use_token == False)
 
     async def find(self, *args):
-        f = bundle_file("data", "posters", *args)
-        if f.exists():
-            return f
+        f = Path("data", "posters", *args)
+        if f.is_file():
+            return f.resolve()
 
-        return bundle_file("posters", *args)
+        return Path("posters", *args).resolve()
 
     async def plex_login(self):
         if self.plexapi_account != None:
@@ -713,18 +722,12 @@ class OnePaceOrganizer(QWidget):
 
     async def start_process(self):
         try:
-            if not self.has_asked_posters and not Path(".", "data", "posters").is_dir() and not Path(".", "posters").is_dir():
-                self.has_asked_posters = True
-
-                answer = QMessageBox.question(
+            if self.fetch_posters and not Path(".", "data", "posters").is_dir() and not Path(".", "posters").is_dir():
+                self.fetch_posters = QMessageBox.question(
                     None,
                     f"One Pace Organizer v{self.version}",
-                    "The posters folder is missing. Do you want to download the posters.zip file that contains the folder?"
-                )
-
-                if answer == QMessageBox.StandardButton.Yes:
-                    webbrowser.open_new_tab("https://github.com/ladyisatis/OnePaceOrganizer/releases/latest")
-                    return
+                    "The posters folder is missing. Do you want to download the posters automatically?"
+                ) == QMessageBox.StandardButton.Yes
 
             self.start_button.setEnabled(False)
 
@@ -1072,11 +1075,19 @@ class OnePaceOrganizer(QWidget):
             show.editSummary(self.tvshow["plot"])
             show.editOriginallyAvailable(self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"])
 
-            tvshow = (await self.find("tvshow.png")).resolve()
+            tvshow = await self.find("tvshow.png")
+            if not tvshow.is_file() and self.fetch_posters:
+                self.log_output.append(f"Downloading: data/posters/{tvshow.name}")
+
+                try:
+                    await download("data/posters/{tvshow.name}", tvshow)
+                except Exception as e:
+                    self.log_output.append(f"Skipping downloading: {e}")
+
             if tvshow.is_file():
                 await run_sync(
                     show.uploadPoster,
-                    filepath=str(tvshow)
+                    filepath=str(tvshow.resolve())
                 )
 
         if show.contentRating != self.tvshow["rating"]:
@@ -1175,9 +1186,17 @@ class OnePaceOrganizer(QWidget):
                     plex_season.editTitle(new_title)
                     plex_season.editSummary(season_info["description"])
 
-                    _poster = (await self.find(f"poster-season{season}.png")).resolve()
+                    _poster = await self.find(f"poster-season{season}.png")
+                    if not _poster.is_file() and self.fetch_posters:
+                        self.log_output.append(f"Downloading: data/posters/{_poster.name}")
+
+                        try:
+                            await download(f"data/posters/{_poster.name}", _poster)
+                        except Exception as e:
+                            self.log_output.append(f"Skipping downloading: {e}")
+
                     if _poster.is_file():
-                        await run_sync(plex_season.uploadPoster, filepath=str(_poster))
+                        await run_sync(plex_season.uploadPoster, filepath=str(_poster.resolve()))
 
                         p = await run_sync(plex_season.posters)
                         if len(p) > 1:
@@ -1186,7 +1205,7 @@ class OnePaceOrganizer(QWidget):
             plex_episode = await run_sync(show.episode, season=season, episode=episode_info["episode"])
             updated = False
 
-            background_art = (await self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
+            background_art = await self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png")
             if background_art.exists():
                 has_background = False
                 arts = await run_sync(plex_episode.arts)
@@ -1197,14 +1216,14 @@ class OnePaceOrganizer(QWidget):
                         break
 
                 if not has_background:
-                    await run_sync(plex_episode.uploadArt, filepath=str(background_art))
+                    await run_sync(plex_episode.uploadArt, filepath=str(background_art.resolve()))
                     updated = True
 
                     arts = await run_sync(plex_episode.arts)
                     if len(arts) > 1:
                         await run_sync(plex_episode.setArt, arts[len(arts)-1])
 
-            poster_art = (await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
+            poster_art = await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")
             if poster_art.exists():
                 has_poster = False
                 posters = await run_sync(plex_episode.posters)
@@ -1215,7 +1234,7 @@ class OnePaceOrganizer(QWidget):
                         break
 
                 if not has_poster:
-                    await run_sync(plex_episode.uploadPoster, filepath=str(poster_art))
+                    await run_sync(plex_episode.uploadPoster, filepath=str(poster_art.resolve()))
                     updated = True
 
                     posters = await run_sync(plex_episode.posters)
@@ -1291,16 +1310,26 @@ class OnePaceOrganizer(QWidget):
             for k, v in dict(sorted(self.seasons.items())).items():
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
 
-            src = (await self.find("tvshow.png")).resolve()
+            src = await self.find("tvshow.png")
             dst = Path(self.output_path, "poster.png").resolve()
 
-            if src.is_file() and not dst.exists():
-                src = str(src)
-                dst = str(dst)
+            if not dst.exists():
+                if not src.is_file() and self.fetch_posters:
+                    self.log_output.append(f"Downloading: data/posters/{src.name}")
 
-                self.log_output.append(f"Copying {src} to: {dst}")
-                await run_sync(shutil.copy, src, dst)
+                    try:
+                        await download(f"data/posters/{src.name}", src)
+                    except Exception as e:
+                        self.log_output.append(f"Skipping downloading: {e}")
 
+                if src.is_file():
+                    src = str(src.resolve())
+                    dst = str(dst)
+
+                    self.log_output.append(f"Copying {src} to: {dst}")
+                    await run_sync(shutil.copy, src, dst)
+
+            if dst.is_file():
                 art = ET.SubElement(root, "art")
                 ET.SubElement(art, "poster").text = dst
 
@@ -1361,16 +1390,26 @@ class OnePaceOrganizer(QWidget):
                 ET.SubElement(root, "outline").text = season_info["description"]
                 ET.SubElement(root, "seasonnumber").text = f"{season}"
 
-                src = (await self.find(f"poster-season{season}.png")).resolve()
+                src = await self.find(f"poster-season{season}.png")
                 dst = Path(season_path, "poster.png").resolve()
 
-                if src.is_file() and not dst.exists():
-                    src = str(src)
-                    dst = str(dst)
+                if not dst.exists():
+                    if not src.is_file() and self.fetch_posters:
+                        self.log_output.append(f"Downloading: data/posters/{src.name}")
 
-                    self.log_output.append(f"Copying {src} to: {dst}")
-                    await run_sync(shutil.copy, src, dst)
+                        try:
+                            await download(f"data/posters/{src.name}", src)
+                        except Exception as e:
+                            self.log_output.append(f"Skipping downloading: {e}")
 
+                    if src.is_file():
+                        src = str(src)
+                        dst = str(dst)
+
+                        self.log_output.append(f"Copying {src} to: {dst}")
+                        await run_sync(shutil.copy, src, dst)
+
+                if dst.is_file():
                     art = ET.SubElement(root, "art")
                     ET.SubElement(art, "poster").text = dst
 

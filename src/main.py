@@ -104,14 +104,25 @@ async def compare_file(file1, file2):
 
     return True
 
-def bundle_file(*args):
-    in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
-    local_path = Path(".", *args)
+async def download(url, out):
+    base_url = "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/"
 
-    if not local_path.exists() and in_bundle:
-        return Path(sys._MEIPASS, *args)
+    if not isinstance(out, Path):
+        out = Path(out)
 
-    return local_path
+    if not out.parent.is_dir():
+        out.parent.mkdir(exist_ok=True)
+
+    async with httpx.AsyncClient() as client:
+        with out.open(mode='w') as f:
+            async with client.stream('GET', f"{base_url}{url}", follow_redirects=True) as resp:
+                #clen = int(resp.headers['Content-Length'])
+                #dl_len = 0
+
+                async for chunk in resp.aiter_bytes():
+                    #dl_len = dl_len + len(chunk)
+                    #await self.pb_progress(int((dl_len / clen) * 100))
+                    await run_sync(f.write, chunk)
 
 def get_env(name, default=""):
     key = f"OPO_{name.upper()}"
@@ -141,6 +152,7 @@ class OnePaceOrganizer():
         self.do_save_config = get_env("save_config", True)
         self.file_action = int(get_env("file_action", 0))
         self.workers = int(get_env("workers", max(8, os.process_cpu_count())))
+        self.fetch_posters = get_env("fetch_posters", True)
 
         self.input_path = get_env("input_path")
         self.output_path = get_env("output_path")
@@ -179,7 +191,9 @@ class OnePaceOrganizer():
         self.pb_lock = asyncio.Lock()
 
     def load_config(self):
-        toml_path = bundle_file("pyproject.toml")
+        in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+        toml_path = Path(sys._MEIPASS, 'pyproject.toml') if in_bundle else Path('.', 'pyproject.toml')
+
         if toml_path.exists():
             with toml_path.open(mode="rb") as f:
                 t = tomllib.load(f)
@@ -204,6 +218,9 @@ class OnePaceOrganizer():
             
             if "file_action" in config:
                 self.file_action = config["file_action"]
+
+            if "fetch_posters" in config:
+                self.fetch_posters = config["fetch_posters"]
 
             if "plex" in config:
                 if "enabled" in config["plex"]:
@@ -256,6 +273,7 @@ class OnePaceOrganizer():
             "path_to_eps": str(self.input_path),
             "episodes": str(self.output_path),
             "file_action": self.file_action,
+            "fetch_posters": self.fetch_posters,
             "plex": {
                 "enabled": self.plex_config_enabled,
                 "url": self.plex_config_url,
@@ -278,11 +296,11 @@ class OnePaceOrganizer():
             sys.exit(1)
 
     async def find(self, *args):
-        f = bundle_file("data", "posters", *args)
-        if f.exists():
-            return f
+        f = Path("data", "posters", *args)
+        if f.is_file():
+            return f.resolve()
 
-        return bundle_file("posters", *args)
+        return Path("posters", *args).resolve()
 
     async def move_file(self, src, dst):
         try:
@@ -414,19 +432,11 @@ class OnePaceOrganizer():
                 text='Make sure to create a folder that has all of the One Pace video\nfiles! The next step will ask for the path to that directory.'
             ).run_async()
 
-            if not Path(".", "data", "posters").is_dir() and not Path(".", "posters").is_dir():
-                yn = await yes_no_dialog(
+            if self.fetch_posters and not Path(".", "data", "posters").is_dir() and not Path(".", "posters").is_dir():
+                self.fetch_posters = await yes_no_dialog(
                     title=self.window_title,
-                    text="The posters folder is missing. Do you want to download the posters.zip file that contains the folder?"
+                    text="The posters folder is missing. Do you want to download the posters automatically?"
                 ).run_async()
-
-                if yn:
-                    url = "https://github.com/ladyisatis/OnePaceOrganizer/releases/latest"
-                    if not webbrowser.open_new_tab(url):
-                        await message_box(
-                            title=self.window_title,
-                            text=f"Unable to open browser, please head to:\n{url}\nand download posters.zip."
-                        ).run_async()
 
         if self.input_path == "":
             self.input_path = Path(".", "in").resolve()
@@ -949,23 +959,9 @@ class OnePaceOrganizer():
         yml_loaded = await self.cache_yml()
 
         if yml_loaded == False or len(self.tvshow) == 0 or len(self.seasons) == 0 or len(self.episodes) == 0:
-            url = "https://raw.githubusercontent.com/ladyisatis/onepaceorganizer/refs/heads/main/data.json"
-
-            await self.pb_log_output(f"Downloading: {url}")
-
             try:
-                async with httpx.AsyncClient() as client:
-                    data_file = Path(".", "data.json")
-
-                    with data_file.open(mode='w') as f:
-                        async with client.stream('GET', url, follow_redirects=True) as resp:
-                            #clen = int(resp.headers['Content-Length'])
-                            #dl_len = 0
-
-                            async for chunk in resp.aiter_bytes():
-                                #dl_len = dl_len + len(chunk)
-                                #await self.pb_progress(int((dl_len / clen) * 100))
-                                await run_sync(f.write, chunk)
+                await self.pb_log_output("Downloading: data.json")
+                await download("data.json", Path(".", "data.json"))
 
                 data = await run_sync(data_file.read_bytes)
                 data = await run_sync(orjson.loads, data)
@@ -1225,10 +1221,18 @@ class OnePaceOrganizer():
             show.editSummary(self.tvshow["plot"])
             show.editOriginallyAvailable(self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"])
 
-            poster = (await self.find("tvshow.png")).resolve()
+            poster = await self.find("tvshow.png")
+            if not poster.is_file() and self.fetch_posters:
+                await self.pb_log_output(f"Downloading: data/posters/{poster.name}")
+
+                try:
+                    await download(f"data/posters/{poster.name}", poster)
+                except Exception as e:
+                    await self.pb_log_output(f"Skipping downloading: {e}")
+
             if poster.is_file():
                 logger.debug(f"uploading tvshow poster: {str(poster)}")
-                await run_sync(show.uploadPoster, filepath=str(poster))
+                await run_sync(show.uploadPoster, filepath=str(poster.resolve()))
 
         if show.contentRating != self.tvshow["rating"]:
             show.editContentRating(self.tvshow["rating"])
@@ -1362,13 +1366,21 @@ class OnePaceOrganizer():
                     plex_season.editSummary(season_info["description"])
 
                     try:
-                        poster = str((await self.find(f"poster-season{season}.png")).resolve())
-                        logger.debug(f"upload s{season} poster: {poster}")
-                        await run_sync(plex_season.uploadPoster, filepath=poster)
+                        poster = await self.find(f"poster-season{season}.png")
+                        if not poster.is_file() and self.fetch_posters:
+                            try:
+                                await self.pb_log_output(f"Downloading: data/posters/{poster.name}")
+                                await download(f"data/posters/{poster.name}", poster)
+                            except Exception as e:
+                                await self.pb_log_output(f"Skipping downloading: {e}")
 
-                        p = await run_sync(plex_season.posters)
-                        if len(p) > 1:
-                            await run_sync(plex_season.setPoster, p[len(p)-1])
+                        if poster.is_file():
+                            logger.debug(f"upload s{season} poster: {poster}")
+                            await run_sync(plex_season.uploadPoster, filepath=str(poster.resolve()))
+
+                            p = await run_sync(plex_season.posters)
+                            if len(p) > 1:
+                                await run_sync(plex_season.setPoster, p[len(p)-1])
 
                     except Exception as e:
                         await self.pb_log_output(f"Skipping setting season poster: {e}")
@@ -1378,7 +1390,7 @@ class OnePaceOrganizer():
             plex_episode = await run_sync(show.episode, season=season, episode=episode_info["episode"])
             updated = False
 
-            background_art = (await self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
+            background_art = await self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png")
             if background_art.exists():
                 has_background = False
                 arts = await run_sync(plex_episode.arts)
@@ -1390,14 +1402,14 @@ class OnePaceOrganizer():
 
                 if not has_background:
                     logger.debug(f"upload background: {background_art}")
-                    await run_sync(plex_episode.uploadArt, filepath=str(background_art))
+                    await run_sync(plex_episode.uploadArt, filepath=str(background_art.resolve()))
                     updated = True
 
                     arts = await run_sync(plex_episode.arts)
                     if len(arts) > 1:
                         await run_sync(plex_episode.setArt, arts[len(arts)-1])
 
-            poster_art = (await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
+            poster_art = await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")
             if poster_art.exists():
                 has_poster = False
                 posters = await run_sync(plex_episode.posters)
@@ -1409,7 +1421,7 @@ class OnePaceOrganizer():
 
                 if not has_poster:
                     logger.debug(f"upload poster: {poster_art}")
-                    await run_sync(plex_episode.uploadPoster, filepath=str(poster_art))
+                    await run_sync(plex_episode.uploadPoster, filepath=str(poster_art.resolve()))
                     updated = True
 
                     posters = await run_sync(plex_episode.posters)
@@ -1485,13 +1497,22 @@ class OnePaceOrganizer():
             for k, v in dict(sorted(self.seasons.items())).items():
                 ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
 
-            src = (await self.find("tvshow.png")).resolve()
+            src = await self.find("tvshow.png")
             dst = Path(self.output_path, "poster.png").resolve()
 
-            if src.is_file() and not dst.exists():
-                await self.pb_log_output(f"Copying {str(src)} to: {str(dst)}")
-                await run_sync(shutil.copy, str(src), str(dst))
+            if not dst.exists():
+                if not src.is_file() and self.fetch_posters:
+                    try:
+                        await self.pb_log_output(f"Downloading: data/posters/{src.name}")
+                        await download(f"data/posters/{src.name}", src)
+                    except Exception as e:
+                        await self.pb_log_output(f"Skipping downloading: {e}")
 
+                if src.is_file():
+                    await self.pb_log_output(f"Copying {str(src)} to: {str(dst)}")
+                    await run_sync(shutil.copy, str(src), str(dst))
+
+            if dst.is_file():
                 art = ET.SubElement(root, "art")
                 ET.SubElement(art, "poster").text = str(dst)
 
@@ -1552,13 +1573,22 @@ class OnePaceOrganizer():
                 ET.SubElement(root, "outline").text = season_info["description"]
                 ET.SubElement(root, "seasonnumber").text = f"{season}"
 
-                src = (await self.find(f"poster-season{season}.png")).resolve()
+                src = await self.find(f"poster-season{season}.png")
                 dst = Path(season_path, "poster.png").resolve()
 
-                if src.is_file() and not dst.exists():
-                    await self.pb_log_output(f"Copying {str(src)} to: {str(dst)}")
-                    await run_sync(shutil.copy, str(src), str(dst))
+                if not dst.exists():
+                    if not src.is_file() and self.fetch_posters:
+                        try:
+                            await self.pb_log_output(f"Downloading: data/posters/{src.name}")
+                            await download(f"data/posters/{src.name}", src)
+                        except Exception as e:
+                            await self.pb_log_output(f"Skipping downloading: {e}")
 
+                    if src.is_file():
+                        await self.pb_log_output(f"Copying {str(src)} to: {str(dst)}")
+                        await run_sync(shutil.copy, str(src), str(dst))
+
+                if dst.is_file():
                     art = ET.SubElement(root, "art")
                     ET.SubElement(art, "poster").text = str(dst)
 
