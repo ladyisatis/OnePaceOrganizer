@@ -14,7 +14,6 @@ import shutil
 import sys
 import tomllib
 import traceback
-import webbrowser
 import yaml
 import zlib
 
@@ -80,7 +79,7 @@ async def compare_file(file1, file2):
             c1 = await run_sync(f1.read, 65536)
             c2 = await run_sync(f2.read, 65536)
 
-            if not c1 and not c2:
+            if not c1 or not c2:
                 break
 
             if c1 != c2:
@@ -181,12 +180,12 @@ class OnePaceOrganizer(QWidget):
         in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
         toml_path = Path(sys._MEIPASS, 'pyproject.toml') if in_bundle else Path('.', 'pyproject.toml')
 
-        if toml_path.exists():
+        if toml_path.is_file():
             with toml_path.open(mode="rb") as f:
                 t = tomllib.load(f)
                 self.version = t["project"]["version"]
 
-        if self.config_file.exists():
+        if self.config_file.is_file():
             config = orjson.loads(self.config_file.read_bytes())
 
             if "path_to_eps" in config:
@@ -761,7 +760,7 @@ class OnePaceOrganizer(QWidget):
         data_file = Path(".", "data.json")
         data = {}
 
-        if data_file.exists():
+        if data_file.is_file():
             self.log_output.append("Checking episode metadata file (data.json)...")
 
             data = await run_sync(data_file.read_bytes)
@@ -852,11 +851,11 @@ class OnePaceOrganizer(QWidget):
                 episode_files.append(file)
 
             tvshow_yml = Path(data_folder, "tvshow.yml")
-            if tvshow_yml.exists():
+            if tvshow_yml.is_file():
                 episode_files.append(tvshow_yml)
 
             seasons_yml = Path(data_folder, "seasons.yml")
-            if seasons_yml.exists():
+            if seasons_yml.is_file():
                 episode_files.append(seasons_yml)
 
             total_files = len(episode_files)
@@ -1080,7 +1079,7 @@ class OnePaceOrganizer(QWidget):
                 self.log_output.append(f"Downloading: data/posters/{tvshow.name}")
 
                 try:
-                    await download("data/posters/{tvshow.name}", tvshow)
+                    await download(f"data/posters/{tvshow.name}", tvshow)
                 except Exception as e:
                     self.log_output.append(f"Skipping downloading: {e}")
 
@@ -1206,7 +1205,7 @@ class OnePaceOrganizer(QWidget):
             updated = False
 
             background_art = await self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png")
-            if background_art.exists():
+            if background_art.is_file():
                 has_background = False
                 arts = await run_sync(plex_episode.arts)
 
@@ -1224,7 +1223,7 @@ class OnePaceOrganizer(QWidget):
                         await run_sync(plex_episode.setArt, arts[len(arts)-1])
 
             poster_art = await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")
-            if poster_art.exists():
+            if poster_art.is_file():
                 has_poster = False
                 posters = await run_sync(plex_episode.posters)
 
@@ -1295,7 +1294,7 @@ class OnePaceOrganizer(QWidget):
 
         tvshow_nfo = Path(self.output_path, "tvshow.nfo")
 
-        if not tvshow_nfo.exists():
+        if not tvshow_nfo.is_file():
             root = ET.Element("tvshow")
 
             for k, v in self.tvshow.items():
@@ -1482,15 +1481,17 @@ class OnePaceOrganizer(QWidget):
                 ET.SubElement(episodedetails, "aired").text = date
 
             ep_poster = (await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
-            if ep_poster.exists():
-                ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
+            ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
 
-                if not ep_poster_new.exists():
-                    self.log_output.append(f"{ep_poster} -> {ep_poster_new}")
+            if ep_poster.is_file() and not ep_poster_new.exists():
+                if not await self.move_file(ep_poster, ep_poster_new):
+                    self.log_output.append(f"{ep_poster} -> {ep_poster_new} (Unsuccessful)")
+                else:
+                    self.log_output.append(f"{ep_poster} -> {ep_poster_new} (Success)")
 
-                    if await self.move_file(ep_poster, ep_poster_new):
-                        art = ET.SubElement(episodedetails, "art")
-                        ET.SubElement(art, "poster").text = str(ep_poster_new)
+            if ep_poster_new.is_file():
+                art = ET.SubElement(episodedetails, "art")
+                ET.SubElement(art, "poster").text = str(ep_poster_new)
 
             ET.indent(episodedetails)
 
