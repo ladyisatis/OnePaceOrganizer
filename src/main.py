@@ -105,7 +105,7 @@ async def compare_file(file1, file2):
     return True
 
 async def download(url, out):
-    base_url = "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/"
+    base_url = get_env("download_url", "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/")
 
     if not isinstance(out, Path):
         out = Path(out)
