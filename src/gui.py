@@ -1322,11 +1322,8 @@ class OnePaceOrganizer(QWidget):
                         self.log_output.append(f"Skipping downloading: {e}")
 
                 if src.is_file():
-                    src = str(src.resolve())
-                    dst = str(dst)
-
                     self.log_output.append(f"Copying {src} to: {dst}")
-                    await run_sync(shutil.copy, src, dst)
+                    await run_sync(shutil.copy, str(src.resolve()), str(dst))
 
             if dst.is_file():
                 art = ET.SubElement(root, "art")
@@ -1402,11 +1399,8 @@ class OnePaceOrganizer(QWidget):
                             self.log_output.append(f"Skipping downloading: {e}")
 
                     if src.is_file():
-                        src = str(src)
-                        dst = str(dst)
-
                         self.log_output.append(f"Copying {src} to: {dst}")
-                        await run_sync(shutil.copy, src, dst)
+                        await run_sync(shutil.copy, str(src), str(dst))
 
                 if dst.is_file():
                     art = ET.SubElement(root, "art")
