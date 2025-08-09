@@ -327,6 +327,7 @@ def update():
                     logger.info(f"{key}: Adding {len(season_eps[key])} episodes")
 
                     for crc32 in season_eps[key]:
+                        out_episodes[crc32]["episode"] = int(episode)
                         out_episodes[crc32]["title"] = title
                         out_episodes[crc32]["description"] = description
 
