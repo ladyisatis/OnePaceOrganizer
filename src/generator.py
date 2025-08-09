@@ -362,7 +362,7 @@ def update():
                 released = released.isoformat()
 
             if file_path.exists():
-                old_data = {"title": "", "description": "", "manga_chapters": "", "anime_episodes": "", "released": ""}
+                old_data = {"episode": None, "title": "", "description": "", "manga_chapters": "", "anime_episodes": "", "released": ""}
 
                 with file_path.open(mode='r', encoding='utf-8') as f:
                     old_data = YamlLoad(stream=f)
@@ -373,7 +373,7 @@ def update():
                 if isinstance(old_data["released"], date) or isinstance(old_data["released"], datetime):
                     old_data["released"] = old_data["released"].isoformat()
 
-                if old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
+                if old_data["episode"] == episode and old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
                     continue
 
             out = (
