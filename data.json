@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-08-03T05:30:25.016205+00:00",
+  "last_update": "2025-08-09T21:16:19.329698+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -1633,6 +1633,19 @@
       "released": "2019-05-13",
       "hashes": {
         "crc32": "3BBE532B"
+      }
+    },
+    "3C0010BE": {
+      "season": 36,
+      "episode": 14,
+      "title": "The Legendary Hero",
+      "sorttitle": "Legendary Hero",
+      "description": "While Koby desperately attempts to flee Beehive, Cross Guild's bounty entices the hundreds of pirates there to hunt him down. But before they can seal his fate and claim the prize, a familiar Marine warship descends from the sky!",
+      "manga_chapters": "1080-1081",
+      "anime_episodes": "1113-1115",
+      "released": "2025-08-09",
+      "hashes": {
+        "crc32": "3C0010BE"
       }
     },
     "3C58DD41": {
@@ -3968,6 +3981,18 @@
         "crc32": "9B126B00"
       }
     },
+    "9BD35F80": {
+      "season": 5,
+      "episode": 2,
+      "title": "Pirate Commodore Don Krieg",
+      "description": "Luffy is on hiatus from pirating to work as a cabin boy to pay off the damage done to the Baratie. While he tries to convince Sanji to join his crew, the pirate Gin brings the infamous Don Krieg and his starving forces to the sea restaurant.",
+      "manga_chapters": "45-47",
+      "anime_episodes": "21-23",
+      "released": "2025-08-09",
+      "hashes": {
+        "crc32": "9BD35F80"
+      }
+    },
     "9C3360D6": {
       "season": 31,
       "episode": 31,
@@ -4990,6 +5015,19 @@
         "crc32": "C99E7631"
       }
     },
+    "CA3683BA": {
+      "season": 36,
+      "episode": 14,
+      "title": "The Legendary Hero",
+      "sorttitle": "Legendary Hero",
+      "description": "While Koby desperately attempts to flee Beehive, Cross Guild's bounty entices the hundreds of pirates there to hunt him down. But before they can seal his fate and claim the prize, a familiar Marine warship descends from the sky!",
+      "manga_chapters": "1080-1081",
+      "anime_episodes": "1113-1115",
+      "released": "2025-08-09",
+      "hashes": {
+        "crc32": "CA3683BA"
+      }
+    },
     "CA3F14A8": {
       "season": 36,
       "episode": 1,
@@ -5703,6 +5741,20 @@
       "released": "2025-05-08",
       "hashes": {
         "crc32": "E85B9E9D"
+      }
+    },
+    "E90342F6": {
+      "season": 5,
+      "episode": 3,
+      "title": "The Storm",
+      "originaltitle": "The Oath",
+      "sorttitle": "Storm",
+      "description": "It's revealed that Chef Zeff was once a great pirate known as \"Red Leg\" Zeff, and his fighting spirit is as strong as ever. Meanwhile, Gin explains how his men met disaster in the Grand Line when they ran afoul of a devastatingly strong opponent.",
+      "manga_chapters": "48-52",
+      "anime_episodes": "23-24, 29, 135",
+      "released": "2025-08-09",
+      "hashes": {
+        "crc32": "E90342F6"
       }
     },
     "E9317CBD": {
