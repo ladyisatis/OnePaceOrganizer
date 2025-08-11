@@ -32,7 +32,7 @@ jobs:
           New-Item -ItemType Directory -Path temp_zip
           Copy-Item dist\OnePaceOrganizer-cli.exe -Destination temp_zip
           Copy-Item dist\OnePaceOrganizer-gui.exe -Destination temp_zip
-          Copy-Item -Recurse data\posters -Destination temp_zip\posters
+          Copy-Item -Recurse data -Destination temp_zip\data
           Compress-Archive -Path temp_zip\* -DestinationPath OnePaceOrganizer-win-x64.zip
           Remove-Item -Recurse -Force temp_zip
           Rename-Item dist\OnePaceOrganizer-cli.exe OnePaceOrganizer-cli-win-x64.exe
