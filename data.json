@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-08-18T18:08:29.663341+00:00",
+  "last_update": "2025-08-20T00:10:56.129386+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -762,13 +762,13 @@
     },
     "15D77CB3": {
       "season": 5,
-      "episode": 4,
+      "episode": 3,
       "title": "The Oath",
       "sorttitle": "Oath",
       "description": "As Nami steals the Going Merry, Hawk-Eye Mihawk, known far and wide as the world's greatest swordsman, arrives all the way from the Grand Line to finish off Don Krieg. However, Zoro challenges the deadly Mihawk to a duel in order to achieve his dream.",
-      "manga_chapters": "50-52",
+      "manga_chapters": "48-52",
       "anime_episodes": "23-24, 29, 135",
-      "released": "2023-05-02",
+      "released": "2025-08-10",
       "hashes": {
         "crc32": "15D77CB3"
       }
@@ -1643,7 +1643,7 @@
       "description": "While Koby desperately attempts to flee Beehive, Cross Guild's bounty entices the hundreds of pirates there to hunt him down. But before they can seal his fate and claim the prize, a familiar Marine warship descends from the sky!",
       "manga_chapters": "1080-1081",
       "anime_episodes": "1113-1115",
-      "released": "2025-08-09",
+      "released": "2025-08-10",
       "hashes": {
         "crc32": "3C0010BE"
       }
@@ -1922,7 +1922,7 @@
       "description": "Eustass \"Captain\" Kid sails in, guns blazing against Elbaph while Shanks of the Red Hair Pirates defends his crew and friends... without an ounce of mercy.",
       "manga_chapters": "1079",
       "anime_episodes": "1112",
-      "released": "2024-09-06",
+      "released": "2025-06-30",
       "hashes": {
         "crc32": "482F69B7"
       }
@@ -2845,7 +2845,7 @@
       "description": "Eustass \"Captain\" Kid sails in, guns blazing against Elbaph while Shanks of the Red Hair Pirates defends his crew and friends... without an ounce of mercy.",
       "manga_chapters": "1079",
       "anime_episodes": "1112",
-      "released": "2024-09-06",
+      "released": "2025-06-30",
       "hashes": {
         "crc32": "6C170189"
       }
@@ -3207,9 +3207,9 @@
     },
     "757AF173": {
       "season": 5,
-      "episode": 6,
-      "title": "MH5",
-      "description": "In a surprising twist, Gin finishes Pearl off himself, claiming Sanji as his own target. Though still wounded, Sanji rises to the challenge and faces off with Gin. As the battle draws to a close, Don Krieg unleashes a deadly toxin into the air.",
+      "episode": 5,
+      "title": "Because of a Dream",
+      "description": "Sanji continues to battle Pearl, but Gin cleverly holds Chef Zeff hostage, forcing Sanji an impossible situation. Sanji's childhood memories flood his mind, and he reflects on why Zeff means so much to him.",
       "manga_chapters": "56-59",
       "anime_episodes": "26",
       "released": "2023-05-28",
@@ -4000,7 +4000,7 @@
       "description": "Luffy is on hiatus from pirating to work as a cabin boy to pay off the damage done to the Baratie. While he tries to convince Sanji to join his crew, the pirate Gin brings the infamous Don Krieg and his starving forces to the sea restaurant.",
       "manga_chapters": "45-47",
       "anime_episodes": "21-23",
-      "released": "2025-08-09",
+      "released": "2025-08-10",
       "hashes": {
         "crc32": "9BD35F80"
       }
@@ -4107,10 +4107,9 @@
     },
     "A1039182": {
       "season": 5,
-      "episode": 7,
-      "title": "The Stalwart War Spear",
-      "sorttitle": "Stalwart War Spear",
-      "description": "The struggle with Krieg nears its end. Luffy's fighting spirit is unwavering, even after taking several hits from Krieg's Stalwart War Spear. Straw Hat's strategy shifts to smashing through Krieg's defenses and attacking the spear head-on.",
+      "episode": 6,
+      "title": "MH5",
+      "description": "In a surprising twist, Gin finishes Pearl off himself, claiming Sanji as his own target. Though still wounded, Sanji rises to the challenge and faces off with Gin. As the battle draws to a close, Don Krieg unleashes a deadly toxin into the air.",
       "manga_chapters": "59-63",
       "anime_episodes": "27-28",
       "released": "2023-07-02",
@@ -4703,7 +4702,7 @@
       "description": "The Straw Hats happen across Zoro's former partners, Yosaku and Johnny, whose dietary dilemma reminds the pirates they still need a cook on their ship. Thus, they set sail for the sea restaurant Baratie, hoping to snag a chef.",
       "manga_chapters": "42-44",
       "anime_episodes": "19-21",
-      "released": "2025-08-01",
+      "released": "2025-08-02",
       "hashes": {
         "crc32": "BE634289"
       }
@@ -5036,7 +5035,7 @@
       "description": "While Koby desperately attempts to flee Beehive, Cross Guild's bounty entices the hundreds of pirates there to hunt him down. But before they can seal his fate and claim the prize, a familiar Marine warship descends from the sky!",
       "manga_chapters": "1080-1081",
       "anime_episodes": "1113-1115",
-      "released": "2025-08-09",
+      "released": "2025-08-10",
       "hashes": {
         "crc32": "CA3683BA"
       }
@@ -5363,9 +5362,10 @@
     },
     "D8C1FD62": {
       "season": 5,
-      "episode": 9,
-      "title": "Baratie 09",
-      "description": "",
+      "episode": 8,
+      "title": "The Fourth",
+      "sorttitle": "Fourth",
+      "description": "As the dust of battle settles, the still poisoned Gin decides to go back to the Grand Line with Krieg, and Sanji makes the difficult decision to join Luffy's crew. Suddenly, Yosaku returns with news of where Nami took the Going Merry.",
       "manga_chapters": "67-69",
       "anime_episodes": "30",
       "released": "2023-07-29",
@@ -6185,10 +6185,10 @@
     },
     "F850EAFD": {
       "season": 5,
-      "episode": 8,
-      "title": "The Fourth",
-      "sorttitle": "Fourth",
-      "description": "As the dust of battle settles, the still poisoned Gin decides to go back to the Grand Line with Krieg, and Sanji makes the difficult decision to join Luffy's crew. Suddenly, Yosaku returns with news of where Nami took the Going Merry.",
+      "episode": 7,
+      "title": "The Stalwart War Spear",
+      "sorttitle": "Stalwart War Spear",
+      "description": "The struggle with Krieg nears its end. Luffy's fighting spirit is unwavering, even after taking several hits from Krieg's Stalwart War Spear. Straw Hat's strategy shifts to smashing through Krieg's defenses and attacking the spear head-on.",
       "manga_chapters": "63-67",
       "anime_episodes": "28-29",
       "released": "2023-07-22",
