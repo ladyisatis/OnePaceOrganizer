@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-08-20T00:10:56.129386+00:00",
+  "last_update": "2025-08-21T12:10:43.132085+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -464,7 +464,10 @@
       "description": "Despite his internal injuries and Luffy's warnings, the prideful giant Dorry insists on continuing his duel with Brogy. Meanwhile, the Baroque Works officer agents begin to make their move on the island with the Straw Hats as their next targets.",
       "manga_chapters": "119-122",
       "anime_episodes": "73-74",
-      "released": "2020-09-11"
+      "released": "2025-04-18",
+      "hashes": {
+        "crc32": "0AB937B1"
+      }
     },
     "0B51015F": {
       "season": 34,
@@ -2638,7 +2641,10 @@
       "description": "Usopp, immensely impressed with the giants of Elbaph, names Brogy his master. To commemorate their duel, the giants imbibe two barrels of booze from Nami, but, unbeknownst to anyone, a saboteur has tampered with one of them!",
       "manga_chapters": "117-118",
       "anime_episodes": "71-72",
-      "released": "2020-08-04"
+      "released": "2025-04-18",
+      "hashes": {
+        "crc32": 64714640
+      }
     },
     "64E446D3": {
       "season": 35,
