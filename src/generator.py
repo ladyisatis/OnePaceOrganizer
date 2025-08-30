@@ -171,7 +171,7 @@ def update():
                                     for chunk in resp.iter_bytes():
                                         f.write(chunk)
 
-                            logger.success("-- Saved poster to {poster_path}")
+                            logger.success(f"-- Saved poster to {poster_path}")
 
                     if poster_path.exists():
                         out_seasons[season]['poster'] = f"https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/{season}/{poster_path.name}"
@@ -513,11 +513,11 @@ def generate_json():
         tvshow_changed = True
 
     if episodes_changed or seasons_changed or tvshow_changed:
-        out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
-        json_file.write_bytes(out)
-
         with Path(".", "data", "data.yml").open(mode='w') as f:
             YamlDump(data=out, stream=f, allow_unicode=True, sort_keys=False)
+
+        out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
+        json_file.write_bytes(out)
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'update':
