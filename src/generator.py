@@ -159,7 +159,7 @@ def update():
                     spreadsheet_html = client.get(f"https://docs.google.com/spreadsheets/u/0/d/{ONE_PACE_EPISODE_GUIDE_ID}/htmlview/sheet?headers=true&gid={sheetId}", follow_redirects=True)
                     img_tag = BeautifulSoup(spreadsheet_html.text, "html.parser").find("img")
                     if img_tag and img_tag.get("src"):
-                        out_season[season]['poster'] = img_tag["src"]
+                        out_seasons[season]['poster'] = img_tag["src"]
                 except:
                     logger.exception("-- Skipping fetching poster")
 
