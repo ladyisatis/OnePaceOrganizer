@@ -127,7 +127,8 @@ def update():
                         "saga": row['saga_title'],
                         "title": title,
                         "originaltitle": "",
-                        "description": row['description_en']
+                        "description": row['description_en'],
+                        "poster": ""
                     }
 
                     logger.success(f"{part}. {title}")
@@ -157,9 +158,7 @@ def update():
 
                 try:
                     spreadsheet_html = client.get(f"https://docs.google.com/spreadsheets/u/0/d/{ONE_PACE_EPISODE_GUIDE_ID}/htmlview/sheet?headers=true&gid={sheetId}", follow_redirects=True)
-                    img_tag = BeautifulSoup(spreadsheet_html.text, "html.parser").find("img")
-                    if img_tag and img_tag.get("src"):
-                        out_seasons[season]['poster'] = img_tag["src"]
+                    out_seasons[season]['poster'] = BeautifulSoup(spreadsheet_html.text, "html.parser").find("img").get("src", "")
                 except:
                     logger.exception("-- Skipping fetching poster")
 
@@ -265,8 +264,8 @@ def update():
                             continue
 
                         pub_date = datetime.strptime(item.pub_date.content, "%a, %d %b %Y %H:%M:%S %z")
-                        if now - pub_date > timedelta(hours=24):
-                            logger.warning(f"Skipping: {item.title.content} (more than 24 hours)")
+                        if now - pub_date > timedelta(hours=72):
+                            logger.warning(f"Skipping: {item.title.content} (more than 72 hours)")
                             continue
 
                         r = httpx.get(item.guid.content)
