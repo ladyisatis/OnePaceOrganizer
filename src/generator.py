@@ -168,7 +168,8 @@ def update():
                         if img and img.get("src", "") != "":
                             with poster_path.open(mode='wb') as f:
                                 with client.stream("GET", img["src"], follow_redirects=True) as resp:
-                                    f.write(resp.iter_bytes)
+                                    for chunk in resp.iter_bytes():
+                                        f.write(chunk)
 
                             logger.success("-- Saved poster to {poster_path}")
 
