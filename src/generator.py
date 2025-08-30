@@ -65,7 +65,7 @@ def update():
             logger.info("--------------------------")
 
             try:
-                resp = httpx.get("https://raw.githubusercontent.com/one-pace/one-pace-public-subtitles/refs/heads/main/main/title.properties", follow_redirects=True)
+                resp = client.get("https://raw.githubusercontent.com/one-pace/one-pace-public-subtitles/refs/heads/main/main/title.properties", follow_redirects=True)
                 title_props = javaproperties.loads(resp.text)
 
             except:
@@ -112,11 +112,11 @@ def update():
                         continue
 
                     part = int(row['part'])
-                    title = row['title_en']
+                    title = row['title_en'].strip()
 
-                    if part == 11:
+                    if part == 11 and title.startswith("Whisk"):
                         part = 10
-                    elif part == 10:
+                    elif part == 10 and title.startswith("The Trials"):
                         part = 11
                     elif part == 99:
                         part = 0
@@ -126,6 +126,7 @@ def update():
                     out_seasons[part] = {
                         "saga": row['saga_title'],
                         "title": title,
+                        "originaltitle": "",
                         "description": row['description_en']
                     }
 
@@ -154,17 +155,26 @@ def update():
 
                     logger.info(f"-- Renaming to: {out_seasons[season]['title']}")
 
+                try:
+                    spreadsheet_html = client.get(f"https://docs.google.com/spreadsheets/u/0/d/{ONE_PACE_EPISODE_GUIDE_ID}/htmlview/sheet?headers=true&gid={sheetId}", follow_redirects=True)
+                    img_tag = BeautifulSoup(spreadsheet_html.text, "html.parser").find("img")
+                    if img_tag and img_tag.get("src"):
+                        out_season[season]['poster'] = img_tag["src"]
+                except:
+                    logger.exception("-- Skipping fetching poster")
+
                 with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_GUIDE_ID}/export?gid={sheetId}&format=csv", follow_redirects=True) as resp:
                     reader = CSVReader(resp.iter_lines())
 
-                    for row in reader:
+                    for _row in reader:
+                        row = {}
+                        for k, v in _row.items():
+                            row[k.strip()] = v
+
                         if 'MKV CRC32' not in row:
                             continue
 
                         id = row['One Pace Episode'].strip() if 'One Pace Episode' in row else ''
-                        if id == '' and ' One Pace Episode' in row:
-                            id = row[' One Pace Episode'].strip()
-
                         chapters = row['Chapters'].strip() if 'Chapters' in row else ''
                         anime_episodes = row['Episodes'].strip() if 'Episodes' in row else ''
                         release_date = row['Release Date'].strip() if 'Release Date' in row else ''
@@ -489,6 +499,9 @@ def generate_json():
     if episodes_changed or seasons_changed or tvshow_changed:
         out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
         json_file.write_bytes(out)
+
+        with Path(".", "data", "data.yml").open(mode='w') as f:
+            YamlDump(data=out, stream=f, allow_unicode=True, sort_keys=False)
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'update':
