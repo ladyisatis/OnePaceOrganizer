@@ -157,8 +157,24 @@ def update():
                     logger.info(f"-- Renaming to: {out_seasons[season]['title']}")
 
                 try:
-                    spreadsheet_html = client.get(f"https://docs.google.com/spreadsheets/u/0/d/{ONE_PACE_EPISODE_GUIDE_ID}/htmlview/sheet?headers=true&gid={sheetId}", follow_redirects=True)
-                    out_seasons[season]['poster'] = BeautifulSoup(spreadsheet_html.text, "html.parser").find("img").get("src", "")
+                    poster_path = Path(".", "data", "posters", f"{season}", "poster.png")
+
+                    if not poster_path.exists():
+                        poster_path.parent.mkdir(exist_ok=True)
+
+                        spreadsheet_html = client.get(f"https://docs.google.com/spreadsheets/u/0/d/{ONE_PACE_EPISODE_GUIDE_ID}/htmlview/sheet?headers=true&gid={sheetId}", follow_redirects=True)
+                        img = BeautifulSoup(spreadsheet_html.text, "html.parser").find("img")
+
+                        if img and img.get("src", "") != "":
+                            with poster_path.open(mode='wb') as f:
+                                with client.stream("GET", img["src"], follow_redirects=True) as resp:
+                                    f.write(resp.iter_bytes)
+
+                            logger.success("-- Saved poster to {poster_path}")
+
+                    if poster_path.exists():
+                        out_seasons[season]['poster'] = f"https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/{season}/{poster_path.name}"
+
                 except:
                     logger.exception("-- Skipping fetching poster")
 
