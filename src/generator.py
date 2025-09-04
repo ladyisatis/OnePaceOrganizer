@@ -463,19 +463,39 @@ def dict_changed(old, new):
 
     return False
 
+def unicode_fix_dict(d):
+    new_dict = {}
+
+    for key in d.keys():
+        str_key = str(key)
+        new_dict[str_key] = {}
+
+        for inner_key, val in d[key].items():
+            if isinstance(val, date) or isinstance(val, datetime):
+                new_dict[str_key][inner_key] = val.isoformat()
+            elif isinstance(val, str):
+                new_dict[str_key][inner_key] = unicode_fix(val)
+            elif not (inner_key == "season" or inner_key == "episode") and (isinstance(val, int) or isinstance(val, float)):
+                new_dict[str_key][inner_key] = str(val)
+            else:
+                new_dict[str_key][inner_key] = val
+
+    return new_dict
+
 def generate_json():
     tvshow_yml = Path(".", "data", "tvshow.yml")
     seasons_yml = Path(".", "data", "seasons.yml")
     episodes_dir = Path(".", "data", "episodes")
     json_file = Path(".", "data.json")
 
-    out = {"last_update": datetime.now(timezone.utc).isoformat()}
+    tvshow = {}
+    seasons = {}
 
     with tvshow_yml.open(mode='r', encoding='utf-8') as f:
-        out["tvshow"] = YamlLoad(stream=f)
+        tvshow = {str(k) if not isinstance(k, str) else k: v for k, v in YamlLoad(stream=f).items()}
 
     with seasons_yml.open(mode='r', encoding='utf-8') as f:
-        out["seasons"] = sort_dict(YamlLoad(stream=f))
+        seasons = unicode_fix_dict(sort_dict(YamlLoad(stream=f)))
 
     episodes = {}
 
@@ -489,23 +509,16 @@ def generate_json():
             with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
                 episodes[key] = YamlLoad(stream=f)
 
-        for inner_key, val in episodes[key].items():
-            if inner_key == "season" or inner_key == "episode":
-                continue
-            elif isinstance(val, date) or isinstance(val, datetime):
-                episodes[key][inner_key] = val.isoformat()
-            elif isinstance(val, str):
-                episodes[key][inner_key] = unicode_fix(val)
-            elif isinstance(val, int) or isinstance(val, float):
-                episodes[key][inner_key] = str(val)
-
-    out["episodes"] = sort_dict(episodes)
+    episodes = unicode_fix_dict(sort_dict(episodes))
 
     try:
         old_json = orjson.loads(json_file.read_bytes())
-        episodes_changed = dict_changed(old_json["episodes"], out["episodes"])
-        seasons_changed = dict_changed(old_json["seasons"], out["seasons"])
-        tvshow_changed = dict_changed(old_json["tvshow"], out["tvshow"])
+        old_json["seasons"] = unicode_fix_dict(old_json["seasons"])
+        old_json["episodes"] = unicode_fix_dict(old_json["episodes"])
+
+        episodes_changed = dict_changed(old_json["episodes"], episodes)
+        seasons_changed = dict_changed(old_json["seasons"], seasons)
+        tvshow_changed = dict_changed(old_json["tvshow"], tvshow)
     except Exception as e:
         print(f"Warning: {e}")
         episodes_changed = True
@@ -513,6 +526,13 @@ def generate_json():
         tvshow_changed = True
 
     if episodes_changed or seasons_changed or tvshow_changed:
+        out = {
+            "last_update": datetime.now(timezone.utc).isoformat(),
+            "tvshow": tvshow,
+            "seasons": seasons,
+            "episodes": episodes
+        }
+
         with Path(".", "data", "data.yml").open(mode='w') as f:
             YamlDump(data=out, stream=f, allow_unicode=True, sort_keys=False)
 
