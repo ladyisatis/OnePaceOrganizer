@@ -1,4 +1,4 @@
-last_update: '2025-09-04T01:20:25.019591+00:00'
+last_update: '2025-09-04T02:12:07.862674+00:00'
 tvshow:
   title: One Pace
   sorttitle: One Pace
@@ -15,7 +15,7 @@ tvshow:
   lockdata: false
   rating: TV-14
 seasons:
-  0:
+  '0':
     saga: Specials
     title: Specials
     originaltitle: ''
@@ -23,14 +23,14 @@ seasons:
       we made animated specials. See alternative storylines with twists you might
       not have expected.
     poster: ''
-  1:
+  '1':
     saga: East Blue
     title: Romance Dawn
     originaltitle: ''
     description: Monkey D. Luffy sets out on an adventure to form a crew, find the
       legendary One Piece, and become the pirate king.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/1/poster.png
-  2:
+  '2':
     saga: East Blue
     title: Orange Town
     originaltitle: ''
@@ -38,14 +38,14 @@ seasons:
       Buggy the Clown. They are joined by a young girl named Nami who helps them navigate
       this predicament.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/2/poster.png
-  3:
+  '3':
     saga: East Blue
     title: Syrup Village
     originaltitle: ''
     description: Luffy's fledgling pirate crew arrives at the slopes of Syrup Village.
       There they find a liar and a conspiracy to steal a young lady's fortune.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/3/poster.png
-  4:
+  '4':
     saga: East Blue
     title: Gaimon
     originaltitle: ''
@@ -54,16 +54,16 @@ seasons:
       There they encounter a strange man stuck in a box who has been looking for the
       same treasure.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/4/poster.png
-  5:
+  '5':
     saga: East Blue
     title: Baratie
     originaltitle: ''
     description: The Straw Hats head to the ocean-going restaurant, Baratie, with
       the hopes of recruiting one of their cooks. In the meantime, hungry yet powerful
-      forces gather to lay siege to the restaurant — all while a menacing swordsman
+      forces gather to lay siege to the restaurant \u2014 all while a menacing swordsman
       from the Grand Line steadily approaches.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/5/poster.png
-  6:
+  '6':
     saga: East Blue
     title: Arlong Park
     originaltitle: ''
@@ -71,7 +71,7 @@ seasons:
       from the Grand Line. When the Straw Hats arrive, they find that their prospective
       navigator has left out a few key details about herself.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/6/poster.png
-  7:
+  '7':
     saga: East Blue
     title: The Adventures of Buggy's Crew
     originaltitle: ''
@@ -79,7 +79,7 @@ seasons:
       quest to regain his body parts and his crew, and then he will get his flashy
       revenge on Luffy.
     poster: ''
-  8:
+  '8':
     saga: East Blue
     title: Loguetown
     originaltitle: ''
@@ -87,7 +87,7 @@ seasons:
       and his crew drop anchor to stock up, sightsee, and pay their respects to the
       place where Gold Roger drew his last breath.'
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/8/poster.png
-  9:
+  '9':
     saga: Arabasta
     title: Reverse Mountain
     originaltitle: ''
@@ -95,23 +95,23 @@ seasons:
       Straw Hats are impossible water currents, a giant whale, and dubious people
       going by codenames.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/9/poster.png
-  10:
+  '10':
     saga: Arabasta
     title: Whisky Peak
     originaltitle: ''
     description: The first island on the Grand Line is surprisingly welcoming to pirates.
       But as night falls, a deadly plot unravels.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/10/poster.png
-  11:
+  '11':
     saga: Arabasta
     title: The Trials of Koby-Meppo
     originaltitle: ''
     description: Koby and Helmeppo are new cabin boys for the marines, but they become
       unwillingly involved in an escape attempt by Morgan. Their bravery will either
-      earn them the respect of their superiors—as well as Vice Admiral Garp—or it
-      will spell their doom.
+      earn them the respect of their superiors\u2014as well as Vice Admiral Garp\u2014or
+      it will spell their doom.
     poster: ''
-  12:
+  '12':
     saga: Arabasta
     title: Little Garden
     originaltitle: ''
@@ -119,7 +119,7 @@ seasons:
       journey brings them to Little Garden, an island from prehistoria that is home
       to creatures and people larger than life.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/12/poster.png
-  13:
+  '13':
     saga: Arabasta
     title: Drum Island
     originaltitle: ''
@@ -127,7 +127,7 @@ seasons:
       medical help. They happen upon a winter island inhabited by a distrusting populace
       and a single doctor with a mysterious reindeer companion.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/13/poster.png
-  14:
+  '14':
     saga: Arabasta
     title: Arabasta
     originaltitle: ''
@@ -135,7 +135,7 @@ seasons:
       Vivi and the Straw Hats to stem the rebellion, uncover the plot of Baroque Works,
       and beat the Warlord Crocodile.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/14/poster.png
-  15:
+  '15':
     saga: Skypiea
     title: Jaya
     originaltitle: ''
@@ -143,7 +143,7 @@ seasons:
       for information on its whereabouts. Their convictions are tested by the pirates
       of Mock Town, but not everyone on the island is a hardline skeptic.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/15/poster.png
-  16:
+  '16':
     saga: Skypiea
     title: Skypiea
     originaltitle: ''
@@ -151,7 +151,7 @@ seasons:
       sights, objects, and customs. What's more, the god of the sky island deems the
       Blue Sea dwellers to be trespassing and casts his judgment upon them.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/16/poster.png
-  17:
+  '17':
     saga: Water Seven
     title: Long Ring Long Land
     originaltitle: ''
@@ -160,7 +160,7 @@ seasons:
       the best the Navy has to offer has meanwhile begun to pay closer attention to
       certain Straw Hat crewmembers.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/17/poster.png
-  18:
+  '18':
     saga: Water Seven
     title: Water Seven
     originaltitle: ''
@@ -169,7 +169,7 @@ seasons:
       repairs for their ship, but the city threatens to take their money, their ship,
       and their crewmates.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/18/poster.png
-  19:
+  '19':
     saga: Water Seven
     title: Enies Lobby
     originaltitle: ''
@@ -177,7 +177,7 @@ seasons:
       the Straw Hats and their allies must invade the judicial island, Enies Lobby,
       and take on the government''s premiere clandestine unit: CP9.'
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/19/poster.png
-  20:
+  '20':
     saga: Water Seven
     title: Post-Enies Lobby
     originaltitle: ''
@@ -185,7 +185,7 @@ seasons:
       While there, they are met by a familial vice admiral, and they await news of
       their new ship.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/20/poster.png
-  21:
+  '21':
     saga: Thriller Bark
     title: Thriller Bark
     originaltitle: ''
@@ -194,7 +194,7 @@ seasons:
       mysterious things such as disappearing crews, conversational skeletons, and
       a floating island full of zombies and other horrors.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/21/poster.png
-  22:
+  '22':
     saga: Summit War
     title: Sabaody Archipelago
     originaltitle: ''
@@ -203,7 +203,7 @@ seasons:
       Holy Land and Navy Headquarters, Luffy's crew comes face-to-face with the darkest
       forces of the World Government.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/22/poster.png
-  23:
+  '23':
     saga: Summit War
     title: Amazon Lily
     originaltitle: ''
@@ -211,15 +211,15 @@ seasons:
       island in the middle of the Calm Belt... an island inhabited only by women where
       men are prohibited from entering.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/23/poster.png
-  24:
+  '24':
     saga: Summit War
     title: Impel Down
     originaltitle: ''
     description: Luffy launches a daring rescue mission to break his big brother Ace
       from the government prison, Impel Down. It's a race to the prison's lowest levels
-      — a literal journey through hell itself.
+      \u2014 a literal journey through hell itself.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/24/poster.png
-  25:
+  '25':
     saga: Summit War
     title: The Adventures of the Straw Hats
     originaltitle: If You Could Go Anywhere... The Adventures of the Straw Hats
@@ -228,7 +228,7 @@ seasons:
       food, and Nami reports on the weather. Brook is repaid in underpants, and Zoro...
       is lost and annoyed.
     poster: ''
-  26:
+  '26':
     saga: Summit War
     title: Marineford
     originaltitle: ''
@@ -237,7 +237,7 @@ seasons:
       past and heritage. Luffy races to Ace''s execution scaffold as a battle between
       the world''s most powerful people unfolds.'
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/26/poster.png
-  27:
+  '27':
     saga: Summit War
     title: Post-War
     originaltitle: ''
@@ -246,7 +246,7 @@ seasons:
       enough to withstand the New World, Luffy must make a critical decision for himself
       and his crew.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/27/poster.png
-  28:
+  '28':
     saga: Fishman Island
     title: Return to Sabaody
     originaltitle: ''
@@ -254,7 +254,7 @@ seasons:
       and they reconvene back at Sabaody stronger and even more committed to the journey
       ahead.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/28/poster.png
-  29:
+  '29':
     saga: Fishman Island
     title: Fishman Island
     originaltitle: ''
@@ -263,7 +263,7 @@ seasons:
       is reaching a breaking point, and Luffy and his crew are caught in the middle
       of the conflict.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/29/poster.png
-  30:
+  '30':
     saga: Dressrosa
     title: Punk Hazard
     originaltitle: ''
@@ -272,7 +272,7 @@ seasons:
       be an unlivable place later reveals a laboratory, a maniac scientist, and a
       certain Warlord of the Sea.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/30/poster.png
-  31:
+  '31':
     saga: Dressrosa
     title: Dressrosa
     originaltitle: ''
@@ -280,7 +280,7 @@ seasons:
       Doflamingo's booming business. But the crazed warlord and self-proclaimed ruler
       of Dressrosa has control over everyone and everything.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/31/poster.png
-  32:
+  '32':
     saga: Four Emperors
     title: Zou
     originaltitle: ''
@@ -289,7 +289,7 @@ seasons:
       Hats soon discover that the people of Zou hold a piece of the puzzle that unlocks
       the mysteries of the world.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/32/poster.png
-  33:
+  '33':
     saga: Four Emperors
     title: Whole Cake Island
     originaltitle: ''
@@ -297,7 +297,7 @@ seasons:
       after Sanji to Whole Cake Island. However, knocking on an emperor's door is
       easier said than done.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/33/poster.png
-  34:
+  '34':
     saga: Four Emperors
     title: Reverie
     originaltitle: ''
@@ -305,7 +305,7 @@ seasons:
       to discuss a mutually agreed upon path for the government. During this particular
       Reverie, many parties with their own agendas arrive... and some are uninvited.
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/34/poster.png
-  35:
+  '35':
     saga: Four Emperors
     title: Wano
     originaltitle: ''
@@ -313,7 +313,7 @@ seasons:
       allies'' ultimate goal: to see to the Emperor Kaido''s downfall and restore
       the Kozuki family to its rightful place of power.'
     poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/35/poster.png
-  36:
+  '36':
     saga: Final Saga
     title: Egghead
     originaltitle: ''
