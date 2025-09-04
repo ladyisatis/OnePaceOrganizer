@@ -204,8 +204,6 @@ def update():
                             logger.warning(f"Skipping: {row} (no data)")
                             continue
 
-                        logger.success(f"-- {id}")
-
                         match = re.search(PATTERN_END_NUMBER, id)
                         if match:
                             episode = int(match.group(1))
@@ -253,6 +251,8 @@ def update():
                                 season_eps[key].append(mkv_crc32_ext)
                         else:
                             season_eps[key] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
+
+                        logger.success(f"-- {id} [id: {key}]")
 
             if ONE_PACE_RSS_FEED != '':
                 logger.info("--------------------------")
