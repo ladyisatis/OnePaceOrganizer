@@ -204,6 +204,8 @@ def update():
                             logger.warning(f"Skipping: {row} (no data)")
                             continue
 
+                        logger.success(f"-- {id}")
+
                         match = re.search(PATTERN_END_NUMBER, id)
                         if match:
                             episode = int(match.group(1))
@@ -243,7 +245,7 @@ def update():
                             logger.info(f"-- Aliasing {mkv_crc32_ext} -> {mkv_crc32}")
                             out_episodes[mkv_crc32_ext] = out_episodes[mkv_crc32]
 
-                        key = f"{out_seasons[season]['originaltitle']} {episode}" if 'originaltitle' in out_seasons[season] else f"{out_seasons[season]['title']} {episode}"
+                        key = f"{out_seasons[season]['originaltitle']} {episode}" if 'originaltitle' in out_seasons[season] and out_seasons[season]['originaltitle'] != "" else f"{out_seasons[season]['title']} {episode}"
                         if key in season_eps:
                             season_eps[key].append(mkv_crc32)
 
@@ -251,8 +253,6 @@ def update():
                                 season_eps[key].append(mkv_crc32_ext)
                         else:
                             season_eps[key] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
-
-                        logger.success(f"-- {id} [id: {key}]")
 
             if ONE_PACE_RSS_FEED != '':
                 logger.info("--------------------------")
