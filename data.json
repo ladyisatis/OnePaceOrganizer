@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-09-04T01:20:25.019591+00:00",
+  "last_update": "2025-09-04T02:09:31.415412+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -54,7 +54,7 @@
       "saga": "East Blue",
       "title": "Baratie",
       "originaltitle": "",
-      "description": "The Straw Hats head to the ocean-going restaurant, Baratie, with the hopes of recruiting one of their cooks. In the meantime, hungry yet powerful forces gather to lay siege to the restaurant — all while a menacing swordsman from the Grand Line steadily approaches.",
+      "description": "The Straw Hats head to the ocean-going restaurant, Baratie, with the hopes of recruiting one of their cooks. In the meantime, hungry yet powerful forces gather to lay siege to the restaurant \u2014 all while a menacing swordsman from the Grand Line steadily approaches.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/5/poster.png"
     },
     "6": {
@@ -96,7 +96,7 @@
       "saga": "Arabasta",
       "title": "The Trials of Koby-Meppo",
       "originaltitle": "",
-      "description": "Koby and Helmeppo are new cabin boys for the marines, but they become unwillingly involved in an escape attempt by Morgan. Their bravery will either earn them the respect of their superiors—as well as Vice Admiral Garp—or it will spell their doom.",
+      "description": "Koby and Helmeppo are new cabin boys for the marines, but they become unwillingly involved in an escape attempt by Morgan. Their bravery will either earn them the respect of their superiors\u2014as well as Vice Admiral Garp\u2014or it will spell their doom.",
       "poster": ""
     },
     "12": {
@@ -187,7 +187,7 @@
       "saga": "Summit War",
       "title": "Impel Down",
       "originaltitle": "",
-      "description": "Luffy launches a daring rescue mission to break his big brother Ace from the government prison, Impel Down. It's a race to the prison's lowest levels — a literal journey through hell itself.",
+      "description": "Luffy launches a daring rescue mission to break his big brother Ace from the government prison, Impel Down. It's a race to the prison's lowest levels \u2014 a literal journey through hell itself.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/24/poster.png"
     },
     "25": {
@@ -1078,19 +1078,6 @@
       "released": "2013-06-09",
       "hashes": {
         "crc32": "216595EE"
-      }
-    },
-    "21BF9495": {
-      "season": 36,
-      "episode": 15,
-      "title": "Let's Go and Take It!!",
-      "originaltitle": "Let's Go and Take It!",
-      "description": "While Cross Guild grows into a serious concern for the Marines, Buggy makes an impassioned speech to spur his crew into a zealous fervor. Additionally, Sabo returns to his comrades and begins his report on the events that happened at the Reverie.",
-      "manga_chapters": "1082-1083",
-      "anime_episodes": "1116-1117",
-      "released": "2025-08-24",
-      "hashes": {
-        "crc32": "21BF9495"
       }
     },
     "224B7846": {
@@ -2844,9 +2831,9 @@
     },
     "6858E16A": {
       "season": 5,
-      "episode": 5,
-      "title": "Because of a Dream",
-      "description": "Sanji continues to battle Pearl, but Gin cleverly holds Chef Zeff hostage, forcing Sanji an impossible situation. Sanji's childhood memories flood his mind, and he reflects on why Zeff means so much to him.",
+      "episode": 4,
+      "title": "Pearl",
+      "description": "Mihawk departs after defeating Zoro, and Krieg continues his assault on the Baratie. Pearl, one of Krieg's strongest men, goes on the offensive with fiery attacks and multiple shields at his disposal, so Sanji reveals his unique fighting style.",
       "manga_chapters": "53-55",
       "anime_episodes": "25",
       "released": "2023-05-15",
@@ -2913,18 +2900,6 @@
       "released": "2014-01-25",
       "hashes": {
         "crc32": "6AAC9B33"
-      }
-    },
-    "6AE11B21": {
-      "season": 36,
-      "episode": 19,
-      "title": "Hostage Situation",
-      "description": "In the Labophase on Egghead, which is completely surrounded by the Marines, Luffy and the others devise a plan to escape the island. However, the Frontier Dome, the laser defense system, cannot be deactivated without York's secret passcode.",
-      "manga_chapters": "1089-1090",
-      "anime_episodes": "1123-1124",
-      "released": "2025-08-29",
-      "hashes": {
-        "crc32": "6AE11B21"
       }
     },
     "6BD41435": {
@@ -3442,19 +3417,6 @@
       "anime_episodes": "34-36",
       "released": "2025-01-24"
     },
-    "7A93DCC5": {
-      "season": 36,
-      "episode": 16,
-      "title": "The Attempted Murder of a Celestial Dragon",
-      "sorttitle": "Attempted Murder of a Celestial Dragon",
-      "description": "During the Reverie, Sabo and Bonney met and worked together toward the same goal. King Cobra also met with the Five Elders to ask some hard questions, in the process learning the dark truth of the world.",
-      "manga_chapters": "1084-1085",
-      "anime_episodes": "1118-1119",
-      "released": "2025-08-29",
-      "hashes": {
-        "crc32": "7A93DCC5"
-      }
-    },
     "7CAE5640": {
       "season": 21,
       "episode": 14,
@@ -3926,18 +3888,6 @@
       "released": "2021-01-09",
       "hashes": {
         "crc32": 93376225
-      }
-    },
-    "93B80191": {
-      "season": 36,
-      "episode": 19,
-      "title": "Hostage Situation",
-      "description": "In the Labophase on Egghead, which is completely surrounded by the Marines, Luffy and the others devise a plan to escape the island. However, the Frontier Dome, the laser defense system, cannot be deactivated without York's secret passcode.",
-      "manga_chapters": "1089-1090",
-      "anime_episodes": "1123-1124",
-      "released": "2025-08-29",
-      "hashes": {
-        "crc32": "93B80191"
       }
     },
     "94E2099D": {
@@ -4541,18 +4491,6 @@
       "released": "2025-02-01",
       "hashes": {
         "crc32": "ACD6AA5F"
-      }
-    },
-    "ACEA0537": {
-      "season": 5,
-      "episode": 5,
-      "title": "Because of a Dream",
-      "description": "Sanji continues to battle Pearl, but Gin cleverly holds Chef Zeff hostage, forcing Sanji an impossible situation. Sanji's childhood memories flood his mind, and he reflects on why Zeff means so much to him.",
-      "manga_chapters": "56-59",
-      "anime_episodes": "26",
-      "released": "2025-08-24",
-      "hashes": {
-        "crc32": "ACEA0537"
       }
     },
     "ACF1C889": {
