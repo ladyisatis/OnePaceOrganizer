@@ -457,6 +457,7 @@ def sort_dict(d):
 
 def dict_changed(old, new):
     changed = DeepDiff(old, new)
+
     for i in ['dictionary_item_added', 'dictionary_item_removed', 'values_changed']:
         if i in changed:
             return True
@@ -486,16 +487,17 @@ def generate_json():
     tvshow_yml = Path(".", "data", "tvshow.yml")
     seasons_yml = Path(".", "data", "seasons.yml")
     episodes_dir = Path(".", "data", "episodes")
+    data_yml = Path(".", "data", "data.yml")
     json_file = Path(".", "data.json")
 
     tvshow = {}
     seasons = {}
 
     with tvshow_yml.open(mode='r', encoding='utf-8') as f:
-        tvshow = {str(k) if not isinstance(k, str) else k: v for k, v in YamlLoad(stream=f).items()}
+        tvshow = YamlLoad(stream=f)
 
     with seasons_yml.open(mode='r', encoding='utf-8') as f:
-        seasons = unicode_fix_dict(sort_dict(YamlLoad(stream=f)))
+        seasons = sort_dict(YamlLoad(stream=f))
 
     episodes = {}
 
@@ -509,16 +511,16 @@ def generate_json():
             with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
                 episodes[key] = YamlLoad(stream=f)
 
-    episodes = unicode_fix_dict(sort_dict(episodes))
+    episodes = sort_dict(episodes)
 
     try:
-        old_json = orjson.loads(json_file.read_bytes())
-        old_json["seasons"] = unicode_fix_dict(old_json["seasons"])
-        old_json["episodes"] = unicode_fix_dict(old_json["episodes"])
+        old = {}
+        with data_yml.open(mode='r', encoding='utf-8') as f:
+            old = YamlLoad(stream=f)
 
-        episodes_changed = dict_changed(old_json["episodes"], episodes)
-        seasons_changed = dict_changed(old_json["seasons"], seasons)
-        tvshow_changed = dict_changed(old_json["tvshow"], tvshow)
+        episodes_changed = dict_changed(old["episodes"], episodes)
+        seasons_changed = dict_changed(old["seasons"], seasons)
+        tvshow_changed = dict_changed(old["tvshow"], tvshow)
     except Exception as e:
         print(f"Warning: {e}")
         episodes_changed = True
@@ -526,17 +528,22 @@ def generate_json():
         tvshow_changed = True
 
     if episodes_changed or seasons_changed or tvshow_changed:
-        out = {
-            "last_update": datetime.now(timezone.utc).isoformat(),
+        last_update = datetime.now(timezone.utc).isoformat()
+
+        with data_yml.open(mode='w') as f:
+            YamlDump(data={
+                "last_update": last_update,
+                "tvshow": tvshow,
+                "seasons": seasons,
+                "episodes": episodes
+            }, stream=f, allow_unicode=True, sort_keys=False)
+
+        out = orjson.dumps({
+            "last_update": last_update,
             "tvshow": tvshow,
-            "seasons": seasons,
-            "episodes": episodes
-        }
-
-        with Path(".", "data", "data.yml").open(mode='w') as f:
-            YamlDump(data=out, stream=f, allow_unicode=True, sort_keys=False)
-
-        out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
+            "seasons": unicode_fix_dict(seasons),
+            "episodes": unicode_fix_dict(episodes)
+        }, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
         json_file.write_bytes(out)
 
 def main():
