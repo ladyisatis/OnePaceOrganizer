@@ -8,6 +8,7 @@ from pathlib import Path
 from loguru import logger
 from src import utils, organizer
 
+from PySide6 import QtAsyncio
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QLineEdit, QFileDialog, QCheckBox, QComboBox, QTextEdit, QProgressBar,
@@ -33,13 +34,13 @@ class Input:
             self.layout.addWidget(self.button)
 
             if connect != None:
-                self.button.connect(connect)
+                self.button.clicked.connect(connect)
         else:
             self.button = None
 
-        layout.addLayout(layout)
+        layout.addLayout(self.layout)
 
-    def setVisible(is_visible):
+    def setVisible(self, is_visible):
         self.label.setVisible(is_visible)
         self.prop.setVisible(is_visible)
 
@@ -55,9 +56,9 @@ class GUI(QMainWindow):
         self.log_output.setReadOnly(True)
 
         logger.add(
-            self.log_output.append, 
+            lambda msg: self.log_output.append(msg.rstrip("\n")),
             level=self.log_level, 
-            format="[{time}] [{level: <8}] {message}", 
+            format="[{time:YYYY-MM-DD HH:mm:ss.SSS}] [{level: <8}] {message}", 
             colorize=False, 
             enqueue=True
         )
@@ -79,11 +80,11 @@ class GUI(QMainWindow):
         self.progress_bar.setValue(0)
         self.organizer.progress_bar_func = self.progress_bar.setValue
 
-        self.input = Input(layout, "Directory of unsorted One Pace .mkv/.mp4 files:", QLineEdit(), "Browse...", self.browse_input_folder)
+        self.input = Input(layout, "Directory of unsorted One Pace .mkv/.mp4 files:", QLineEdit(), button="Browse...", connect=self.browse_input_folder)
         self.input.prop.setText(str(self.organizer.input_path))
         self.input.prop.setPlaceholderText(str(Path.home() / "Downloads"))
 
-        self.output = Input(layout, "Move the sorted and renamed files to:", QLineEdit(), "Browse...", self.browse_output_folder)
+        self.output = Input(layout, "Move the sorted and renamed files to:", QLineEdit(), button="Browse...", connect=self.browse_output_folder)
         self.output.prop.setText(str(self.organizer.output_path))
         self.output.prop.setPlaceholderText(str(Path("/", "path", "to", "plex_or_jellyfin", "Anime", "One Pace").resolve()))
         self.output.setVisible(self.organizer.file_action != 4)
@@ -121,7 +122,7 @@ class GUI(QMainWindow):
         self.plex_password.prop.setText(self.organizer.plex_config_password)
         self.plex_password.setVisible(not self.organizer.plex_config_use_token)
 
-        self.plex_remember_login = Input(self.plex_group_layout, "", QCheckBox("Remember"), "Login", lambda: asyncio.create_task(self.plex_login()))
+        self.plex_remember_login = Input(self.plex_group_layout, "", QCheckBox("Remember"), button="Login", connect=lambda: asyncio.create_task(self.plex_login()))
         self.plex_remember_login.prop.setChecked(self.organizer.plex_config_remember)
 
         self.plex_server = Input(self.plex_group_layout, "Plex Server:", QComboBox(), width=self.plex_width)
@@ -205,26 +206,26 @@ class GUI(QMainWindow):
         action_after_sort.addAction(self.action_after_sort_metadata)
 
         self.action_season = menu_configuration.addMenu("Set Season Folder Names")
-        self.action_season.setVisible(not self.organizer.plex_config_enabled)
-        menu_configuration.addAction(self.action_season)
+        self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
+        #menu_configuration.addAction(self.action_season)
 
         self.action_season_0 = QAction("Season 01-09, 10-... (recommended)", self)
         self.action_season_0.setCheckable(True)
         self.action_season_0.setChecked(self.organizer.folder_action == 0)
         self.action_season_0.triggered.connect(func_partial(self.set_season, 0))
-        action_season.addAction(self.action_season_0)
+        self.action_season.addAction(self.action_season_0)
 
         self.action_season_1 = QAction("Season 1-9, 10-...", self)
         self.action_season_1.setCheckable(True)
-        self.action_season_0.setChecked(self.organizer.folder_action == 1)
+        self.action_season_1.setChecked(self.organizer.folder_action == 1)
         self.action_season_1.triggered.connect(func_partial(self.set_season, 1))
-        action_season.addAction(self.action_season_1)
+        self.action_season.addAction(self.action_season_1)
 
         self.action_season_2 = QAction("Do not create folders", self)
         self.action_season_2.setCheckable(True)
-        self.action_season_0.setChecked(self.organizer.folder_action == 2)
+        self.action_season_2.setChecked(self.organizer.folder_action == 2)
         self.action_season_2.triggered.connect(func_partial(self.set_season, 2))
-        action_season.addAction(self.action_season_2)
+        self.action_season.addAction(self.action_season_2)
 
         self.action_edit_output_tmpl = QAction("Set Output Filenames", self)
         self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
@@ -248,7 +249,7 @@ class GUI(QMainWindow):
         elif self.organizer.file_action == 3:
             _action = "Hardlink"
 
-        self.output.prop.setText(f"{_action} the sorted and renamed files to:")
+        self.output.label.setText(f"{_action} the sorted and renamed files to:")
         self.output.setVisible(self.organizer.file_action != 4)
 
     def _input_dialog(self, text, default=""):
@@ -267,8 +268,10 @@ class GUI(QMainWindow):
         if not folder or folder == "":
             return
 
-        if Path(self.input.prop.text()).resolve() == Path(self.output.prop.text()).resolve() and self.file_action != 4:
-            QMessageBox.error(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
+        logger.debug(f"input folder set: {folder}")
+
+        if Path(folder).resolve() == Path(self.output.prop.text()).resolve() and self.organizer.file_action != 4:
+            QMessageBox.information(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
             return
 
         if len(folder) > 2 and (folder[:2] == "\\\\" or folder[:2] == "//"):
@@ -295,7 +298,7 @@ class GUI(QMainWindow):
         if not folder or folder == "":
             return
 
-        if Path(self.input.prop.text()).resolve() == Path(self.output.prop.text()).resolve() and self.file_action != 4:
+        if Path(self.input.prop.text()).resolve() == Path(folder).resolve() and self.organizer.file_action != 4:
             QMessageBox.error(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
             return
 
@@ -321,9 +324,11 @@ class GUI(QMainWindow):
         self.organizer.plex_config_enabled = text == "Plex"
         self.plex_group.setVisible(self.organizer.plex_config_enabled)
         self.action_after_sort_metadata.setVisible(not self.organizer.plex_config_enabled)
-        self.action_plex_url.setVisible(self.organizer.plex_config_enabled)
-        self.action_season.setVisible(not self.organizer.plex_config_enabled)
+        self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
         self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
+
+        if self.organizer.plex_config_enabled and self.organizer.file_action == 4:
+            self.set_action(0)
 
     def switch_plex_method(self, text):
         self.organizer.plex_config_use_token = text == "Authentication Token"
@@ -353,11 +358,11 @@ class GUI(QMainWindow):
         self._plex_toggle_enabled(False)
         self.plex_remember_login.button.setEnabled(False)
 
-        self.organizer.plex_config_use_token = self.plex_method.prop.currentText() == "Authentication Token"
+        self.organizer.plex_config_use_token = self.plex_method.prop.text() == "Authentication Token"
         self.organizer.plex_config_remember = self.plex_remember_login.prop.checkState() == Qt.Checked
-        self.organizer.plex_config_auth_token = self.plex_token.prop.currentText()
-        self.organizer.plex_config_username = self.plex_username.prop.currentText()
-        self.organizer.plex_config_password = self.plex_password.prop.currentText()
+        self.organizer.plex_config_auth_token = self.plex_token.prop.text()
+        self.organizer.plex_config_username = self.plex_username.prop.text()
+        self.organizer.plex_config_password = self.plex_password.prop.text()
 
         if not await self.organizer.plex_login(True):
             self._plex_toggle_enabled(True)
@@ -369,7 +374,7 @@ class GUI(QMainWindow):
         self.start_button.setEnabled(False)
         await self.plex_get_servers()
 
-    async def plex_get_servers():
+    async def plex_get_servers(self):
         self.plex_server.setVisible(True)
         self.plex_library.setVisible(False)
         self.plex_show.setVisible(False)
@@ -471,6 +476,7 @@ class GUI(QMainWindow):
         self.action_after_sort_symlink.setChecked(action == 2)
         self.action_after_sort_hardlink.setChecked(action == 3)
         self.action_after_sort_metadata.setChecked(action == 4)
+        self._output_label_txt()
 
     def set_season(self, season):
         self.organizer.folder_action = season
@@ -486,7 +492,7 @@ class GUI(QMainWindow):
 
     async def start(self):
         self.start_button.setEnabled(False)
-        self.log_output.clear()
+        self.log_output.append(self.spacer)
 
         if self.organizer.plex_config_enabled:
             self.plex_server.prop.setEnabled(False)
@@ -531,14 +537,19 @@ class GUI(QMainWindow):
 
 def main(organizer, log_level):
     try:
+        app = QApplication(sys.argv)
+        gui = GUI(organizer, log_level)
+
         logger.debug("loading configuration")
         asyncio.run(organizer.load_config())
 
         logger.debug("launching Qt app")
-        app = QApplication(sys.argv)
-        GUI(organizer, log_level).show()
+        gui.setWindowTitle(organizer.window_title)
+        gui.show()
 
         QtAsyncio.run(handle_sigint=True)
+        asyncio.run(organizer.save_config())
 
     except:
-        QMessageBox.critical(None, f"One Pace Organizer v{organizer.version}", traceback.format_exc())
+        print(traceback.format_exc())
+        QMessageBox.critical(None, organizer.window_title, traceback.format_exc())
