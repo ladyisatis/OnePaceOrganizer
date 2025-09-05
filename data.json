@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-08-11T03:39:21.749317+00:00",
+  "last_update": "2025-09-04T02:29:53.321011+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -18,188 +18,261 @@
     "0": {
       "saga": "Specials",
       "title": "Specials",
-      "description": "Occasionally, the One Pace team likes to have some extra fun, so we made animated specials. See alternative storylines with twists you might not have expected."
+      "originaltitle": "",
+      "description": "Occasionally, the One Pace team likes to have some extra fun, so we made animated specials. See alternative storylines with twists you might not have expected.",
+      "poster": ""
     },
     "1": {
       "saga": "East Blue",
       "title": "Romance Dawn",
-      "description": "Monkey D. Luffy sets out on an adventure to form a crew, find the legendary One Piece, and become the pirate king."
+      "originaltitle": "",
+      "description": "Monkey D. Luffy sets out on an adventure to form a crew, find the legendary One Piece, and become the pirate king.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/1/poster.png"
     },
     "2": {
       "saga": "East Blue",
       "title": "Orange Town",
-      "description": "Luffy and Zoro run afoul of a flashy crew of pirates and their captain, Buggy the Clown. They are joined by a young girl named Nami who helps them navigate this predicament."
+      "originaltitle": "",
+      "description": "Luffy and Zoro run afoul of a flashy crew of pirates and their captain, Buggy the Clown. They are joined by a young girl named Nami who helps them navigate this predicament.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/2/poster.png"
     },
     "3": {
       "saga": "East Blue",
       "title": "Syrup Village",
-      "description": "Luffy's fledgling pirate crew arrives at the slopes of Syrup Village. There they find a liar and a conspiracy to steal a young lady's fortune."
+      "originaltitle": "",
+      "description": "Luffy's fledgling pirate crew arrives at the slopes of Syrup Village. There they find a liar and a conspiracy to steal a young lady's fortune.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/3/poster.png"
     },
     "4": {
       "saga": "East Blue",
       "title": "Gaimon",
-      "description": "With Usopp now on the crew and their new ship, the Going Merry, under their command, the Straw Hats head to an island said to hold a fabled treasure. There they encounter a strange man stuck in a box who has been looking for the same treasure."
+      "originaltitle": "",
+      "description": "With Usopp now on the crew and their new ship, the Going Merry, under their command, the Straw Hats head to an island said to hold a fabled treasure. There they encounter a strange man stuck in a box who has been looking for the same treasure.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/4/poster.png"
     },
     "5": {
       "saga": "East Blue",
       "title": "Baratie",
-      "description": "The Straw Hats head to the ocean-going restaurant, Baratie, with the hopes of recruiting one of their cooks. In the meantime, hungry yet powerful forces gather to lay siege to the restaurant — all while a menacing swordsman from the Grand Line steadily approaches."
+      "originaltitle": "",
+      "description": "The Straw Hats head to the ocean-going restaurant, Baratie, with the hopes of recruiting one of their cooks. In the meantime, hungry yet powerful forces gather to lay siege to the restaurant \u2014 all while a menacing swordsman from the Grand Line steadily approaches.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/5/poster.png"
     },
     "6": {
       "saga": "East Blue",
       "title": "Arlong Park",
-      "description": "Nami's hometown has long been overrun by Arlong and his band of fishmen from the Grand Line. When the Straw Hats arrive, they find that their prospective navigator has left out a few key details about herself."
+      "originaltitle": "",
+      "description": "Nami's hometown has long been overrun by Arlong and his band of fishmen from the Grand Line. When the Straw Hats arrive, they find that their prospective navigator has left out a few key details about herself.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/6/poster.png"
     },
     "7": {
       "saga": "East Blue",
       "title": "The Adventures of Buggy's Crew",
-      "description": "Buggy, after being defeated by Luffy, Zoro, and Nami, begins his quest to regain his body parts and his crew, and then he will get his flashy revenge on Luffy."
+      "originaltitle": "",
+      "description": "Buggy, after being defeated by Luffy, Zoro, and Nami, begins his quest to regain his body parts and his crew, and then he will get his flashy revenge on Luffy.",
+      "poster": ""
     },
     "8": {
       "saga": "East Blue",
       "title": "Loguetown",
-      "description": "The final island before entering the Grand Line: Loguetown. Luffy and his crew drop anchor to stock up, sightsee, and pay their respects to the place where Gold Roger drew his last breath."
+      "originaltitle": "",
+      "description": "The final island before entering the Grand Line: Loguetown. Luffy and his crew drop anchor to stock up, sightsee, and pay their respects to the place where Gold Roger drew his last breath.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/8/poster.png"
     },
     "9": {
       "saga": "Arabasta",
       "title": "Reverse Mountain",
-      "description": "Reverse Mountain is the entrance to the Grand Line. What await the Straw Hats are impossible water currents, a giant whale, and dubious people going by codenames."
+      "originaltitle": "",
+      "description": "Reverse Mountain is the entrance to the Grand Line. What await the Straw Hats are impossible water currents, a giant whale, and dubious people going by codenames.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/9/poster.png"
     },
     "10": {
       "saga": "Arabasta",
       "title": "Whisky Peak",
-      "description": "The first island on the Grand Line is surprisingly welcoming to pirates. But as night falls, a deadly plot unravels."
+      "originaltitle": "",
+      "description": "The first island on the Grand Line is surprisingly welcoming to pirates. But as night falls, a deadly plot unravels.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/10/poster.png"
     },
     "11": {
       "saga": "Arabasta",
       "title": "The Trials of Koby-Meppo",
-      "description": "Koby and Helmeppo are new cabin boys for the marines, but they become unwillingly involved in an escape attempt by Morgan. Their bravery will either earn them the respect of their superiors—as well as Vice Admiral Garp—or it will spell their doom."
+      "originaltitle": "",
+      "description": "Koby and Helmeppo are new cabin boys for the marines, but they become unwillingly involved in an escape attempt by Morgan. Their bravery will either earn them the respect of their superiors\u2014as well as Vice Admiral Garp\u2014or it will spell their doom.",
+      "poster": ""
     },
     "12": {
       "saga": "Arabasta",
       "title": "Little Garden",
-      "description": "The Straw Hats vow to bring Princess Vivi to Arabasta, and their journey brings them to Little Garden, an island from prehistoria that is home to creatures and people larger than life."
+      "originaltitle": "",
+      "description": "The Straw Hats vow to bring Princess Vivi to Arabasta, and their journey brings them to Little Garden, an island from prehistoria that is home to creatures and people larger than life.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/12/poster.png"
     },
     "13": {
       "saga": "Arabasta",
       "title": "Drum Island",
-      "description": "When Nami falls ill, the crew makes a detour from Arabasta to seek medical help. They happen upon a winter island inhabited by a distrusting populace and a single doctor with a mysterious reindeer companion."
+      "originaltitle": "",
+      "description": "When Nami falls ill, the crew makes a detour from Arabasta to seek medical help. They happen upon a winter island inhabited by a distrusting populace and a single doctor with a mysterious reindeer companion.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/13/poster.png"
     },
     "14": {
       "saga": "Arabasta",
       "title": "Arabasta",
-      "description": "Arabasta teeters on the edge of civil war, and it's up to Princess Vivi and the Straw Hats to stem the rebellion, uncover the plot of Baroque Works, and beat the Warlord Crocodile."
+      "originaltitle": "",
+      "description": "Arabasta teeters on the edge of civil war, and it's up to Princess Vivi and the Straw Hats to stem the rebellion, uncover the plot of Baroque Works, and beat the Warlord Crocodile.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/14/poster.png"
     },
     "15": {
       "saga": "Skypiea",
       "title": "Jaya",
-      "description": "The Straw Hats seek the fabled sky island Skypiea and head to Jaya for information on its whereabouts. Their convictions are tested by the pirates of Mock Town, but not everyone on the island is a hardline skeptic."
+      "originaltitle": "",
+      "description": "The Straw Hats seek the fabled sky island Skypiea and head to Jaya for information on its whereabouts. Their convictions are tested by the pirates of Mock Town, but not everyone on the island is a hardline skeptic.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/15/poster.png"
     },
     "16": {
       "saga": "Skypiea",
       "title": "Skypiea",
-      "description": "Arriving at Skypiea, the Straw Hats are instantly met with unfamiliar sights, objects, and customs. What's more, the god of the sky island deems the Blue Sea dwellers to be trespassing and casts his judgment upon them."
+      "originaltitle": "",
+      "description": "Arriving at Skypiea, the Straw Hats are instantly met with unfamiliar sights, objects, and customs. What's more, the god of the sky island deems the Blue Sea dwellers to be trespassing and casts his judgment upon them.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/16/poster.png"
     },
     "17": {
       "saga": "Water Seven",
       "title": "Long Ring Long Land",
-      "description": "On Long Ring Long Land, the Straw Hats are challenged to a Davy Back Fight. As they dive headfirst into a series of games with serious outcomes, the best the Navy has to offer has meanwhile begun to pay closer attention to certain Straw Hat crewmembers."
+      "originaltitle": "",
+      "description": "On Long Ring Long Land, the Straw Hats are challenged to a Davy Back Fight. As they dive headfirst into a series of games with serious outcomes, the best the Navy has to offer has meanwhile begun to pay closer attention to certain Straw Hat crewmembers.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/17/poster.png"
     },
     "18": {
       "saga": "Water Seven",
       "title": "Water Seven",
-      "description": "The Straw Hats make landfall at the glorious city of Water Seven, known worldwide for its unparalleled shipyards. The pirates go to inquire about repairs for their ship, but the city threatens to take their money, their ship, and their crewmates."
+      "originaltitle": "",
+      "description": "The Straw Hats make landfall at the glorious city of Water Seven, known worldwide for its unparalleled shipyards. The pirates go to inquire about repairs for their ship, but the city threatens to take their money, their ship, and their crewmates.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/18/poster.png"
     },
     "19": {
       "saga": "Water Seven",
       "title": "Enies Lobby",
-      "description": "In order to free Nico Robin from the clutches of the World Government, the Straw Hats and their allies must invade the judicial island, Enies Lobby, and take on the government's premiere clandestine unit: CP9."
+      "originaltitle": "",
+      "description": "In order to free Nico Robin from the clutches of the World Government, the Straw Hats and their allies must invade the judicial island, Enies Lobby, and take on the government's premiere clandestine unit: CP9.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/19/poster.png"
     },
     "20": {
       "saga": "Water Seven",
       "title": "Post-Enies Lobby",
-      "description": "The Straw Hats return to Water Seven after the ordeal at Enies Lobby. While there, they are met by a familial vice admiral, and they await news of their new ship."
+      "originaltitle": "",
+      "description": "The Straw Hats return to Water Seven after the ordeal at Enies Lobby. While there, they are met by a familial vice admiral, and they await news of their new ship.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/20/poster.png"
     },
     "21": {
       "saga": "Thriller Bark",
       "title": "Thriller Bark",
-      "description": "The Straw Hats' next destination is Fishman Island, but first they must traverse the dreaded Florian Triangle which is known for many eerie and mysterious things such as disappearing crews, conversational skeletons, and a floating island full of zombies and other horrors."
+      "originaltitle": "",
+      "description": "The Straw Hats' next destination is Fishman Island, but first they must traverse the dreaded Florian Triangle which is known for many eerie and mysterious things such as disappearing crews, conversational skeletons, and a floating island full of zombies and other horrors.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/21/poster.png"
     },
     "22": {
       "saga": "Summit War",
       "title": "Sabaody Archipelago",
-      "description": "The second half of the Grand Line lays just ahead, so the Straw Hats stop at Sabaody Archipelago to plan the way forward. But being so close to the Holy Land and Navy Headquarters, Luffy's crew comes face-to-face with the darkest forces of the World Government."
+      "originaltitle": "",
+      "description": "The second half of the Grand Line lays just ahead, so the Straw Hats stop at Sabaody Archipelago to plan the way forward. But being so close to the Holy Land and Navy Headquarters, Luffy's crew comes face-to-face with the darkest forces of the World Government.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/22/poster.png"
     },
     "23": {
       "saga": "Summit War",
       "title": "Amazon Lily",
-      "description": "Luffy is separated from his crew, and he finds himself on an unfamiliar island in the middle of the Calm Belt... an island inhabited only by women where men are prohibited from entering."
+      "originaltitle": "",
+      "description": "Luffy is separated from his crew, and he finds himself on an unfamiliar island in the middle of the Calm Belt... an island inhabited only by women where men are prohibited from entering.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/23/poster.png"
     },
     "24": {
       "saga": "Summit War",
       "title": "Impel Down",
-      "description": "Luffy launches a daring rescue mission to break his big brother Ace from the government prison, Impel Down. It's a race to the prison's lowest levels — a literal journey through hell itself."
+      "originaltitle": "",
+      "description": "Luffy launches a daring rescue mission to break his big brother Ace from the government prison, Impel Down. It's a race to the prison's lowest levels \u2014 a literal journey through hell itself.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/24/poster.png"
     },
     "25": {
       "saga": "Summit War",
       "title": "The Adventures of the Straw Hats",
+      "originaltitle": "If You Could Go Anywhere... The Adventures of the Straw Hats",
       "description": "Somewhere in the world... Sanji resists, while Robin meets terrible people. Franky's not himself, and Usopp learns to survive. Chopper avoids becoming food, and Nami reports on the weather. Brook is repaid in underpants, and Zoro... is lost and annoyed.",
-      "originaltitle": "If You Could Go Anywhere... The Adventures of the Straw Hats"
+      "poster": ""
     },
     "26": {
       "saga": "Summit War",
       "title": "Marineford",
-      "description": "Pirate Whitebeard and his allies on one side; the Navy and its Seven Warlords on the other. At the center of it all: Portgas D. Ace and his unspeakable past and heritage. Luffy races to Ace's execution scaffold as a battle between the world's most powerful people unfolds."
+      "originaltitle": "",
+      "description": "Pirate Whitebeard and his allies on one side; the Navy and its Seven Warlords on the other. At the center of it all: Portgas D. Ace and his unspeakable past and heritage. Luffy races to Ace's execution scaffold as a battle between the world's most powerful people unfolds.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/26/poster.png"
     },
     "27": {
       "saga": "Summit War",
       "title": "Post-War",
-      "description": "The war has taken its toll on the world, and Luffy reminisces about younger days when he first met Ace and became his brother. To become strong enough to withstand the New World, Luffy must make a critical decision for himself and his crew."
+      "originaltitle": "",
+      "description": "The war has taken its toll on the world, and Luffy reminisces about younger days when he first met Ace and became his brother. To become strong enough to withstand the New World, Luffy must make a critical decision for himself and his crew.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/27/poster.png"
     },
     "28": {
       "saga": "Fishman Island",
       "title": "Return to Sabaody",
-      "description": "Two years have passed since the Straw Hats were forcibly separated, and they reconvene back at Sabaody stronger and even more committed to the journey ahead."
+      "originaltitle": "",
+      "description": "Two years have passed since the Straw Hats were forcibly separated, and they reconvene back at Sabaody stronger and even more committed to the journey ahead.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/28/poster.png"
     },
     "29": {
       "saga": "Fishman Island",
       "title": "Fishman Island",
-      "description": "The path the to the New World takes the Straw Hats thousands of leagues under the sea to the underwater Fishman Island. However, the island's dark past is reaching a breaking point, and Luffy and his crew are caught in the middle of the conflict."
+      "originaltitle": "",
+      "description": "The path the to the New World takes the Straw Hats thousands of leagues under the sea to the underwater Fishman Island. However, the island's dark past is reaching a breaking point, and Luffy and his crew are caught in the middle of the conflict.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/29/poster.png"
     },
     "30": {
       "saga": "Dressrosa",
       "title": "Punk Hazard",
-      "description": "The first island of the New World is a strange place covered in flames on one half, and freezing temperatures on the other. What seems at first to be an unlivable place later reveals a laboratory, a maniac scientist, and a certain Warlord of the Sea."
+      "originaltitle": "",
+      "description": "The first island of the New World is a strange place covered in flames on one half, and freezing temperatures on the other. What seems at first to be an unlivable place later reveals a laboratory, a maniac scientist, and a certain Warlord of the Sea.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/30/poster.png"
     },
     "31": {
       "saga": "Dressrosa",
       "title": "Dressrosa",
-      "description": "Luffy's alliance with Law brings him next to Dressrosa to take down Doflamingo's booming business. But the crazed warlord and self-proclaimed ruler of Dressrosa has control over everyone and everything."
+      "originaltitle": "",
+      "description": "Luffy's alliance with Law brings him next to Dressrosa to take down Doflamingo's booming business. But the crazed warlord and self-proclaimed ruler of Dressrosa has control over everyone and everything.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/31/poster.png"
     },
     "32": {
       "saga": "Four Emperors",
       "title": "Zou",
-      "description": "Zou cannot be reached by conventional means, nor is it easy to enter once one finds it. Within its secretive walls lie the Mink Tribe, and the Straw Hats soon discover that the people of Zou hold a piece of the puzzle that unlocks the mysteries of the world."
+      "originaltitle": "",
+      "description": "Zou cannot be reached by conventional means, nor is it easy to enter once one finds it. Within its secretive walls lie the Mink Tribe, and the Straw Hats soon discover that the people of Zou hold a piece of the puzzle that unlocks the mysteries of the world.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/32/poster.png"
     },
     "33": {
       "saga": "Four Emperors",
       "title": "Whole Cake Island",
-      "description": "Luffy will not sail the seas without his cook, so he stubbornly goes after Sanji to Whole Cake Island. However, knocking on an emperor's door is easier said than done."
+      "originaltitle": "",
+      "description": "Luffy will not sail the seas without his cook, so he stubbornly goes after Sanji to Whole Cake Island. However, knocking on an emperor's door is easier said than done.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/33/poster.png"
     },
     "34": {
       "saga": "Four Emperors",
       "title": "Reverie",
-      "description": "Every four years, the leaders of the world gather at the Holy Land to discuss a mutually agreed upon path for the government. During this particular Reverie, many parties with their own agendas arrive... and some are uninvited."
+      "originaltitle": "",
+      "description": "Every four years, the leaders of the world gather at the Holy Land to discuss a mutually agreed upon path for the government. During this particular Reverie, many parties with their own agendas arrive... and some are uninvited.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/34/poster.png"
     },
     "35": {
       "saga": "Four Emperors",
       "title": "Wano",
-      "description": "The Straw Hats finally regroup in Wano to carry out theirs and their allies' ultimate goal: to see to the Emperor Kaido's downfall and restore the Kozuki family to its rightful place of power."
+      "originaltitle": "",
+      "description": "The Straw Hats finally regroup in Wano to carry out theirs and their allies' ultimate goal: to see to the Emperor Kaido's downfall and restore the Kozuki family to its rightful place of power.",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/35/poster.png"
     },
     "36": {
       "saga": "Final Saga",
       "title": "Egghead",
-      "description": "Futuristic tech, giant alien monsters, battle robots, superhuman clones... Who are all these people calling themselves Dr. Vegapunk, and why is the government after one of their own?"
+      "originaltitle": "",
+      "description": "Futuristic tech, giant alien monsters, battle robots, superhuman clones... Who are all these people calling themselves Dr. Vegapunk, and why is the government after one of their own?",
+      "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/36/poster.png"
     }
   },
   "episodes": {
@@ -464,7 +537,10 @@
       "description": "Despite his internal injuries and Luffy's warnings, the prideful giant Dorry insists on continuing his duel with Brogy. Meanwhile, the Baroque Works officer agents begin to make their move on the island with the Straw Hats as their next targets.",
       "manga_chapters": "119-122",
       "anime_episodes": "73-74",
-      "released": "2020-09-11"
+      "released": "2025-04-18",
+      "hashes": {
+        "crc32": "0AB937B1"
+      }
     },
     "0B51015F": {
       "season": 34,
@@ -762,13 +838,13 @@
     },
     "15D77CB3": {
       "season": 5,
-      "episode": 4,
+      "episode": 3,
       "title": "The Oath",
       "sorttitle": "Oath",
       "description": "As Nami steals the Going Merry, Hawk-Eye Mihawk, known far and wide as the world's greatest swordsman, arrives all the way from the Grand Line to finish off Don Krieg. However, Zoro challenges the deadly Mihawk to a duel in order to achieve his dream.",
-      "manga_chapters": "50-52",
+      "manga_chapters": "48-52",
       "anime_episodes": "23-24, 29, 135",
-      "released": "2023-05-02",
+      "released": "2025-08-10",
       "hashes": {
         "crc32": "15D77CB3"
       }
@@ -1002,6 +1078,19 @@
       "released": "2013-06-09",
       "hashes": {
         "crc32": "216595EE"
+      }
+    },
+    "21BF9495": {
+      "season": 36,
+      "episode": 15,
+      "title": "Let's Go and Take It!!",
+      "originaltitle": "Let's Go and Take It!",
+      "description": "While Cross Guild grows into a serious concern for the Marines, Buggy makes an impassioned speech to spur his crew into a zealous fervor. Additionally, Sabo returns to his comrades and begins his report on the events that happened at the Reverie.",
+      "manga_chapters": "1082-1083",
+      "anime_episodes": "1116-1117",
+      "released": "2025-08-24",
+      "hashes": {
+        "crc32": "21BF9495"
       }
     },
     "224B7846": {
@@ -1643,7 +1732,7 @@
       "description": "While Koby desperately attempts to flee Beehive, Cross Guild's bounty entices the hundreds of pirates there to hunt him down. But before they can seal his fate and claim the prize, a familiar Marine warship descends from the sky!",
       "manga_chapters": "1080-1081",
       "anime_episodes": "1113-1115",
-      "released": "2025-08-09",
+      "released": "2025-08-10",
       "hashes": {
         "crc32": "3C0010BE"
       }
@@ -1922,7 +2011,7 @@
       "description": "Eustass \"Captain\" Kid sails in, guns blazing against Elbaph while Shanks of the Red Hair Pirates defends his crew and friends... without an ounce of mercy.",
       "manga_chapters": "1079",
       "anime_episodes": "1112",
-      "released": "2024-09-06",
+      "released": "2025-06-30",
       "hashes": {
         "crc32": "482F69B7"
       }
@@ -2638,7 +2727,10 @@
       "description": "Usopp, immensely impressed with the giants of Elbaph, names Brogy his master. To commemorate their duel, the giants imbibe two barrels of booze from Nami, but, unbeknownst to anyone, a saboteur has tampered with one of them!",
       "manga_chapters": "117-118",
       "anime_episodes": "71-72",
-      "released": "2020-08-04"
+      "released": "2025-04-18",
+      "hashes": {
+        "crc32": 64714640
+      }
     },
     "64E446D3": {
       "season": 35,
@@ -2752,9 +2844,9 @@
     },
     "6858E16A": {
       "season": 5,
-      "episode": 4,
-      "title": "Pearl",
-      "description": "Mihawk departs after defeating Zoro, and Krieg continues his assault on the Baratie. Pearl, one of Krieg's strongest men, goes on the offensive with fiery attacks and multiple shields at his disposal, so Sanji reveals his unique fighting style.",
+      "episode": 5,
+      "title": "Because of a Dream",
+      "description": "Sanji continues to battle Pearl, but Gin cleverly holds Chef Zeff hostage, forcing Sanji an impossible situation. Sanji's childhood memories flood his mind, and he reflects on why Zeff means so much to him.",
       "manga_chapters": "53-55",
       "anime_episodes": "25",
       "released": "2023-05-15",
@@ -2823,6 +2915,18 @@
         "crc32": "6AAC9B33"
       }
     },
+    "6AE11B21": {
+      "season": 36,
+      "episode": 19,
+      "title": "Hostage Situation",
+      "description": "In the Labophase on Egghead, which is completely surrounded by the Marines, Luffy and the others devise a plan to escape the island. However, the Frontier Dome, the laser defense system, cannot be deactivated without York's secret passcode.",
+      "manga_chapters": "1089-1090",
+      "anime_episodes": "1123-1124",
+      "released": "2025-08-29",
+      "hashes": {
+        "crc32": "6AE11B21"
+      }
+    },
     "6BD41435": {
       "season": 26,
       "episode": 12,
@@ -2845,7 +2949,7 @@
       "description": "Eustass \"Captain\" Kid sails in, guns blazing against Elbaph while Shanks of the Red Hair Pirates defends his crew and friends... without an ounce of mercy.",
       "manga_chapters": "1079",
       "anime_episodes": "1112",
-      "released": "2024-09-06",
+      "released": "2025-06-30",
       "hashes": {
         "crc32": "6C170189"
       }
@@ -3317,6 +3421,18 @@
         "crc32": "7926F9B5"
       }
     },
+    "792BE789": {
+      "season": 5,
+      "episode": 4,
+      "title": "Pearl",
+      "description": "Mihawk departs after defeating Zoro, and Krieg continues his assault on the Baratie. Pearl, one of Krieg's strongest men, goes on the offensive with fiery attacks and multiple shields at his disposal, so Sanji reveals his unique fighting style.",
+      "manga_chapters": "53-55",
+      "anime_episodes": "25",
+      "released": "2025-08-18",
+      "hashes": {
+        "crc32": "792BE789"
+      }
+    },
     "7A559716": {
       "season": 6,
       "episode": 4,
@@ -3325,6 +3441,19 @@
       "manga_chapters": "77-78",
       "anime_episodes": "34-36",
       "released": "2025-01-24"
+    },
+    "7A93DCC5": {
+      "season": 36,
+      "episode": 16,
+      "title": "The Attempted Murder of a Celestial Dragon",
+      "sorttitle": "Attempted Murder of a Celestial Dragon",
+      "description": "During the Reverie, Sabo and Bonney met and worked together toward the same goal. King Cobra also met with the Five Elders to ask some hard questions, in the process learning the dark truth of the world.",
+      "manga_chapters": "1084-1085",
+      "anime_episodes": "1118-1119",
+      "released": "2025-08-29",
+      "hashes": {
+        "crc32": "7A93DCC5"
+      }
     },
     "7CAE5640": {
       "season": 21,
@@ -3799,6 +3928,18 @@
         "crc32": 93376225
       }
     },
+    "93B80191": {
+      "season": 36,
+      "episode": 19,
+      "title": "Hostage Situation",
+      "description": "In the Labophase on Egghead, which is completely surrounded by the Marines, Luffy and the others devise a plan to escape the island. However, the Frontier Dome, the laser defense system, cannot be deactivated without York's secret passcode.",
+      "manga_chapters": "1089-1090",
+      "anime_episodes": "1123-1124",
+      "released": "2025-08-29",
+      "hashes": {
+        "crc32": "93B80191"
+      }
+    },
     "94E2099D": {
       "season": 29,
       "episode": 20,
@@ -3988,7 +4129,7 @@
       "description": "Luffy is on hiatus from pirating to work as a cabin boy to pay off the damage done to the Baratie. While he tries to convince Sanji to join his crew, the pirate Gin brings the infamous Don Krieg and his starving forces to the sea restaurant.",
       "manga_chapters": "45-47",
       "anime_episodes": "21-23",
-      "released": "2025-08-09",
+      "released": "2025-08-10",
       "hashes": {
         "crc32": "9BD35F80"
       }
@@ -4402,6 +4543,18 @@
         "crc32": "ACD6AA5F"
       }
     },
+    "ACEA0537": {
+      "season": 5,
+      "episode": 5,
+      "title": "Because of a Dream",
+      "description": "Sanji continues to battle Pearl, but Gin cleverly holds Chef Zeff hostage, forcing Sanji an impossible situation. Sanji's childhood memories flood his mind, and he reflects on why Zeff means so much to him.",
+      "manga_chapters": "56-59",
+      "anime_episodes": "26",
+      "released": "2025-08-24",
+      "hashes": {
+        "crc32": "ACEA0537"
+      }
+    },
     "ACF1C889": {
       "season": 30,
       "episode": 5,
@@ -4690,7 +4843,7 @@
       "description": "The Straw Hats happen across Zoro's former partners, Yosaku and Johnny, whose dietary dilemma reminds the pirates they still need a cook on their ship. Thus, they set sail for the sea restaurant Baratie, hoping to snag a chef.",
       "manga_chapters": "42-44",
       "anime_episodes": "19-21",
-      "released": "2025-08-01",
+      "released": "2025-08-02",
       "hashes": {
         "crc32": "BE634289"
       }
@@ -5023,7 +5176,7 @@
       "description": "While Koby desperately attempts to flee Beehive, Cross Guild's bounty entices the hundreds of pirates there to hunt him down. But before they can seal his fate and claim the prize, a familiar Marine warship descends from the sky!",
       "manga_chapters": "1080-1081",
       "anime_episodes": "1113-1115",
-      "released": "2025-08-09",
+      "released": "2025-08-10",
       "hashes": {
         "crc32": "CA3683BA"
       }

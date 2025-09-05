@@ -65,7 +65,7 @@ def update():
             logger.info("--------------------------")
 
             try:
-                resp = httpx.get("https://raw.githubusercontent.com/one-pace/one-pace-public-subtitles/refs/heads/main/main/title.properties", follow_redirects=True)
+                resp = client.get("https://raw.githubusercontent.com/one-pace/one-pace-public-subtitles/refs/heads/main/main/title.properties", follow_redirects=True)
                 title_props = javaproperties.loads(resp.text)
 
             except:
@@ -81,7 +81,7 @@ def update():
                         continue
 
                     arc_name = match.group("arc")
-                    ep_num = f"{int(match.group("num"))}"
+                    ep_num = f"{int(match.group('num'))}"
 
                     if arc_name not in arc_name_to_id:
                         if arc_name == "loguetown":
@@ -112,11 +112,11 @@ def update():
                         continue
 
                     part = int(row['part'])
-                    title = row['title_en']
+                    title = row['title_en'].strip()
 
-                    if part == 11:
+                    if part == 11 and title.startswith("Whisk"):
                         part = 10
-                    elif part == 10:
+                    elif part == 10 and title.startswith("The Trials"):
                         part = 11
                     elif part == 99:
                         part = 0
@@ -126,7 +126,9 @@ def update():
                     out_seasons[part] = {
                         "saga": row['saga_title'],
                         "title": title,
-                        "description": row['description_en']
+                        "originaltitle": "",
+                        "description": row['description_en'],
+                        "poster": ""
                     }
 
                     logger.success(f"{part}. {title}")
@@ -154,17 +156,41 @@ def update():
 
                     logger.info(f"-- Renaming to: {out_seasons[season]['title']}")
 
+                try:
+                    poster_path = Path(".", "data", "posters", f"{season}", "poster.png")
+
+                    if not poster_path.exists():
+                        poster_path.parent.mkdir(exist_ok=True)
+
+                        spreadsheet_html = client.get(f"https://docs.google.com/spreadsheets/u/0/d/{ONE_PACE_EPISODE_GUIDE_ID}/htmlview/sheet?headers=true&gid={sheetId}", follow_redirects=True)
+                        img = BeautifulSoup(spreadsheet_html.text, "html.parser").find("img")
+
+                        if img and img.get("src", "") != "":
+                            with poster_path.open(mode='wb') as f:
+                                with client.stream("GET", img["src"], follow_redirects=True) as resp:
+                                    for chunk in resp.iter_bytes():
+                                        f.write(chunk)
+
+                            logger.success(f"-- Saved poster to {poster_path}")
+
+                    if poster_path.exists():
+                        out_seasons[season]['poster'] = f"https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/{season}/{poster_path.name}"
+
+                except:
+                    logger.exception("-- Skipping fetching poster")
+
                 with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_GUIDE_ID}/export?gid={sheetId}&format=csv", follow_redirects=True) as resp:
                     reader = CSVReader(resp.iter_lines())
 
-                    for row in reader:
+                    for _row in reader:
+                        row = {}
+                        for k, v in _row.items():
+                            row[k.strip()] = v
+
                         if 'MKV CRC32' not in row:
                             continue
 
                         id = row['One Pace Episode'].strip() if 'One Pace Episode' in row else ''
-                        if id == '' and ' One Pace Episode' in row:
-                            id = row[' One Pace Episode'].strip()
-
                         chapters = row['Chapters'].strip() if 'Chapters' in row else ''
                         anime_episodes = row['Episodes'].strip() if 'Episodes' in row else ''
                         release_date = row['Release Date'].strip() if 'Release Date' in row else ''
@@ -219,7 +245,7 @@ def update():
                             logger.info(f"-- Aliasing {mkv_crc32_ext} -> {mkv_crc32}")
                             out_episodes[mkv_crc32_ext] = out_episodes[mkv_crc32]
 
-                        key = f"{out_seasons[season]['originaltitle']} {episode}" if 'originaltitle' in out_seasons[season] else f"{out_seasons[season]['title']} {episode}"
+                        key = f"{out_seasons[season]['originaltitle']} {episode}" if 'originaltitle' in out_seasons[season] and out_seasons[season]['originaltitle'] != "" else f"{out_seasons[season]['title']} {episode}"
                         if key in season_eps:
                             season_eps[key].append(mkv_crc32)
 
@@ -255,8 +281,8 @@ def update():
                             continue
 
                         pub_date = datetime.strptime(item.pub_date.content, "%a, %d %b %Y %H:%M:%S %z")
-                        if now - pub_date > timedelta(hours=24):
-                            logger.warning(f"Skipping: {item.title.content} (more than 24 hours)")
+                        if now - pub_date > timedelta(hours=72):
+                            logger.warning(f"Skipping: {item.title.content} (more than 72 hours)")
                             continue
 
                         r = httpx.get(item.guid.content)
@@ -431,25 +457,47 @@ def sort_dict(d):
 
 def dict_changed(old, new):
     changed = DeepDiff(old, new)
+
     for i in ['dictionary_item_added', 'dictionary_item_removed', 'values_changed']:
         if i in changed:
             return True
 
     return False
 
+def unicode_fix_dict(d):
+    new_dict = {}
+
+    for key in d.keys():
+        str_key = str(key)
+        new_dict[str_key] = {}
+
+        for inner_key, val in d[key].items():
+            if isinstance(val, date) or isinstance(val, datetime):
+                new_dict[str_key][inner_key] = val.isoformat()
+            elif isinstance(val, str):
+                new_dict[str_key][inner_key] = unicode_fix(val)
+            elif not (inner_key == "season" or inner_key == "episode") and (isinstance(val, int) or isinstance(val, float)):
+                new_dict[str_key][inner_key] = str(val)
+            else:
+                new_dict[str_key][inner_key] = val
+
+    return new_dict
+
 def generate_json():
     tvshow_yml = Path(".", "data", "tvshow.yml")
     seasons_yml = Path(".", "data", "seasons.yml")
     episodes_dir = Path(".", "data", "episodes")
+    data_yml = Path(".", "data", "data.yml")
     json_file = Path(".", "data.json")
 
-    out = {"last_update": datetime.now(timezone.utc).isoformat()}
+    tvshow = {}
+    seasons = {}
 
     with tvshow_yml.open(mode='r', encoding='utf-8') as f:
-        out["tvshow"] = YamlLoad(stream=f)
+        tvshow = YamlLoad(stream=f)
 
     with seasons_yml.open(mode='r', encoding='utf-8') as f:
-        out["seasons"] = sort_dict(YamlLoad(stream=f))
+        seasons = sort_dict(YamlLoad(stream=f))
 
     episodes = {}
 
@@ -463,23 +511,16 @@ def generate_json():
             with Path(episodes_dir, f"{episodes[key]['reference']}.yml").open(mode='r', encoding='utf-8') as f:
                 episodes[key] = YamlLoad(stream=f)
 
-        for inner_key, val in episodes[key].items():
-            if inner_key == "season" or inner_key == "episode":
-                continue
-            elif isinstance(val, date) or isinstance(val, datetime):
-                episodes[key][inner_key] = val.isoformat()
-            elif isinstance(val, str):
-                episodes[key][inner_key] = unicode_fix(val)
-            elif isinstance(val, int) or isinstance(val, float):
-                episodes[key][inner_key] = str(val)
-
-    out["episodes"] = sort_dict(episodes)
+    episodes = sort_dict(episodes)
 
     try:
-        old_json = orjson.loads(json_file.read_bytes())
-        episodes_changed = dict_changed(old_json["episodes"], out["episodes"])
-        seasons_changed = dict_changed(old_json["seasons"], out["seasons"])
-        tvshow_changed = dict_changed(old_json["tvshow"], out["tvshow"])
+        old = {}
+        with data_yml.open(mode='r', encoding='utf-8') as f:
+            old = YamlLoad(stream=f)
+
+        episodes_changed = dict_changed(old["episodes"], episodes)
+        seasons_changed = dict_changed(old["seasons"], seasons)
+        tvshow_changed = dict_changed(old["tvshow"], tvshow)
     except Exception as e:
         print(f"Warning: {e}")
         episodes_changed = True
@@ -487,7 +528,22 @@ def generate_json():
         tvshow_changed = True
 
     if episodes_changed or seasons_changed or tvshow_changed:
-        out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
+        last_update = datetime.now(timezone.utc).isoformat()
+
+        with data_yml.open(mode='w') as f:
+            YamlDump(data={
+                "last_update": last_update,
+                "tvshow": tvshow,
+                "seasons": seasons,
+                "episodes": episodes
+            }, stream=f, allow_unicode=True, sort_keys=False)
+
+        out = orjson.dumps({
+            "last_update": last_update,
+            "tvshow": tvshow,
+            "seasons": [v for v in unicode_fix_dict(seasons).values()],
+            "episodes": unicode_fix_dict(episodes)
+        }, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
         json_file.write_bytes(out)
 
 def main():

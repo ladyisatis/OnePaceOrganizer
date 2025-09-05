@@ -1,1531 +1,544 @@
 import asyncio
-import concurrent.futures
-import datetime
-import enzyme
-import xml.etree.ElementTree as ET
-import functools
-import hashlib
-import httpx
-import orjson
-import os
-import plexapi
-import re
-import shutil
 import sys
-import tomllib
 import traceback
-import yaml
-import zlib
 
-from plexapi.exceptions import TwoFactorRequired as PlexApiTwoFactorRequired, Unauthorized as PlexApiUnauthorized
-from plexapi.myplex import MyPlexAccount
-from pathlib import Path, UnsupportedOperation
-from multiprocessing import freeze_support
+from aiopath import AsyncPath
+from functools import partial as func_partial
+from pathlib import Path
+from loguru import logger
+from src import utils, organizer
 
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QLineEdit, QFileDialog, QCheckBox, QComboBox, QTextEdit, QProgressBar,
-    QGroupBox, QMessageBox, QInputDialog
+    QGroupBox, QMessageBox, QInputDialog, QMainWindow
 )
+from PySide6.QtGui import QAction
 from PySide6.QtCore import Qt
-import PySide6.QtAsyncio as QtAsyncio
-
-async def run_sync(func, *args, **kwargs):
-    loop = kwargs.pop("loop") if "loop" in kwargs else asyncio.get_event_loop()
-    executor = kwargs.pop("executor") if "executor" in kwargs else None
-    return await loop.run_in_executor(executor, functools.partial(func, *args, **kwargs))
-
-async def read_chunks(file, loop=None):
-    if loop == None:
-        loop = asyncio.get_event_loop()
-
-    with file.open(mode='rb') as f:
-        while chunk := await run_sync(f.read, 1024 * 1024, loop=loop):
-            yield chunk
-
-async def glob(file, pattern):
-    for path in await run_sync(file.glob, pattern):
-        yield path
-
-async def async_blake2s_16(video_file, loop=None):
-    if loop == None:
-        loop = asyncio.get_event_loop()
-
-    h = hashlib.blake2s()
-
-    async for chunk in read_chunks(video_file, loop):
-        await run_sync(h.update, chunk, loop=loop)
-
-    res = (await run_sync(h.hexdigest, loop=loop))[:16]
-    return res.lower()
-
-def _crc32_worker(video_file):
-    crc_value = 0
-
-    try:
-        with Path(video_file).open(mode='rb') as f:
-            while chunk := f.read(1024 * 1024):
-                crc_value = zlib.crc32(chunk, crc_value)
-
-    except Exception as e:
-        return (video_file, str(e), "")
-
-    res = f"{crc_value & 0xFFFFFFFF:08x}"
-    return (video_file, "", res.upper())
-
-async def compare_file(file1, file2):
-    with file1.open(mode='rb') as f1, file2.open(mode='rb') as f2:
-        while True:
-            c1 = await run_sync(f1.read, 131072)
-            c2 = await run_sync(f2.read, 131072)
-
-            if not c1 and not c2:
-                return True
-
-            if c1 != c2:
-                return False
-
-    return True
-
-async def download(url, out):
-    base_url = "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/"
-
-    if not isinstance(out, Path):
-        out = Path(out)
-
-    if not out.parent.is_dir():
-        out.parent.mkdir(exist_ok=True)
-
-    resp = await run_sync(httpx.get, f"{base_url}{url}", follow_redirects=True)
-    await run_sync(out.write_bytes, resp.content)
 
 class Input:
-    def __init__(self, layout, label, prop, btn="", btn_connect=None, set=False, width=250):
+    def __init__(self, layout, label, prop, width=250, button="", connect=None):
         self.layout = QHBoxLayout()
         self.label = QLabel(label)
-
-        font_metrics = self.label.fontMetrics()
-        label_width = font_metrics.boundingRect(label).width()
-        if label_width > width:
-            width = label_width
-
-        self.label.setFixedWidth(width + 10)
-        self.layout.addWidget(self.label)
-
         self.prop = prop
-        self.layout.addWidget(self.prop, stretch=1)
 
-        if btn != "":
-            self.btn = QPushButton(btn)
-            if btn_connect != None:
-                self.btn.clicked.connect(btn_connect)
+        label_width = self.label.fontMetrics().boundingRect(label).width()
+        self.label.setFixedWidth((label_width if label_width > width else width) + 10)
 
-            self.layout.addWidget(self.btn)
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(prop, stretch=1)
+
+        if button != "":
+            self.button = QPushButton(button)
+            self.layout.addWidget(self.button)
+
+            if connect != None:
+                self.button.connect(connect)
         else:
-            self.btn = None
+            self.button = None
 
-        layout.addLayout(self.layout)
+        layout.addLayout(layout)
 
-    def setVisible(self, is_visible):
+    def setVisible(is_visible):
         self.label.setVisible(is_visible)
         self.prop.setVisible(is_visible)
-        if self.btn != None:
-            self.btn.setVisible(is_visible)
 
-class OnePaceOrganizer(QWidget):
-    def __init__(self):
+        if self.button is not None:
+            self.button.setVisible(is_visible)
+
+class GUI(QMainWindow):
+    def __init__(self, organizer=None, log_level="info"):
         super().__init__()
 
-        self.tvshow = {}
-        self.episodes = {}
-        self.seasons = {}
+        self.log_level = log_level.upper()
+        self.log_output = QTextEdit()
+        self.log_output.setReadOnly(True)
 
-        self.plex_width = 125
-        self.version = "?"
-        self.spacer = "------------------------------------------------------------------"
-        self.config_file = Path(".", "config.json")
+        logger.add(
+            self.log_output.append, 
+            level=self.log_level, 
+            format="[{time}] [{level: <8}] {message}", 
+            colorize=False, 
+            enqueue=True
+        )
 
-        self.input_path = ""
-        self.output_path = ""
-        self.file_action = 0
-        self.fetch_posters = True
-
-        self.plexapi_account = None
-        self.plexapi_server = None
-        self.plex_config_enabled = False
-        self.plex_config_url = "http://127.0.0.1:32400"
-
-        self.plex_config_servers = {}
-        self.plex_config_server_id = ""
-
-        self.plex_config_libraries = {}
-        self.plex_config_library_key = None
-
-        self.plex_config_shows = {}
-        self.plex_config_show_guid = None
-
-        self.plex_config_use_token = False
-        self.plex_config_auth_token = ""
-        self.plex_config_username = ""
-        self.plex_config_password = ""
-        self.plex_config_remember = True
-
-        self.load_config()
-
-        self.setWindowTitle(f"One Pace Organizer v{self.version} - github.com/ladyisatis/OnePaceOrganizer")
+        self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
+        self.setWindowTitle(self.organizer.window_title)
         self.setMinimumSize(800, 600)
-        self.setup_ui()
 
-    def load_config(self):
-        in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
-        toml_path = Path(sys._MEIPASS, 'pyproject.toml') if in_bundle else Path('.', 'pyproject.toml')
+        self.organizer.message_dialog_func = self._message_dialog
+        self.organizer.input_dialog_func = self._input_dialog
+        self.plex_width = 125
+        self.spacer = "------------------------------------------------------------------"
 
-        if toml_path.is_file():
-            with toml_path.open(mode="rb") as f:
-                t = tomllib.load(f)
-                self.version = t["project"]["version"]
+        widget = QWidget()
+        self.setCentralWidget(widget)
+        layout = QVBoxLayout(widget)
 
-        if self.config_file.is_file():
-            config = orjson.loads(self.config_file.read_bytes())
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setValue(0)
+        self.organizer.progress_bar_func = self.progress_bar.setValue
 
-            if "path_to_eps" in config:
-                self.input_path = Path(config["path_to_eps"]).resolve()
+        self.input = Input(layout, "Directory of unsorted One Pace .mkv/.mp4 files:", QLineEdit(), "Browse...", self.browse_input_folder)
+        self.input.prop.setText(str(self.organizer.input_path))
+        self.input.prop.setPlaceholderText(str(Path.home() / "Downloads"))
 
-            if "episodes" in config:
-                self.output_path = Path(config["episodes"]).resolve()
-
-            if "move_after_sort" in config:
-                self.file_action = 0 if config["move_after_sort"] else 1
-
-            if "file_action" in config:
-                self.file_action = config["file_action"]
-
-            if "fetch_posters" in config:
-                self.fetch_posters = config["fetch_posters"]
-
-            if "plex" in config:
-                if "enabled" in config["plex"]:
-                    self.plex_config_enabled = config["plex"]["enabled"]
-
-                if "url" in config["plex"]:
-                    self.plex_config_url = config["plex"]["url"]
-
-                if "servers" in config["plex"] and isinstance(config["plex"]["servers"], dict):
-                    self.plex_config_servers = config["plex"]["servers"]
-                    for server_id, item in self.plex_config_servers.items():
-                        if item["selected"]:
-                            self.plex_config_server_id = server_id
-                            break
-
-                if "libraries" in config["plex"] and isinstance(config["plex"]["libraries"], dict):
-                    self.plex_config_libraries = config["plex"]["libraries"]
-                    for library_key, item in self.plex_config_libraries.items():
-                        if item["selected"]:
-                            self.plex_config_library_key = library_key
-                            break
-
-                if "shows" in config["plex"] and isinstance(config["plex"]["shows"], dict):
-                    self.plex_config_shows = config["plex"]["shows"]
-                    for show_guid, item in self.plex_config_shows.items():
-                        if item["selected"]:
-                            self.plex_config_show_guid = show_guid
-                            break
-
-                if "use_token" in config["plex"]:
-                    self.plex_config_use_token = config["plex"]["use_token"]
-
-                if "token" in config["plex"]:
-                    self.plex_config_auth_token = config["plex"]["token"]
-
-                if "username" in config["plex"]:
-                    self.plex_config_username = config["plex"]["username"]
-
-                if "password" in config["plex"]:
-                    self.plex_config_password = config["plex"]["password"]
-
-                if "remember" in config["plex"]:
-                    self.plex_config_remember = config["plex"]["remember"]
-
-    def save_config(self):
-        self.config_file.write_bytes(orjson.dumps({
-            "path_to_eps": str(self.input_path),
-            "episodes": str(self.output_path),
-            "file_action": self.file_action,
-            "fetch_posters": self.fetch_posters,
-            "plex": {
-                "enabled": self.plex_config_enabled,
-                "url": self.plex_config_url,
-
-                "servers": self.plex_config_servers,
-                "libraries": self.plex_config_libraries,
-                "shows": self.plex_config_shows,
-
-                "use_token": self.plex_config_use_token,
-                "token": self.plex_config_auth_token,
-                "username": self.plex_config_username,
-                "password": self.plex_config_password,
-                "remember": self.plex_config_remember
-            }
-        }, option=orjson.OPT_NON_STR_KEYS ))
-
-    def setup_ui(self):
-        layout = QVBoxLayout()
-
-        self.input = Input(
-            layout, 
-            "Directory of unsorted One Pace .mkv/.mp4 files:",
-            QLineEdit(),
-            btn="Browse...",
-            btn_connect=self.browse_input_folder
-        )
-        self.input.prop.setText(str(self.input_path))
-        self.input.prop.setPlaceholderText(str(Path(".", "in").resolve()))
-
-        _output_label_txt = "Move"
-        if self.file_action == 1:
-            _output_label_txt = "Copy"
-        elif self.file_action == 2:
-            _output_label_txt = "Symlink"
-        elif self.file_action == 3:
-            _output_label_txt = "Hardlink"
-
-        self.output = Input(
-            layout,
-            f"{_output_label_txt} the sorted and renamed files to:",
-            QLineEdit(),
-            btn="Browse...",
-            btn_connect=self.browse_output_folder
-        )
-        self.output.prop.setText(str(self.output_path))
+        self.output = Input(layout, "Move the sorted and renamed files to:", QLineEdit(), "Browse...", self.browse_output_folder)
+        self.output.prop.setText(str(self.organizer.output_path))
         self.output.prop.setPlaceholderText(str(Path("/", "path", "to", "plex_or_jellyfin", "Anime", "One Pace").resolve()))
+        self.output.setVisible(self.organizer.file_action != 4)
+        self._output_label_txt()
 
         self.method = Input(layout, "I'm watching via...", QComboBox())
-        self.method.prop.addItems(["Jellyfin", "Plex"])
-        self.method.prop.setCurrentIndex(1 if self.plex_config_enabled else 0)
+        self.method.prop.addItems(["Jellyfin/Emby (.nfo mode)", "Plex"])
+        self.method.prop.setCurrentIndex(1 if self.organizer.plex_config_enabled else 0)
         self.method.prop.currentTextChanged.connect(self.set_method)
 
         self.plex_group = QGroupBox("Plex")
         self.plex_group_layout = QVBoxLayout()
 
+        self.plex_url = Input(self.plex_group_layout, "Plex URL:", QLineEdit(), width=self.plex_width)
+        self.plex_url.prop.setText(self.organizer.plex_config_url)
+        self.plex_url.prop.setPlaceholderText("http://127.0.0.1:32400")
+        self.plex_url.prop.textEdited.connect(self.edit_plex_url)
+
         self.plex_method = Input(self.plex_group_layout, "Login Method:", QComboBox(), width=self.plex_width)
         self.plex_method.prop.addItems(["Username and Password", "Authentication Token"])
         self.plex_method.prop.currentTextChanged.connect(self.switch_plex_method)
-        self.plex_method.prop.setCurrentText("Authentication Token" if self.plex_config_use_token else "Username and Password")
+        self.plex_method.prop.setCurrentText("Authentication Token" if self.organizer.plex_config_use_token else "Username and Password")
 
         self.plex_token = Input(self.plex_group_layout, "Authentication Token:", QLineEdit(), width=self.plex_width)
         self.plex_token.prop.setEchoMode(QLineEdit.EchoMode.Password)
-        self.plex_token.prop.setText(self.plex_config_auth_token)
-        self.plex_token.setVisible(self.plex_config_use_token == True)
+        self.plex_token.prop.setText(self.organizer.plex_config_auth_token)
+        self.plex_token.setVisible(self.organizer.plex_config_use_token)
 
         self.plex_username = Input(self.plex_group_layout, "Username:", QLineEdit(), width=self.plex_width)
-        self.plex_username.prop.setText(self.plex_config_username)
-        self.plex_username.setVisible(self.plex_config_use_token == False)
+        self.plex_username.prop.setText(self.organizer.plex_config_username)
+        self.plex_username.setVisible(not self.organizer.plex_config_use_token)
 
         self.plex_password = Input(self.plex_group_layout, "Password:", QLineEdit(), width=self.plex_width)
         self.plex_password.prop.setEchoMode(QLineEdit.EchoMode.Password)
-        self.plex_password.prop.setText(self.plex_config_password)
-        self.plex_password.setVisible(self.plex_config_use_token == False)
+        self.plex_password.prop.setText(self.organizer.plex_config_password)
+        self.plex_password.setVisible(not self.organizer.plex_config_use_token)
 
-        self.plex_remember_login = Input(
-            self.plex_group_layout, 
-            " ", 
-            QCheckBox("Remember"), 
-            btn="Login", 
-            btn_connect=lambda: asyncio.create_task(self.plex_login()), 
-            width=self.plex_width
-        )
-        self.plex_remember_login.prop.setChecked(self.plex_config_remember)
+        self.plex_remember_login = Input(self.plex_group_layout, "", QCheckBox("Remember"), "Login", lambda: asyncio.create_task(self.plex_login()))
+        self.plex_remember_login.prop.setChecked(self.organizer.plex_config_remember)
 
         self.plex_server = Input(self.plex_group_layout, "Plex Server:", QComboBox(), width=self.plex_width)
         self.plex_server.prop.addItem("")
 
-        for server_id, item in self.plex_config_servers.items():
+        for server_id, item in self.organizer.plex_config_servers.items():
             self.plex_server.prop.addItem(item["name"])
-            if server_id == self.plex_config_server_id:
+            if server_id == self.organizer.plex_config_server_id:
                 self.plex_server.prop.setCurrentText(item["name"])
 
         self.plex_server.prop.currentTextChanged.connect(lambda: asyncio.create_task(self.select_plex_server()))
-        self.plex_server.setVisible(self.plex_config_enabled == True and len(self.plex_config_servers) > 0)
+        self.plex_server.setVisible(len(self.organizer.plex_config_servers) > 0)
 
         self.plex_library = Input(self.plex_group_layout, "Library:", QComboBox(), width=self.plex_width)
         self.plex_library.prop.addItem("")
 
-        for library_key, item in self.plex_config_libraries.items():
+        for library_key, item in self.organizer.plex_config_libraries.items():
             self.plex_library.prop.addItem(item["title"])
-            if library_key == self.plex_config_library_key:
+            if library_key == self.organizer.plex_config_library_key:
                 self.plex_library.prop.setCurrentText(item["title"])
 
         self.plex_library.prop.currentTextChanged.connect(lambda: asyncio.create_task(self.select_plex_library()))
-        self.plex_library.setVisible(self.plex_config_library_key != "" and len(self.plex_config_libraries) > 0)
+        self.plex_library.setVisible(self.organizer.plex_config_server_id != "" and len(self.organizer.plex_config_libraries) > 0)
 
         self.plex_show = Input(self.plex_group_layout, "Show:", QComboBox(), width=self.plex_width)
         self.plex_show.prop.addItem("")
 
-        for show_guid, item in self.plex_config_shows.items():
+        for show_guid, item in self.organizer.plex_config_shows.items():
             self.plex_show.prop.addItem(item["title"])
-            if show_guid == self.plex_config_show_guid:
+            if show_guid == self.organizer.plex_config_show_guid:
                 self.plex_show.prop.setCurrentText(item["title"])
 
         self.plex_show.prop.currentTextChanged.connect(lambda: asyncio.create_task(self.select_plex_show()))
-        self.plex_show.setVisible(self.plex_config_show_guid != "" and len(self.plex_config_shows) > 0)
+        self.plex_show.setVisible(self.organizer.plex_config_library_key != "" and len(self.organizer.plex_config_shows) > 0)
 
         self.plex_group.setLayout(self.plex_group_layout)
         layout.addWidget(self.plex_group)
-        
-        if not self.plex_config_enabled:
+
+        if not self.organizer.plex_config_enabled:
             self.plex_group.hide()
 
-        self.move_copy = Input(layout, "Action after Sorting/Renaming:", QComboBox())
-        self.move_copy.prop.addItems(["Move (recommended)", "Copy", "Symlink", "Hardlink"])
-        self.move_copy.prop.setCurrentIndex(self.file_action)
-        self.move_copy.prop.currentIndexChanged.connect(self.set_action)
+        menu = self.menuBar()
+        menu_file = menu.addMenu("&File")
+        menu_configuration = menu.addMenu("&Configuration")
+
+        action_exit = QAction("Exit", self)
+        action_exit.triggered.connect(lambda: asyncio.create_task(self.exit()))
+        menu_file.addAction(action_exit)
+
+        action_after_sort = menu_configuration.addMenu("Action after Sorting/Renaming")
+
+        self.action_after_sort_move = QAction("Move (recommended)", self)
+        self.action_after_sort_move.setCheckable(True)
+        self.action_after_sort_move.setChecked(self.organizer.file_action == 0)
+        self.action_after_sort_move.triggered.connect(func_partial(self.set_action, 0))
+        action_after_sort.addAction(self.action_after_sort_move)
+
+        self.action_after_sort_copy = QAction("Copy", self)
+        self.action_after_sort_copy.setCheckable(True)
+        self.action_after_sort_copy.setChecked(self.organizer.file_action == 1)
+        self.action_after_sort_copy.triggered.connect(func_partial(self.set_action, 1))
+        action_after_sort.addAction(self.action_after_sort_copy)
+
+        self.action_after_sort_symlink = QAction("Symlink", self)
+        self.action_after_sort_symlink.setCheckable(True)
+        self.action_after_sort_symlink.setChecked(self.organizer.file_action == 2)
+        self.action_after_sort_symlink.triggered.connect(func_partial(self.set_action, 2))
+        action_after_sort.addAction(self.action_after_sort_symlink)
+
+        self.action_after_sort_hardlink = QAction("Hardlink", self)
+        self.action_after_sort_hardlink.setCheckable(True)
+        self.action_after_sort_hardlink.setChecked(self.organizer.file_action == 3)
+        self.action_after_sort_hardlink.triggered.connect(func_partial(self.set_action, 3))
+        action_after_sort.addAction(self.action_after_sort_hardlink)
+
+        self.action_after_sort_metadata = QAction("Sort and update metadata only", self)
+        self.action_after_sort_metadata.setVisible(not self.organizer.plex_config_enabled)
+        self.action_after_sort_metadata.setCheckable(True)
+        self.action_after_sort_metadata.setChecked(self.organizer.file_action == 4)
+        self.action_after_sort_metadata.triggered.connect(func_partial(self.set_action, 4))
+        action_after_sort.addAction(self.action_after_sort_metadata)
+
+        self.action_season = menu_configuration.addMenu("Set Season Folder Names")
+        self.action_season.setVisible(not self.organizer.plex_config_enabled)
+        menu_configuration.addAction(self.action_season)
+
+        self.action_season_0 = QAction("Season 01-09, 10-... (recommended)", self)
+        self.action_season_0.setCheckable(True)
+        self.action_season_0.setChecked(self.organizer.folder_action == 0)
+        self.action_season_0.triggered.connect(func_partial(self.set_season, 0))
+        action_season.addAction(self.action_season_0)
+
+        self.action_season_1 = QAction("Season 1-9, 10-...", self)
+        self.action_season_1.setCheckable(True)
+        self.action_season_0.setChecked(self.organizer.folder_action == 1)
+        self.action_season_1.triggered.connect(func_partial(self.set_season, 1))
+        action_season.addAction(self.action_season_1)
+
+        self.action_season_2 = QAction("Do not create folders", self)
+        self.action_season_2.setCheckable(True)
+        self.action_season_0.setChecked(self.organizer.folder_action == 2)
+        self.action_season_2.triggered.connect(func_partial(self.set_season, 2))
+        action_season.addAction(self.action_season_2)
+
+        self.action_edit_output_tmpl = QAction("Set Output Filenames", self)
+        self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
+        self.action_edit_output_tmpl.triggered.connect(self.edit_output_template)
+        menu_configuration.addAction(self.action_edit_output_tmpl)
 
         self.start_button = QPushButton("Start")
-        self.start_button.clicked.connect(lambda: asyncio.create_task(self.start_process()))
-        self.start_button.setEnabled(self.plex_config_enabled == False)
+        self.start_button.clicked.connect(lambda: asyncio.create_task(self.start()))
         layout.addWidget(self.start_button)
 
-        self.log_output = QTextEdit()
-        self.log_output.setReadOnly(True)
         layout.addWidget(self.log_output, stretch=1)
-
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setValue(0)
         layout.addWidget(self.progress_bar)
+        widget.setLayout(layout)
 
-        self.setLayout(layout)
+    def _output_label_txt(self):
+        _action = "Move"
+        if self.organizer.file_action == 1:
+            _action = "Copy"
+        elif self.organizer.file_action == 2:
+            _action = "Symlink"
+        elif self.organizer.file_action == 3:
+            _action = "Hardlink"
 
-        if self.plex_config_enabled and self.plex_config_remember and (self.plex_config_use_token and self.plex_config_auth_token != "") or (not self.plex_config_use_token and self.plex_config_auth_token != "" and self.plex_config_username != "" and self.plex_config_password != ""):
-            try:
-                self.plexapi_account = MyPlexAccount(token=self.plex_config_auth_token)
+        self.output.prop.setText(f"{_action} the sorted and renamed files to:")
+        self.output.setVisible(self.organizer.file_action != 4)
 
-                resources = self.plexapi_account.resources()
-                for resource in resources:
-                    if resource.clientIdentifier == self.plex_config_server_id:
-                        self.plexapi_server = resource.connect()
-                        break
+    def _input_dialog(self, text, default=""):
+        res, ok = QInputDialog.getText(None, self.organizer.window_title, text, QLineEdit.Normal, default)
+        if ok:
+            return res
 
-                self.plex_token.prop.setVisible(False)
-                self.plex_username.setVisible(False)
-                self.plex_password.setVisible(False)
-                self.plex_remember_login.prop.setVisible(False)
-                self.plex_remember_login.btn.setText("Disconnect")
-                self.plex_method.setVisible(False)
-                self.start_button.setEnabled(True)
-            except:
-                self.plex_token.prop.setVisible(True)
-                self.plex_username.setVisible(True)
-                self.plex_password.setVisible(True)
-                self.plex_remember_login.prop.setVisible(True)
-                self.plex_remember_login.btn.setText("Login")
-                self.plex_method.setVisible(True)
+        return ""
+
+    def _message_dialog(self, text):
+        logger.warning(text)
+        return QMessageBox.information(None, self.organizer.window_title, text) == QMessageBox.StandardButtons.Ok
 
     def browse_input_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Input Folder")
-        if folder:
-            self.input.prop.setText(folder)
-            self.input_path = Path(folder).resolve()
+        if not folder or folder == "":
+            return
+
+        if Path(self.input.prop.text()).resolve() == Path(self.output.prop.text()).resolve() and self.file_action != 4:
+            QMessageBox.error(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
+            return
+
+        if len(folder) > 2 and (folder[:2] == "\\\\" or folder[:2] == "//"):
+            yn = QMessageBox.question(
+                None,
+                self.organizer.window_title,
+                "Network storage has less support with this application and thus may be " +
+                "prone to errors or data corruption in case of data loss in transport. " +
+                "Do you still want to continue?"
+            ) == QMessageBox.StandardButton.Yes
+
+            if not yn:
+                return
+
+        self.organizer.input_path = AsyncPath(Path(folder).resolve())
+        self.input.prop.setText(str(self.organizer.input_path))
+
+        if self.organizer.file_action == 4:
+            self.output.prop.setText(self.input.prop.text())
+            self.organizer.output_path = self.organizer.input_path
 
     def browse_output_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Output Folder")
-        if folder:
-            self.output.prop.setText(folder)
-            self.output_path = Path(folder).resolve()
+        if not folder or folder == "":
+            return
+
+        if Path(self.input.prop.text()).resolve() == Path(self.output.prop.text()).resolve() and self.file_action != 4:
+            QMessageBox.error(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
+            return
+
+        if len(folder) > 2 and (folder[:2] == "\\\\" or folder[:2] == "//"):
+            yn = QMessageBox.question(
+                None,
+                self.organizer.window_title,
+                "Network storage has less support with this application and thus may be " +
+                "prone to errors or data corruption in case of data loss in transport. " +
+                "Do you still want to continue?"
+            ) == QMessageBox.StandardButton.Yes
+
+            if not yn:
+                return
+
+        self.organizer.output_path = AsyncPath(Path(folder).resolve())
+        self.output.prop.setText(str(self.organizer.output_path))
+
+    def edit_plex_url(self, text):
+        self.organizer.plex_config_url = text
 
     def set_method(self, text):
-        self.plex_config_enabled = text == "Plex"
-        self.plex_group.setVisible(self.plex_config_enabled)
-
-    def set_action(self, index):
-        _output_label_txt = "Move"
-        if index == 1:
-            _output_label_txt = "Copy"
-        elif index == 2:
-            _output_label_txt = "Symlink"
-        elif index == 3:
-            _output_label_txt = "Hardlink"
-
-        self.output.label.setText(f"{_output_label_txt} the sorted and renamed files to:")
-        self.file_action = index
+        self.organizer.plex_config_enabled = text == "Plex"
+        self.plex_group.setVisible(self.organizer.plex_config_enabled)
+        self.action_after_sort_metadata.setVisible(not self.organizer.plex_config_enabled)
+        self.action_plex_url.setVisible(self.organizer.plex_config_enabled)
+        self.action_season.setVisible(not self.organizer.plex_config_enabled)
+        self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
 
     def switch_plex_method(self, text):
-        self.plex_config_use_token = text == "Authentication Token"
+        self.organizer.plex_config_use_token = text == "Authentication Token"
 
-        self.plex_token.setVisible(self.plex_config_use_token)
-        self.plex_username.setVisible(self.plex_config_use_token == False)
-        self.plex_password.setVisible(self.plex_config_use_token == False)
+        self.plex_token.setVisible(self.organizer.plex_config_use_token)
+        self.plex_username.setVisible(not self.organizer.plex_config_use_token)
+        self.plex_password.setVisible(not self.organizer.plex_config_use_token)
 
-    async def find(self, *args):
-        f = Path("data", "posters", *args)
-        if f.is_file():
-            return f.resolve()
+    def _plex_toggle_enabled(self, enable_all: bool):
+        self.plex_method.setEnabled(enable_all)
+        self.plex_token.prop.setEnabled(enable_all)
+        self.plex_username.prop.setEnabled(enable_all)
+        self.plex_password.prop.setEnabled(enable_all)
+        self.plex_remember_login.prop.setEnabled(enable_all)
+        self.plex_remember_login.button.setEnabled(enable_all)
+        self.plex_server.prop.setEnabled(enable_all)
+        self.plex_library.prop.setEnabled(enable_all)
+        self.plex_show.prop.setEnabled(enable_all)
 
-        return Path("posters", *args).resolve()
+    def _plex_toggle_visible(self, enable_all: bool):
+        self.plex_method.setVisible(enable_all)
+        self.plex_token.prop.setVisible(enable_all)
+        self.plex_username.prop.setVisible(enable_all)
+        self.plex_password.prop.setVisible(enable_all)
 
     async def plex_login(self):
-        if self.plexapi_account != None:
-            self.plexapi_account = None
+        self._plex_toggle_enabled(False)
+        self.plex_remember_login.button.setEnabled(False)
 
-            if not self.plex_config_use_token and self.plex_config_auth_token != "":
-                self.plex_config_auth_token = ""
+        self.organizer.plex_config_use_token = self.plex_method.prop.currentText() == "Authentication Token"
+        self.organizer.plex_config_remember = self.plex_remember_login.prop.checkState() == Qt.Checked
+        self.organizer.plex_config_auth_token = self.plex_token.prop.currentText()
+        self.organizer.plex_config_username = self.plex_username.prop.currentText()
+        self.organizer.plex_config_password = self.plex_password.prop.currentText()
 
-            self.plex_config_servers = {}
-            self.plex_config_server_id = ""
+        if not await self.organizer.plex_login(True):
+            self._plex_toggle_enabled(True)
+            self.plex_remember_login.button.setEnabled(True)
+            return
 
-            self.plex_config_libraries = {}
-            self.plex_config_library_key = ""
+        self.plex_remember_login.button.setEnabled(True)
+        self.plex_remember_login.button.setText("Disconnect")
+        self.start_button.setEnabled(False)
+        await self.plex_get_servers()
 
-            self.plex_config_shows = {}
-            self.plex_config_show_guid = ""
+    async def plex_get_servers():
+        self.plex_server.setVisible(True)
+        self.plex_library.setVisible(False)
+        self.plex_show.setVisible(False)
 
-            self.plex_method.setVisible(True)
-            self.plex_token.setVisible(self.plex_config_use_token)
-            self.plex_username.setVisible(self.plex_config_use_token == False)
-            self.plex_password.setVisible(self.plex_config_use_token == False)
-            self.plex_remember_login.btn.setEnabled(True)
-            self.plex_remember_login.prop.setVisible(True)
-            self.plex_remember_login.btn.setText("Login")
-            self.plex_server.setVisible(False)
+        self.plex_server.prop.setEnabled(False)
+        self.plex_server.prop.clear()
+        self.plex_server.prop.addItem("Loading...")
+
+        if not await self.organizer.plex_get_servers():
+            self.plex_server.prop.setVisible(False)
+            return
+
+        self.plex_server.prop.setEnabled(True)
+        self.plex_server.prop.clear()
+        self.plex_server.prop.addItem("")
+
+        for identifier, item in self.organizer.plex_config_servers.items():
+            self.plex_server.prop.addItem(item.name, userData=identifier)
+
+    async def select_plex_server(self):
+        _id = self.plex_server.prop.currentData()
+        if _id is None or _id == "":
+            await self.plex_get_servers()
+            self.plex_server.setVisible(True)
             self.plex_library.setVisible(False)
             self.plex_show.setVisible(False)
             self.start_button.setEnabled(False)
             return
 
-        use_token = self.plex_method.prop.currentText() == "Authentication Token"
-        remember = self.plex_remember_login.prop.checkState() == Qt.Checked
-
-        if use_token:
-            self.plex_remember_login.btn.setEnabled(False)
-            self.plex_token.prop.setEnabled(False)
-
-            try:
-                self.plexapi_account = await run_sync(MyPlexAccount, token=self.plex_token.prop.text())
-
-            except PlexApiUnauthorized:
-                QMessageBox.warning(None, f"One Pace Organizer v{self.version}", "Invalid Plex account token, please try again.")
-                self.plex_token.prop.setEnabled(True)
-                self.plex_remember_login.btn.setEnabled(True)
-                return
-
-            except:
-                self.log_output.append(self.spacer)
-                self.log_output.append(traceback.format_exc())
-
-        else:
-            self.plex_remember_login.btn.setEnabled(False)
-            self.plex_username.prop.setEnabled(False)
-            self.plex_password.prop.setEnabled(False)
-
-            try:
-                self.plexapi_account = await run_sync(
-                    MyPlexAccount,
-                    username=self.plex_username.prop.text(),
-                    password=self.plex_password.prop.text(),
-                    remember=remember
-                )
-            except PlexApiTwoFactorRequired:
-                unauthorized = True
-
-                while unauthorized:
-                    code, ok = QInputDialog.getText(
-                        None,
-                        f"One Pace Organizer v{self.version}",
-                        "Enter the 2-Factor Authorization Code for your Plex Account:"
-                    )
-
-                    if not ok or code == "":
-                        self.plex_remember_login.btn.setEnabled(True)
-                        self.plex_username.prop.setEnabled(True)
-                        self.plex_password.prop.setEnabled(True)
-                        return
-
-                    try:
-                        self.plexapi_account = await run_sync(
-                            MyPlexAccount,
-                            username=self.plex_username.prop.text(),
-                            password=self.plex_password.prop.text(),
-                            remember=remember,
-                            code=int(code)
-                        )
-                        unauthorized = False
-                    except:
-                        QMessageBox.warning(None, f"One Pace Organizer v{self.version}", "Invalid 2-Factor Auth code, please try again.")
-
-            except PlexApiUnauthorized:
-                QMessageBox.warning(None, f"One Pace Organizer v{self.version}", "Invalid username or password, please try again.")
-                self.plex_remember_login.btn.setEnabled(True)
-                self.plex_username.prop.setEnabled(True)
-                self.plex_password.prop.setEnabled(True)
-                return
-
-            except:
-                self.log_output.append(self.spacer)
-                self.log_output.append(traceback.format_exc())
-
-            self.plex_config_remember = remember
-
-        if remember:
-            self.plex_config_auth_token = self.plex_token.prop.text() if use_token else self.plexapi_account.authenticationToken
-            self.plex_config_username = self.plex_username.prop.text()
-            self.plex_config_password = self.plex_password.prop.text()
-            self.plex_config_remember = True
-
-        resources = await run_sync(self.plexapi_account.resources)
-
-        self.plex_method.setVisible(False)
-        self.plex_token.setVisible(False)
-        self.plex_username.setVisible(False)
-        self.plex_password.setVisible(False)
-        self.plex_remember_login.prop.setVisible(False)
-        self.plex_remember_login.btn.setEnabled(True)
-        self.plex_remember_login.btn.setText("Disconnect")
-
-        self.plex_config_servers = {}
-
-        self.plex_server.prop.clear()
-        self.plex_server.prop.addItem("")
-
-        for i, resource in enumerate(resources):
-            self.plex_server.prop.addItem(resource.name)
-
-            self.plex_config_servers[resource.clientIdentifier] = {
-                "name": resource.name,
-                "selected": self.plex_config_server_id == resource.clientIdentifier
-            }
+        await self.organizer.plex_select_server(_id)
 
         self.plex_server.setVisible(True)
+        self.plex_library.setVisible(True)
+        self.plex_show.setVisible(False)
 
-    async def select_plex_server(self):
-        self.plex_server.prop.setEnabled(False)
+        self.plex_library.prop.setEnabled(False)
+        self.plex_library.prop.clear()
+        self.plex_library.prop.addItem("Loading...")
 
-        try:
-            server_name = self.plex_server.prop.currentText()
-            if server_name == "":
-                self.plex_server.prop.setEnabled(True)
-                self.start_button.setEnabled(False)
-                self.plex_library.setVisible(False)
-                self.plex_show.setVisible(False)
-                return
+        if not await self.organizer.plex_get_libraries():
+            return
 
-            self.plexapi_server = None
+        self.plex_library.prop.setEnabled(True)
+        self.plex_library.prop.clear()
+        self.plex_library.prop.addItem("")
 
-            resources = await run_sync(self.plexapi_account.resources)
-            for resource in resources:
-                if resource.name == server_name:
-                    self.plexapi_server = await run_sync(resource.connect)
-                    self.plex_config_server_id = resource.clientIdentifier
-                    self.plex_config_servers[resource.clientIdentifier]["selected"] = True
-                else:
-                    self.plex_config_servers[resource.clientIdentifier]["selected"] = False
-
-            if self.plexapi_server == None:
-                self.plex_server.prop.setEnabled(True)
-                self.start_button.setEnabled(False)
-                self.plex_library.setVisible(False)
-                self.plex_show.setVisible(False)
-                return
-
-            self.plex_config_libraries = {}
-
-            self.plex_library.prop.clear()
-            self.plex_library.prop.addItem("")
-
-            sections = await run_sync(self.plexapi_server.library.sections)
-            for section in sections:
-                if section.type == 'show':
-                    self.plex_library.prop.addItem(section.title)
-
-                    self.plex_config_libraries[section.key] = {
-                        "title": section.title,
-                        "selected": self.plex_config_library_key == section.key
-                    }
-
-            self.plex_library.setVisible(True)
-
-        except:
-            self.log_output.append(self.spacer)
-            self.log_output.append(traceback.format_exc())
-
-        finally:
-            self.plex_server.prop.setEnabled(True)
+        for identifier, item in self.organizer.plex_config_libraries.items():
+            self.plex_library.prop.addItem(item.title, userData=identifier)
 
     async def select_plex_library(self):
-        self.plex_library.prop.setEnabled(False)
-
-        try:
-            library_name = self.plex_library.prop.currentText()
-            if library_name == "":
-                self.plex_library.prop.setEnabled(True)
-                self.start_button.setEnabled(False)
-                self.plex_show.setVisible(False)
-                return
-
-            self.plex_config_library_key = ""
-
-            for key, item in self.plex_config_libraries.items():
-                if library_name == item["title"]:
-                    self.plex_config_library_key = key
-                    self.plex_config_libraries[key]["selected"] = True
-                    break
-                else:
-                    self.plex_config_libraries[key]["selected"] = False
-
-            if self.plex_config_library_key == "":
-                self.plex_library.prop.setEnabled(True)
-                self.start_button.setEnabled(False)
-                self.plex_show.setVisible(False)
-                return
-
-            self.plex_config_shows = {}
-
-            self.plex_show.prop.clear()
-            self.plex_show.prop.addItem("")
-
-            section = await run_sync(self.plexapi_server.library.sectionByID, self.plex_config_library_key)
-            shows = await run_sync(section.all)
-
-            for show in shows:
-                self.plex_show.prop.addItem(show.title)
-
-                self.plex_config_shows[show.guid] = {
-                    "title": show.title,
-                    "selected": self.plex_config_show_guid == show.guid
-                }
-
-            self.plex_show.setVisible(True)
-
-        except:
-            self.log_output.append(self.spacer)
-            self.log_output.append(traceback.format_exc())
-
-        finally:
-            self.plex_library.prop.setEnabled(True)
-
-    async def select_plex_show(self):
-        show_name = self.plex_show.prop.currentText()
-        if show_name == "":
+        _id = self.plex_library.prop.currentData()
+        if _id is None or _id == "":
+            self.plex_server.setVisible(True)
+            self.plex_library.setVisible(True)
+            self.plex_show.setVisible(False)
             self.start_button.setEnabled(False)
             return
 
-        self.plex_config_show_guid = ""
+        await self.organizer.plex_select_library(_id)
 
-        for key, item in self.plex_config_shows.items():
-            if show_name == item["title"]:
-                self.plex_config_show_guid = key
-                self.plex_config_shows[key]["selected"] = True
-                break
-            else:
-                self.plex_config_shows[key]["selected"] = False
+        self.plex_server.setVisible(True)
+        self.plex_library.setVisible(True)
+        self.plex_show.setVisible(True)
 
-        self.start_button.setEnabled(self.plex_config_show_guid != "")
+        self.plex_show.prop.setEnabled(False)
+        self.plex_show.prop.clear()
+        self.plex_show.prop.addItem("Loading...")
 
-    async def start_process(self):
-        try:
-            if self.fetch_posters and not Path(".", "data", "posters").is_dir() and not Path(".", "posters").is_dir():
-                self.fetch_posters = QMessageBox.question(
-                    None,
-                    f"One Pace Organizer v{self.version}",
-                    "The posters folder is missing. Do you want to download the posters automatically?"
-                ) == QMessageBox.StandardButton.Yes
+        if not await self.organizer.plex_get_shows():
+            return
 
+        self.plex_show.prop.setEnabled(True)
+        self.plex_show.prop.clear()
+        self.plex_show.prop.addItem("")
+
+        for identifier, item in self.organizer.plex_config_shows.items():
+            self.plex_show.prop.addItem(item.title, userData=identifier)
+
+    async def select_plex_show(self):
+        _id = self.plex_show.prop.currentData()
+        if _id is None or _id == "":
+            self.plex_server.setVisible(True)
+            self.plex_library.setVisible(True)
+            self.plex_show.setVisible(True)
             self.start_button.setEnabled(False)
+            return
 
-            self.input_path = Path(self.input.prop.text()).resolve()
-            self.output_path = Path(self.output.prop.text()).resolve()
+        await self.organizer.plex_select_show(_id)
+        self.start_button.setEnabled(True)
 
-            has_data = await self.cache_episode_data()
-            if has_data:
-                self.log_output.append(self.spacer)
-                self.log_output.append(f"{self.tvshow['title']} metadata loaded: {len(self.seasons)} seasons, {len(self.episodes)} episodes")
-            else:
-                self.log_output.append("Exiting due to a lack of metadata - grab data.json and put it in the same directory.")
-                self.start_button.setEnabled(True)
-                return
+    async def exit(self):
+        await self.organizer.save_config()
+        self.close()
 
-            video_files = await self.glob_video_files()
+    def set_action(self, action):
+        self.organizer.file_action = action
+        self.action_after_sort_move.setChecked(action == 0)
+        self.action_after_sort_copy.setChecked(action == 1)
+        self.action_after_sort_symlink.setChecked(action == 2)
+        self.action_after_sort_hardlink.setChecked(action == 3)
+        self.action_after_sort_metadata.setChecked(action == 4)
 
-            if self.plex_config_enabled:
-                await self.start_process_plex(video_files)
-            else:
-                await self.start_process_jellyfin(video_files)
+    def set_season(self, season):
+        self.organizer.folder_action = season
+        self.action_season_0.setChecked(season == 0)
+        self.action_season_1.setChecked(season == 1)
+        self.action_season_2.setChecked(season == 2)
 
-        except:
-            self.log_output.append(self.spacer)
-            self.log_output.append(traceback.format_exc())
+    def edit_output_template(self):
+        self.organizer.filename_tmpl = self._input_dialog("Enter the template for the filename:", self.organizer.filename_tmpl)
 
-        finally:
+    def set_plex_url(self):
+        self.organizer.plex_config_url = self._input_dialog("Enter the URL to your Plex instance:", self.organizer.plex_config_url)
+
+    async def start(self):
+        self.start_button.setEnabled(False)
+        self.log_output.clear()
+
+        if self.organizer.plex_config_enabled:
+            self.plex_server.prop.setEnabled(False)
+            self.plex_library.prop.setEnabled(False)
+            self.plex_show.prop.setEnabled(False)
+            self.plex_remember_login.button.setEnabled(False)
+            self.plex_remember_login.prop.setEnabled(False)
+
+            res = await self.organizer.start()
+            if isinstance(res, tuple):
+                queue, completed, skipped = res
+
+                if len(queue) > 0:
+                    QMessageBox.information(None, self.organizer.window_title,
+                        (
+                            f"All of the One Pace files have been created in:\n"
+                            f"{str(self.organizer.output_path)}\n\n"
+                            f"Please move the\"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
+                            "and make sure that it appears in Plex. Seasons and episodes will temporarily "
+                            "have incorrect information, and the next step will correct them.\n\n"
+                            "Click OK once this has been done and you can see the One Pace video files in Plex."
+                        )
+                    )
+
+                    completed, skipped = await self.organizer.process_plex_episodes(queue)
+                    self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
+                else:
+                    self.log_output.append(self.spacer)
+                    self.log_output.append("Nothing to do")
+
+            self.plex_server.prop.setEnabled(True)
+            self.plex_library.prop.setEnabled(True)
+            self.plex_show.prop.setEnabled(True)
+            self.plex_remember_login.button.setEnabled(True)
+            self.plex_remember_login.prop.setEnabled(True)
             self.start_button.setEnabled(True)
+            return
 
-    async def cache_episode_data(self):
-        data_file = Path(".", "data.json")
-        data = {}
+        completed, skipped = await self.organizer.start()
+        self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
+        self.start_button.setEnabled(True)
 
-        if data_file.is_file():
-            self.log_output.append("Checking episode metadata file (data.json)...")
-
-            data = await run_sync(data_file.read_bytes)
-            data = await run_sync(orjson.loads, data)
-
-            if "last_update" in data and data["last_update"] != "":
-                now = datetime.datetime.now(tz=datetime.UTC)
-                last_update_remote = datetime.datetime.fromisoformat(data["last_update"])
-                last_update_local = datetime.datetime.fromtimestamp(data_file.stat().st_mtime, tz=datetime.UTC)
-
-                if now - last_update_remote < datetime.timedelta(hours=12):
-                    self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.seasons = data["seasons"] if "seasons" in data else {}
-                    self.episodes = data["episodes"] if "episodes" in data else {}
-
-                elif now - last_update_local < datetime.timedelta(hours=1):
-                    self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.seasons = data["seasons"] if "seasons" in data else {}
-                    self.episodes = data["episodes"] if "episodes" in data else {}
-
-        yml_loaded = await self.cache_yml()
-
-        if yml_loaded == False or len(self.tvshow) == 0 or len(self.seasons) == 0 or len(self.episodes) == 0:
-            url = "https://raw.githubusercontent.com/ladyisatis/onepaceorganizer/refs/heads/main/data.json"
-
-            self.log_output.append(f"Downloading: {url}")
-            #self.progress_bar.setValue(0)
-
-            try:
-                # AsyncClient would be more straightforward but
-                # "QAsyncioEventLoop.getaddrinfo() is not implemented yet"
-                resp = await run_sync(httpx.get, url, follow_redirects=True)
-                if len(resp.content) == 0:
-                    return False
-
-                data = await run_sync(orjson.loads, resp.content)
-                if len(data) > 0:
-                    await run_sync(data_file.write_bytes, resp.content)
-
-                    self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.seasons = data["seasons"] if "seasons" in data else {}
-                    self.episodes = data["episodes"] if "episodes" in data else {}
-      
-            except:
-                self.log_output.append(f"Unable to download new metadata: {traceback.format_exc()}")
-
-        return len(self.tvshow) > 0 and len(self.seasons) > 0 and len(self.episodes) > 0
-
-    async def process_yml_metadata(self, file, crc32):
-        with file.open(mode='r', encoding='utf-8') as f:
-            parsed = await run_sync(yaml.safe_load, stream=f)
-
-        if not isinstance(parsed, dict):
-            return None
-
-        if "reference" in parsed:
-            ref = parsed["reference"].upper()
-
-            if ref in self.episodes and isinstance(self.episodes[ref], dict):
-                return self.episodes[ref]
-            else:
-                return await self.process_metadata(Path(file.parent, f"{ref}.yml"), ref)
-
-        if "_" in crc32:
-            crc32 = crc32.split("_")[0]
-
-            if crc32 in self.episodes and isinstance(self.episodes[crc32], list):
-                new_list = [item for item in self.episodes[crc32]]
-                new_list.append(parsed)
-                return new_list
-
-            return [parsed]
-
-        return parsed
-
-    async def cache_yml(self):
-        try:
-            data_folder = Path(".", "data")
-            episodes_folder = Path(data_folder, "episodes")
-
-            if not episodes_folder.is_dir():
-                return False
-
-            self.log_output.append("data/episodes folder detected, loading metadata from folder")
-
-            episode_files = []
-            async for file in glob(episodes_folder, "*.yml"):
-                episode_files.append(file)
-
-            tvshow_yml = Path(data_folder, "tvshow.yml")
-            if tvshow_yml.is_file():
-                episode_files.append(tvshow_yml)
-
-            seasons_yml = Path(data_folder, "seasons.yml")
-            if seasons_yml.is_file():
-                episode_files.append(seasons_yml)
-
-            total_files = len(episode_files)
-
-            if total_files == 0:
-                return False
-
-            self.progress_bar.setValue(0)
-
-            for index, file in enumerate(episode_files):
-                if file == tvshow_yml:
-                    with file.open(mode='r', encoding='utf-8') as f:
-                        self.tvshow = await run_sync(yaml.safe_load, stream=f)
-
-                elif file == seasons_yml:
-                    with file.open(mode='r', encoding='utf-8') as f:
-                        self.seasons = await run_sync(yaml.safe_load, stream=f)
-
-                else:
-                    crc32 = file.name.replace(".yml", "")
-                    result = await self.process_yml_metadata(file, crc32)
-
-                    if result is not None:
-                        self.episodes[crc32] = result
-
-                self.progress_bar.setValue(int(((index + 1) / total_files) * 100))
-
-            self.progress_bar.setValue(100)
-
-        except:
-            self.progress_bar.setValue(0)
-            self.log_output.append(f"Skipping using data/episodes for metadata: {traceback.format_exc()}")
-            return False
-
-        return True
-
-    async def glob_video_files(self):
-        self.log_output.append(self.spacer)
-        self.log_output.append("Searching for .mkv and .mp4 files...")
-
-        crc_pattern = re.compile(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
-
-        video_files = []
-        filelist = []
-
-        async for file in glob(self.input_path, "**/*.[mM][kK][vV]"):
-            filelist.append(file)
-
-        async for file in glob(self.input_path, "**/*.[mM][pP]4"):
-            filelist.append(file)
-
-        num_found = 0
-        num_calced = 0
-        results = []
-        filelist_total = len(filelist)
-
-        workers = max(8, os.process_cpu_count())
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-            tasks = []
-            loop = asyncio.get_event_loop()
-
-            for file in filelist:
-                match = crc_pattern.search(file.name)
-                if match:
-                    num_found = num_found + 1
-                    results.append((match.group(1), file.resolve()))
-                else:
-                    tasks.append(loop.run_in_executor(executor, _crc32_worker, str(file.resolve())))
-
-            if len(tasks) > 0:
-                self.progress_bar.setValue(0)
-                self.log_output.append(f"Calculating CRC32 for {len(tasks)} file(s)...")
-
-                try:
-                    i = 0
-                    async for result in asyncio.as_completed(tasks):
-                        file, error, crc32 = await result
-                        file = Path(file).resolve()
-
-                        if error != "":
-                            self.log_output.append(f"Unable to calculate {file.name}: {error}")
-                        else:
-                            self.log_output.append(f"Complete: {file.name} ({crc32})")
-                            results.append((crc32, file))
-                            num_calced = num_calced + 1
-
-                        i = i + 1
-                        self.progress_bar.setValue(int((i / len(tasks)) * 100))
-
-                except asyncio.CancelledError:
-                    for task in tasks:
-                        if not task.done():
-                            task.cancel()
-
-        self.progress_bar.setValue(0)
-
-        for index, info in enumerate(results):
-            if info[0] in self.episodes:
-                video_files.append(info)
-
-            elif info[1].suffix.lower() == '.mkv':
-                crc32, file_path = info
-
-                try:
-                    with file_path.open(mode='rb') as f:
-                        mkv = await run_sync(enzyme.MKV, f)
-
-                    if mkv == None or mkv.info == None or mkv.info.title == None or mkv.info.title == "":
-                        self.log_output.append(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
-                        continue
-
-                    title = mkv.info.title.split(" - ")
-                    match = re.match(r'^(.*\D)?\s*(\d+)$', title[0])
-
-                    ep_title = " - ".join(title[1:]) if len(title) > 1 else title[0]
-                    ep_date = mkv.info.date if mkv.info.date != None else datetime.date.fromtimestamp(file_path.stat().st_ctime)
-
-                    m_season = 0
-                    m_episode = 0
-
-                    if match:
-                        arc_name = match.group(1).strip()
-                        ep_num = int(match.group(2))
-
-                        for season, season_info in self.seasons.items():
-                            if season_info["title"] == arc_name and crc32 not in self.episodes:
-                                m_season = season
-                                m_episode = ep_num
-
-                    if m_season != 0 and m_episode != 0:
-                        found_existing = False
-
-                        for j, episode_info in self.episodes.items():
-                            if episode_info["season"] == m_season and episode_info["episode"] == m_episode:
-                                self.episodes[crc32] = episode_info
-                                found_existing = True
-
-                        if not found_existing:
-                            self.episodes[crc32] = {
-                                "season": m_season,
-                                "episode": m_episode,
-                                "title": ep_title,
-                                "description": "",
-                                "manga_chapters": "",
-                                "anime_episodes": "",
-                                "released": ep_date.isoformat()
-                            }
-
-                        video_files.append(info)
-
-                    else:
-                        self.log_output.append(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
-
-                except:
-                    self.log_output.append(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed")
-
-            else:
-                self.log_output.append(f"Skipping {info[1].name}: Episode metadata missing")
-
-            self.progress_bar.setValue(int(((index + 1) / filelist_total) * 100))
-
-        self.progress_bar.setValue(100)
-        self.log_output.append(f"Found: {num_found}, Calculated: {num_calced}, Total: {filelist_total}")
-
-        return video_files
-
-    async def move_file(self, src, dst):
-        try:
-            if dst.exists():
-                if await compare_file(src, dst):
-                    return True #skip
-                else:
-                    dst.unlink(missing_ok=True)
-
-            if self.file_action == 1: #Copy
-                await run_sync(shutil.copy2, str(src), str(dst))
-            elif self.file_action == 2: #Symlink
-                await run_sync(dst.symlink_to, src)
-            elif self.file_action == 3: #Hardlink
-                await run_sync(dst.hardlink_to, src)
-            else: #Move, or other
-                await run_sync(shutil.move, str(src), str(dst))
-
-        except UnsupportedOperation:
-            self.log_output.append("Aborting: failed due to an 'UnsupportedOperation' error. If you're on Windows, " +
-                "and have chosen the symlink option, you may need administrator privileges.")
-            return False
-
-        except OSError as e:
-            self.log_output.append(f"Aborting due to {e} (check that you have permission to write here)")
-            return False
-
-        except Exception as e:
-            self.log_output.append(f"Aborting due to unknown error: {traceback.format_exc()}")
-            return False
-
-        return True
-
-    async def start_process_plex(self, video_files):
-        self.log_output.append(self.spacer)
-        self.progress_bar.setValue(0)
-        self.output_path.mkdir(exist_ok=True)
-
-        section = await run_sync(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
-        show = await run_sync(section.getGuid, self.plex_config_show_guid)
-
-        if show.title != self.tvshow["title"]:
-            show.editTitle(self.tvshow["title"])
-
-        if show.originalTitle != self.tvshow["originaltitle"]:
-            show.editOriginalTitle(self.tvshow["originaltitle"])
-            show.editSortTitle(self.tvshow["sorttitle"])
-
-        if show.summary != self.tvshow["plot"]:
-            show.editSummary(self.tvshow["plot"])
-            show.editOriginallyAvailable(self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"])
-
-            tvshow = await self.find("tvshow.png")
-            if not tvshow.is_file() and self.fetch_posters:
-                self.log_output.append(f"Downloading: data/posters/{tvshow.name}")
-
-                try:
-                    await download(f"data/posters/{tvshow.name}", tvshow)
-                except Exception as e:
-                    self.log_output.append(f"Skipping downloading: {e}")
-
-            if tvshow.is_file():
-                await run_sync(
-                    show.uploadPoster,
-                    filepath=str(tvshow.resolve())
-                )
-
-        if show.contentRating != self.tvshow["rating"]:
-            show.editContentRating(self.tvshow["rating"])
-
-        i = 0
-        queue = []
-        num_complete = 0
-        num_skipped = 0
-
-        for crc32, file_path in video_files:
-            episode_info = self.episodes[crc32]
-
-            if isinstance(episode_info, list):
-                stop = True
-
-                for v in episode_info:
-                    if "hashes" not in v or "blake2" not in v["hashes"] or not v["hashes"]["blake2"]:
-                        self.log_output.append(f"Skipping {file_path.name}: Blake2s 16-character hash is required but not provided")
-
-                    elif await async_blake2s_16(file_path) == v["hashes"]["blake2"]:
-                        stop = False
-                        episode_info = v
-                        break
-
-                if stop:
-                    i = i + 1
-                    num_skipped = num_skipped + 1
-                    self.progress_bar.setValue(int((i / len(video_files)) * 100))
-                    continue
-
-            season = episode_info["season"]
-            episode = episode_info["episode"]
-
-            season_path = Path(self.output_path, "Specials" if season == 0 else f"Season {season:02d}")
-
-            if not season_path.is_dir():
-                await run_sync(season_path.mkdir, exist_ok=True)
-
-            if not "title" in episode_info or episode_info["title"] == "":
-                self.log_output.append(f"Skipping {file_path.name}: metadata for {crc32} has no title, please report this issue as a GitHub issue")
-                i = i + 1
-                num_skipped = num_skipped + 1
-                self.progress_bar.setValue(int((i / len(video_files)) * 100))
-                continue
-
-            prefix = f"One Pace - S{season:02d}E{episode_info['episode']:02d} - "
-            safe_title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"])
-
-            new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
-
-            if await self.move_file(file_path, new_video_file_path):
-                queue.append((new_video_file_path, episode_info))
-
-            i = i + 1
-            self.progress_bar.setValue(int((i / len(video_files)) * 100))
-
-        self.progress_bar.setValue(100)
-
-        QMessageBox.information(None, "One Pace Organizer",
-            (
-                f"All of the One Pace files have been created in:\n"
-                f"{str(self.output_path)}\n\n"
-                f"Please move the\"{self.output_path.name}\" folder to the Plex library folder you've selected, "
-                "and make sure that it appears in Plex. Seasons and episodes will temporarily "
-                "have incorrect information, and the next step will correct them.\n\n"
-                "Click OK once this has been done and you can see the One Pace video files in Plex."
-            )
-        )
-
-        done = []
-
-        self.progress_bar.setValue(0)
-
-        for i, item in enumerate(queue):
-            new_video_file_path = item[0]
-            episode_info = item[1]
-
-            season = episode_info["season"]
-
-            if not season in done:
-                done.append(season)
-
-                plex_season = await run_sync(show.season, season=season)
-
-                if season in self.seasons:
-                    season_info = self.seasons[season]
-                else:
-                    season_info = self.seasons[f"{season}"]
-
-                new_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
-
-                if plex_season.title != new_title or plex_season.summary != season_info["description"]:
-                    self.log_output.append(f"Updating Season: {new_title}")
-
-                    plex_season.editTitle(new_title)
-                    plex_season.editSummary(season_info["description"])
-
-                    _poster = await self.find(f"poster-season{season}.png")
-                    if not _poster.is_file() and self.fetch_posters:
-                        self.log_output.append(f"Downloading: data/posters/{_poster.name}")
-
-                        try:
-                            await download(f"data/posters/{_poster.name}", _poster)
-                        except Exception as e:
-                            self.log_output.append(f"Skipping downloading: {e}")
-
-                    if _poster.is_file():
-                        await run_sync(plex_season.uploadPoster, filepath=str(_poster.resolve()))
-
-                        p = await run_sync(plex_season.posters)
-                        if len(p) > 1:
-                            await run_sync(plex_season.setPoster, p[len(p)-1])
-
-            plex_episode = await run_sync(show.episode, season=season, episode=episode_info["episode"])
-            updated = False
-
-            background_art = await self.find(f"background-s{season:02d}e{episode_info['episode']:02d}.png")
-            if background_art.is_file():
-                has_background = False
-                arts = await run_sync(plex_episode.arts)
-
-                for background in arts:
-                    if (background.provider == None or background.provider == "local") and background.selected:
-                        has_background = True
-                        break
-
-                if not has_background:
-                    await run_sync(plex_episode.uploadArt, filepath=str(background_art.resolve()))
-                    updated = True
-
-                    arts = await run_sync(plex_episode.arts)
-                    if len(arts) > 1:
-                        await run_sync(plex_episode.setArt, arts[len(arts)-1])
-
-            poster_art = await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")
-            if poster_art.is_file():
-                has_poster = False
-                posters = await run_sync(plex_episode.posters)
-
-                for poster in posters:
-                    if (poster.provider == None or poster.provider == "local") and poster.selected:
-                        has_poster = True
-                        break
-
-                if not has_poster:
-                    await run_sync(plex_episode.uploadPoster, filepath=str(poster_art.resolve()))
-                    updated = True
-
-                    posters = await run_sync(plex_episode.posters)
-                    if len(posters) > 1:
-                        await run_sync(plex_episode.setPoster, posters[len(posters)-1])
-
-            if plex_episode.title != episode_info["title"]:
-                self.log_output.append(f"Updating Season: {season} Episode: {episode_info['episode']}")
-
-                plex_episode.editTitle(episode_info["title"])
-                plex_episode.editContentRating(episode_info["rating"] if "rating" in episode_info else self.tvshow["rating"])
-                plex_episode.editSortTitle(episode_info["sorttitle"] if "sorttitle" in episode_info else episode_info["title"].replace("The ", "", 1))
-
-                if "released" in episode_info:
-                    if isinstance(episode_info["released"], datetime.date):
-                        plex_episode.editOriginallyAvailable(episode_info["released"].isoformat())
-                    else:
-                        plex_episode.editOriginallyAvailable(str(episode_info["released"]))
-
-                updated = True
-
-            desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
-            manga_str = ""
-            anime_str = ""
-
-            if episode_info["manga_chapters"] != "":
-                if desc_str != "":
-                    manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
-                else:
-                    manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
-
-            if episode_info["anime_episodes"] != "":
-                if desc_str != "" or manga_str != "":
-                    anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
-                else:
-                    anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
-
-            description = f"{desc_str}{manga_str}{anime_str}"
-
-            if plex_episode.description != description:
-                plex_episode.editSummary(description)
-                updated = True
-
-            if updated:
-                num_complete = num_complete + 1
-
-            self.progress_bar.setValue(int(((i+1) / len(queue)) * 100))
-
-        self.progress_bar.setValue(100)
-
-        self.log_output.append(self.spacer)
-        self.log_output.append(f"Completed: {len(done)} seasons updated, {num_complete} episodes updated, {num_skipped} skipped")
-
-    async def start_process_jellyfin(self, video_files):
-        self.log_output.append(self.spacer)
-        self.progress_bar.setValue(0)
-        self.output_path.mkdir(exist_ok=True)
-
-        tvshow_nfo = Path(self.output_path, "tvshow.nfo")
-
-        if not tvshow_nfo.is_file():
-            root = ET.Element("tvshow")
-
-            for k, v in self.tvshow.items():
-                if isinstance(v, datetime.date):
-                    ET.SubElement(root, k).text = v.isoformat()
-                elif k == "plot":
-                    ET.SubElement(root, "plot").text = v
-                    ET.SubElement(root, "outline").text = v
-                else:
-                    ET.SubElement(root, str(k)).text = str(v)
-
-            for k, v in dict(sorted(self.seasons.items())).items():
-                ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
-
-            src = await self.find("tvshow.png")
-            dst = Path(self.output_path, "poster.png").resolve()
-
-            if not dst.exists():
-                if not src.is_file() and self.fetch_posters:
-                    self.log_output.append(f"Downloading: data/posters/{src.name}")
-
-                    try:
-                        await download(f"data/posters/{src.name}", src)
-                    except Exception as e:
-                        self.log_output.append(f"Skipping downloading: {e}")
-
-                if src.is_file():
-                    self.log_output.append(f"Copying {src} to: {dst}")
-                    await run_sync(shutil.copy, str(src.resolve()), str(dst))
-
-            if dst.is_file():
-                art = ET.SubElement(root, "art")
-                ET.SubElement(art, "poster").text = str(dst)
-
-            ET.indent(root)
-
-            self.log_output.append(f"Writing tvshow.nfo to: {tvshow_nfo.resolve()}")
-
-            tree = ET.ElementTree(root)
-            await run_sync(
-                tree.write,
-                str(tvshow_nfo.resolve()),
-                encoding='utf-8',
-                xml_declaration=True
-            )
-
-        i = 0
-        num_complete = 0
-        num_skipped = 0
-
-        for crc32, file_path in video_files:
-            episode_info = self.episodes[crc32]
-
-            if isinstance(episode_info, list):
-                stop = True
-
-                for v in episode_info:
-                    if not "hashes" in v or not "blake2" in v["hashes"] or v["hashes"]["blake2"] == "":
-                        self.log_output.append(f"Skipping {file_path.name}: Blake2s 16-character hash is required but not provided")
-
-                    elif await async_blake2s_16(file_path) == v["hashes"]["blake2"]:
-                        stop = False
-                        episode_info = v
-                        break
-
-                if stop:
-                    i = i + 1
-                    num_skipped = num_skipped + 1
-                    self.progress_bar.setValue(int((i / len(video_files)) * 100))
-                    continue
-
-            season = episode_info["season"]
-            season_path = Path(self.output_path, "Specials" if season == 0 else f"Season {season:02d}")
-
-            if not season_path.is_dir():
-                await run_sync(season_path.mkdir, exist_ok=True)
-
-                root = ET.Element("season")
-
-                if season in self.seasons:
-                    season_info = self.seasons[season]
-                else:
-                    season_info = self.seasons[f"{season}"]
-
-                title_text = season_info['title'] if season == 0 else f"{season}. {season_info['title']}"
-
-                ET.SubElement(root, "title").text = title_text
-                ET.SubElement(root, "plot").text = season_info["description"]
-                ET.SubElement(root, "outline").text = season_info["description"]
-                ET.SubElement(root, "seasonnumber").text = f"{season}"
-
-                src = await self.find(f"poster-season{season}.png")
-                dst = Path(season_path, "poster.png").resolve()
-
-                if not dst.exists():
-                    if not src.is_file() and self.fetch_posters:
-                        self.log_output.append(f"Downloading: data/posters/{src.name}")
-
-                        try:
-                            await download(f"data/posters/{src.name}", src)
-                        except Exception as e:
-                            self.log_output.append(f"Skipping downloading: {e}")
-
-                    if src.is_file():
-                        self.log_output.append(f"Copying {src} to: {dst}")
-                        await run_sync(shutil.copy, str(src), str(dst))
-
-                if dst.is_file():
-                    art = ET.SubElement(root, "art")
-                    ET.SubElement(art, "poster").text = str(dst)
-
-                ET.indent(root)
-                tree = ET.ElementTree(root)
-                await run_sync(
-                    tree.write,
-                    str(Path(season_path, "season.nfo").resolve()),
-                    encoding='utf-8',
-                    xml_declaration=True
-                )
-
-            episodedetails = ET.Element("episodedetails")
-
-            if not "title" in episode_info or episode_info["title"] == "":
-                self.log_output.append(f"Skipping {file_path.name}: metadata for {crc32} has no title, please report this issue as a GitHub issue")
-                i = i + 1
-                num_skipped = num_skipped + 1
-                self.progress_bar.setValue(int((i / len(video_files)) * 100))
-                continue
-
-            prefix = f"One Pace - S{season:02d}E{episode_info['episode']:02d} - "
-            safe_title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"])
-
-            new_video_file_path = Path(season_path, f"{prefix}{safe_title}{file_path.suffix}")
-
-            _action = "moving"
-            if self.file_action == 1:
-                _action = "copying"
-            elif self.file_action == 2:
-                _action = "symlinking"
-            elif self.file_action == 3:
-                _action = "hardlinking"
-
-            self.log_output.append(f"Creating metadata and {_action} {file_path.name} to: {new_video_file_path}")
-
-            ET.SubElement(episodedetails, "title").text = episode_info["title"]
-            ET.SubElement(episodedetails, "showtitle").text = self.tvshow["title"]
-            ET.SubElement(episodedetails, "season").text = f"{season}"
-            ET.SubElement(episodedetails, "episode").text = f"{episode_info['episode']}"
-            ET.SubElement(episodedetails, "rating").text = episode_info["rating"] if "rating" in episode_info else self.tvshow["rating"]
-
-            desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
-            manga_str = ""
-            anime_str = ""
-
-            if episode_info["manga_chapters"] != "":
-                if desc_str != "":
-                    manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
-                else:
-                    manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
-
-            if episode_info["anime_episodes"] != "":
-                if desc_str != "" or manga_str != "":
-                    anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
-                else:
-                    anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
-
-            description = f"{desc_str}{manga_str}{anime_str}"
-
-            ET.SubElement(episodedetails, "plot").text = description
-
-            if "released" in episode_info:
-                if isinstance(episode_info["released"], datetime.date):
-                    date = episode_info["released"].isoformat()
-                else:
-                    date = episode_info["released"]
-
-                ET.SubElement(episodedetails, "premiered").text = date
-                ET.SubElement(episodedetails, "aired").text = date
-
-            ep_poster = (await self.find(f"poster-s{season:02d}e{episode_info['episode']:02d}.png")).resolve()
-            ep_poster_new = Path(season_path, f"{prefix}{safe_title}-poster.png").resolve()
-
-            if ep_poster.is_file() and not ep_poster_new.exists():
-                if not await self.move_file(ep_poster, ep_poster_new):
-                    self.log_output.append(f"{ep_poster} -> {ep_poster_new} (Unsuccessful)")
-                else:
-                    self.log_output.append(f"{ep_poster} -> {ep_poster_new} (Success)")
-
-            if ep_poster_new.is_file():
-                art = ET.SubElement(episodedetails, "art")
-                ET.SubElement(art, "poster").text = str(ep_poster_new)
-
-            ET.indent(episodedetails)
-
-            episode_nfo = str(Path(season_path, f"{prefix}{safe_title}.nfo").resolve())
-            ET.ElementTree(episodedetails).write(
-                episode_nfo,
-                encoding='utf-8', 
-                xml_declaration=True
-            )
-
-            if await self.move_file(file_path, new_video_file_path):
-                num_complete = num_complete + 1
-            else:
-                num_skipped = num_skipped + 1
-
-            i = i + 1
-            self.progress_bar.setValue(int((i / len(video_files)) * 100))
-
-        self.progress_bar.setValue(100)
-
-        self.log_output.append(self.spacer)
-        self.log_output.append(f"Completed: {num_complete} episodes updated, {num_skipped} skipped")
-
-if __name__ == "__main__":
+def main(organizer, log_level):
     try:
-        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-            freeze_support()
+        logger.debug("loading configuration")
+        asyncio.run(organizer.load_config())
 
+        logger.debug("launching Qt app")
         app = QApplication(sys.argv)
-        opo = OnePaceOrganizer()
-        opo.show()
+        GUI(organizer, log_level).show()
 
         QtAsyncio.run(handle_sigint=True)
 
-    except asyncio.CancelledError:
-        pass
-
-    except Exception:
-        QMessageBox.critical(None, "One Pace Organizer", traceback.format_exc())
-
-    finally:
-        if 'opo' in locals() and opo.input_path is not None and opo.input_path != "" and opo.output_path is not None and opo.output_path != "":
-            opo.save_config()
+    except:
+        QMessageBox.critical(None, f"One Pace Organizer v{organizer.version}", traceback.format_exc())
