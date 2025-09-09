@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-09-09T00:57:01.336944+00:00",
+  "last_update": "2025-09-09T01:01:54.548622+00:00",
   "tvshow": {
     "title": "One Pace",
     "sorttitle": "One Pace",
@@ -4148,15 +4148,15 @@
       }
     },
     "9C115EE6": {
-      "season": 3,
+      "season": 2,
       "episode": 2,
-      "title": "Captain Kuro",
-      "description": "After uncovering a devious plot, Usopp warns the village and Kaya, but finds his years of lying make it difficult to convince people of the truth.",
-      "manga_chapters": "26-27",
-      "anime_episodes": "10-11",
-      "released": "2025-06-06",
+      "title": "Treasure",
+      "description": "Luffy meets a small dog guarding his late master's store. Meanwhile, Beast Tamer Mohji, Cabaji the Acrobat, and the lion Richie show up in the streets of Orange Town to get revenge for Captain Buggy's humiliating loss.",
+      "manga_chapters": "12-19",
+      "anime_episodes": "6-7",
+      "released": "2025-04-25",
       "hashes": {
-        "crc32": "0433686D"
+        "crc32": "D7327225"
       }
     },
     "9C3360D6": {
@@ -5244,16 +5244,15 @@
       }
     },
     "CBFE01C7": {
-      "season": 3,
+      "season": 2,
       "episode": 1,
-      "title": "Captain Usopp",
-      "originaltitle": "Enter: Captain Usopp",
-      "description": "With Nami joining as Luffy's navigator (though not as an actual member of the crew), they arrive at Syrup Village in search of a proper ship. There they meet a man claiming to be a pirate captain who also seems to have ties to Red-Haired Shanks.",
-      "manga_chapters": "23-25",
-      "anime_episodes": "9-10",
-      "released": "2025-05-23",
+      "title": "Enter: Nami",
+      "description": "Nami, a street-smart girl who loves money and tangerines, makes Luffy's acquaintance. To save herself and steal a map to the Grand Line, she tricks Luffy into allowing her to turn him over to the infamous pirate Buggy the Clown.",
+      "manga_chapters": "8-11",
+      "anime_episodes": "4-6",
+      "released": "2025-04-11",
       "hashes": {
-        "crc32": "A6DDEC2C"
+        "crc32": "C23AC8D3"
       }
     },
     "CC37D6C6": {
@@ -6443,16 +6442,15 @@
       }
     },
     "FAFCDE38": {
-      "season": 3,
+      "season": 2,
       "episode": 3,
-      "title": "The Slope",
-      "sorttitle": "Slope",
-      "description": "Usopp resolves that if he is to keep the peace, the town must continue to believe he is a liar, which means he cannot let Captain Kuro's men up the slope to the village! Luffy, Zoro, and Nami aid Usopp in his plan to keep the Black Cat Pirates at bay.",
-      "manga_chapters": "28-30",
-      "anime_episodes": "12-13",
-      "released": "2025-06-20",
+      "title": "Pirate Buggy \"the Clown\"",
+      "description": "Shockingly, it turns out Captain Buggy and Red-Haired Shanks share a common history. When the bombastic clown rips Shanks' straw hat, Luffy's rage knows no bounds.",
+      "manga_chapters": "19-21",
+      "anime_episodes": "8",
+      "released": "2025-05-09",
       "hashes": {
-        "crc32": "35E9CFA6"
+        "crc32": "1809DA8A"
       }
     },
     "FB406E73": {
