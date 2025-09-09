@@ -270,60 +270,106 @@ def update():
                             logger.warning(f"Skipping: {item}")
                             continue
 
-                        match = title_pattern.match(item.title.content)
-                        if not match:
-                            logger.warning(f"Skipping: {item.title.content} (title does not match)")
-                            continue
-
-                        arc_name, ep_num, extra, crc32 = match.groups()
-                        if Path(".", "data", "episodes", f"{crc32}.yml").exists():
-                            logger.warning(f"Skipping: {item.title.content} (crc32 file exists)")
-                            continue
-
+                        logger.info(item.title.content)
                         pub_date = datetime.strptime(item.pub_date.content, "%a, %d %b %Y %H:%M:%S %z")
-                        if now - pub_date > timedelta(hours=72):
-                            logger.warning(f"Skipping: {item.title.content} (more than 72 hours)")
-                            continue
 
-                        r = httpx.get(item.guid.content)
-                        div = BeautifulSoup(r.text, 'html.parser').find('div', { 'class': 'panel-body', 'id': 'torrent-description' })
-                        desc = div.get_text(strip=True).split("\n") if div else []
+                        if item.title.content.endswith(".mkv"):
+                            match = title_pattern.match(item.title.content)
+                            if not match:
+                                logger.warning("-- Skipping: regex does not match")
+                                continue
 
-                        chs = ""
-                        eps = ""
+                            arc_name, ep_num, extra, crc32 = match.groups()
+                            if Path(".", "data", "episodes", f"{crc32}.yml").exists():
+                                logger.warning("-- Skipping: crc32 file exists")
+                                continue
 
-                        for d in desc:
-                            if d.startswith("Chapters: "):
-                                chs = d.replace("Chapters: ", "")
-                            elif d.startswith("Episodes: "):
-                                eps = d.replace("Episodes: ", "")
+                            r = httpx.get(item.guid.content)
+                            div = BeautifulSoup(r.text, 'html.parser').find('div', { 'class': 'panel-body', 'id': 'torrent-description' })
+                            desc = div.get_text(strip=True).split("\n") if div else []
 
-                        if arc_name in season_to_num:
-                            ep_num = int(ep_num)
-                            released = (pub_date.isoformat().split("T"))[0]
-                            t = f"{arc_name} {ep_num:02d}"
+                            chs = ""
+                            eps = ""
 
-                            if crc32 not in out_episodes:
-                                out_episodes[crc32] = {
-                                    "season": season_to_num[arc_name],
-                                    "episode": ep_num,
-                                    "title": t,
-                                    "description": "",
-                                    "manga_chapters": chs,
-                                    "anime_episodes": eps,
-                                    "released": released
-                                }
+                            for d in desc:
+                                if d.startswith("Chapters: "):
+                                    chs = d.replace("Chapters: ", "")
+                                elif d.startswith("Episodes: "):
+                                    eps = d.replace("Episodes: ", "")
 
-                            key = f"{arc_name} {ep_num}"
-                            if key in season_eps:
-                                season_eps[key].append(crc32)
+                            if arc_name in season_to_num:
+                                ep_num = int(ep_num)
+                                released = (pub_date.isoformat().split("T"))[0]
+                                t = f"{arc_name} {ep_num:02d}"
+
+                                if crc32 not in out_episodes:
+                                    out_episodes[crc32] = {
+                                        "season": season_to_num[arc_name],
+                                        "episode": ep_num,
+                                        "title": t,
+                                        "description": "",
+                                        "manga_chapters": chs,
+                                        "anime_episodes": eps,
+                                        "released": released
+                                    }
+
+                                key = f"{arc_name} {ep_num}"
+                                if key in season_eps:
+                                    season_eps[key].append(crc32)
+                                else:
+                                    season_eps[key] = [crc32]
+
+                                logger.success(f"-- Added S{season_to_num[arc_name]:02d}E{ep_num:02d} ({t}, {released})")
+
                             else:
-                                season_eps[key] = [crc32]
-
-                            logger.success(f"Added S{season_to_num[arc_name]}E{ep_num:02d} from RSS ({t}, {released})")
+                                logger.warning(f"-- Skipping: arc {arc_name} not found")
 
                         else:
-                            logger.warning(f"Skipping: {item.title.content} (arc {arc_name} not found)")
+                            r = httpx.get(item.guid.content)
+
+                            for item in BeautifulSoup(r.text, "html.parser").select("li i.fa-file"):
+                                li = item.find_parent("li")
+                                if not li:
+                                    continue
+
+                                filename = " ".join([t for t in li.stripped_strings if not t.startswith("(")])
+                                logger.info(f"-- {filename}")
+
+                                match = title_pattern.match(filename)
+                                if not match:
+                                    logger.warning("---- Skipping: regex does not match")
+                                    continue
+
+                                arc_name, ep_num, extra, crc32 = match.groups()
+                                if Path(".", "data", "episodes", f"{crc32}.yml").exists():
+                                    logger.warning("---- Skipping: crc32 file exists")
+                                    continue
+
+                                if arc_name in season_to_num:
+                                    ep_num = int(ep_num)
+                                    released = (pub_date.isoformat().split("T"))[0]
+                                    t = f"{arc_name} {ep_num:02d}"
+
+                                    if crc32 not in out_episodes:
+                                        out_episodes[crc32] = {
+                                            "season": season_to_num[arc_name],
+                                            "episode": ep_num,
+                                            "title": t,
+                                            "description": "",
+                                            "manga_chapters": "",
+                                            "anime_episodes": "",
+                                            "released": released
+                                        }
+
+                                    key = f"{arc_name} {ep_num}"
+                                    if key in season_eps:
+                                        season_eps[key].append(crc32)
+                                    else:
+                                        season_eps[key] = [crc32]
+
+                                    logger.success(f"---- Added S{season_to_num[arc_name]:02d}E{ep_num:02d} ({t}, {released})")
+                                else:
+                                    logger.warning(f"---- Skipping: arc {arc_name} not found")
 
                 except:
                     logger.error(f"Skipping RSS parsing\n{traceback.format_exc()}")
