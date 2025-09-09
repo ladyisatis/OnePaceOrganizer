@@ -351,13 +351,23 @@ def update():
                                     t = f"{arc_name} {ep_num:02d}"
 
                                     if crc32 not in out_episodes:
+                                        _s = season_to_num[arc_name]
+                                        chs = ""
+                                        eps = ""
+
+                                        for v in out_episodes.values():
+                                            if v["season"] == _s and v["episode"] == ep_num:
+                                                chs = v["manga_chapters"]
+                                                eps = v["anime_episodes"]
+                                                break
+
                                         out_episodes[crc32] = {
-                                            "season": season_to_num[arc_name],
+                                            "season": _s,
                                             "episode": ep_num,
                                             "title": t,
                                             "description": "",
-                                            "manga_chapters": "",
-                                            "anime_episodes": "",
+                                            "manga_chapters": chs,
+                                            "anime_episodes": eps,
                                             "released": released
                                         }
 
