@@ -1,4 +1,4 @@
-last_update: '2025-09-07T18:06:46.039327+00:00'
+last_update: '2025-09-09T06:07:18.352621+00:00'
 tvshow:
   title: One Pace
   sorttitle: One Pace
@@ -4363,6 +4363,18 @@ episodes:
     released: 2025-08-10
     hashes:
       crc32: 9BD35F80
+  9C115EE6:
+    season: 2
+    episode: 2
+    title: Treasure
+    description: Luffy meets a small dog guarding his late master’s store. Meanwhile,
+      Beast Tamer Mohji, Cabaji the Acrobat, and the lion Richie show up in the streets
+      of Orange Town to get revenge for Captain Buggy's humiliating loss.
+    manga_chapters: 12-19
+    anime_episodes: 6-7
+    released: 2025-04-25
+    hashes:
+      crc32: D7327225
   9C3360D6:
     season: 31
     episode: 31
@@ -5495,6 +5507,18 @@ episodes:
     released: 2017-05-20
     hashes:
       crc32: CAA32C42
+  CBFE01C7:
+    season: 2
+    episode: 1
+    title: 'Enter: Nami'
+    description: Nami, a street-smart girl who loves money and tangerines, makes Luffy's
+      acquaintance. To save herself and steal a map to the Grand Line, she tricks
+      Luffy into allowing her to turn him over to the infamous pirate Buggy the Clown.
+    manga_chapters: 8-11
+    anime_episodes: 4-6
+    released: 2025-04-11
+    hashes:
+      crc32: C23AC8D3
   CC37D6C6:
     season: 5
     episode: 1
@@ -6738,6 +6762,18 @@ episodes:
     released: 2025-03-22
     hashes:
       crc32: FA63AC14
+  FAFCDE38:
+    season: 2
+    episode: 3
+    title: Pirate Buggy "the Clown"
+    description: Shockingly, it turns out Captain Buggy and Red-Haired Shanks share
+      a common history. When the bombastic clown rips Shanks' straw hat, Luffy's rage
+      knows no bounds.
+    manga_chapters: 19-21
+    anime_episodes: 8
+    released: 2025-05-09
+    hashes:
+      crc32: 1809DA8A
   FB406E73:
     season: 24
     episode: 3
