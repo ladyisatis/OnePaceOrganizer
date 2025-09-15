@@ -584,6 +584,7 @@ def generate_json():
     episodes_dir = Path(".", "data", "episodes")
     data_yml = Path(".", "data", "data.yml")
     json_file = Path(".", "data.json")
+    json_min_file = Path(".", "data", "data.min.json")
 
     tvshow = {}
     arcs = {}
@@ -640,14 +641,18 @@ def generate_json():
                 "episodes": episodes
             }, stream=f, allow_unicode=True, sort_keys=False)
 
-        out = orjson.dumps({
+        out = {
             "last_update": last_update,
             "last_update_ts": last_update_ts,
             "tvshow": tvshow,
             "arcs": _a,
             "episodes": unicode_fix_dict(episodes)
-        }, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
-        json_file.write_bytes(out)
+        }
+
+        _data_json_out = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\", b"\\")
+        json_file.write_bytes(_data_json_out)
+        _data_min_json = orjson.dumps(out, option=orjson.OPT_NON_STR_KEYS).replace(b"\\\\", b"\\")
+        json_min_file.write_bytes(_data_min_json)
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'update':
