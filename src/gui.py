@@ -60,13 +60,13 @@ class GUI(QMainWindow):
         self._log_scrollbar = self.log_output.verticalScrollBar()
         self._log_signal.connect(self._log_output_append)
 
-        #logger.add(
-        #    self._log,
-        #    level=self.log_level, 
-        #    format="{time:YYYY-MM-DD HH:mm:ss.SSS},{level: <8},{message}", 
-        #    colorize=False, 
-        #    enqueue=True
-        #)
+        logger.add(
+            self._log,
+            level=self.log_level, 
+            format="{time:YYYY-MM-DD HH:mm:ss.SSS},{level: <8},{message}", 
+            colorize=False, 
+            enqueue=False
+        )
 
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.setWindowTitle(self.organizer.window_title)

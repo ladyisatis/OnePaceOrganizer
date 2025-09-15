@@ -31,7 +31,7 @@ class OnePaceOrganizer:
         self.window_title = "One Pace Organizer"
         self.tvshow = {}
         self.episodes = {}
-        self.seasons = {}
+        self.arcs = []
 
         self.workers = int(utils.get_env("workers", 0))
         self.base_path = Path(utils.get_env("base_path", Path.cwd().resolve()))
@@ -49,7 +49,7 @@ class OnePaceOrganizer:
 
         self.input_path = utils.get_env("input_path")
         self.output_path = utils.get_env("output_path")
-        self.filename_tmpl = utils.get_env("filename_tmpl", "One Pace - S{season:02d}E{episode:02d} - {title}{suffix}")
+        self.filename_tmpl = utils.get_env("filename_tmpl", "One Pace - S{arc:02d}E{episode:02d} - {title}{suffix}")
 
         self.plexapi_account: MyPlexAccount = None
         self.plexapi_server: PlexServer = None
@@ -538,7 +538,7 @@ class OnePaceOrganizer:
 
     async def cache_yml(self):
         try:
-            data_folder = Path(self.base_path, "data")
+            data_folder = Path(self.base_path, "metadata")
             episodes_folder = Path(data_folder, "episodes")
 
             if not await utils.is_dir(episodes_folder):
@@ -554,9 +554,9 @@ class OnePaceOrganizer:
             if await utils.is_file(tvshow_yml):
                 episode_files.append(tvshow_yml)
 
-            seasons_yml = Path(data_folder, "seasons.yml")
-            if await utils.is_file(seasons_yml):
-                episode_files.append(seasons_yml)
+            arcs_yml = Path(data_folder, "arcs.yml")
+            if await utils.is_file(arcs_yml):
+                episode_files.append(arcs_yml)
 
             total_files = len(episode_files)
             self.logger.trace(episode_files)
@@ -570,8 +570,8 @@ class OnePaceOrganizer:
                 if file == tvshow_yml:
                     self.tvshow = await utils.load_yaml(tvshow_yml)
 
-                elif file == seasons_yml:
-                    self.seasons = await utils.load_yaml(seasons_yml)
+                elif file == arcs_yml:
+                    self.arcs = await utils.load_yaml(arcs_yml)
 
                 else:
                     crc32 = file.name.replace(".yml", "")
@@ -586,13 +586,13 @@ class OnePaceOrganizer:
 
         except:
             await utils.run_func(self.progress_bar_func, 0)
-            self.logger.warning(f"Skipping using data/episodes for metadata\n{traceback.format_exc()}")
+            self.logger.warning(f"Skipping using metadata/episodes for metadata\n{traceback.format_exc()}")
             return False
 
         return True
 
     async def cache_episode_data(self):
-        data_file = Path(self.base_path, "data.json")
+        data_file = Path(self.base_path, "metadata", "data.json")
         data = {}
 
         if await utils.is_file(data_file):
@@ -609,33 +609,33 @@ class OnePaceOrganizer:
 
                 if now - last_update_remote < datetime.timedelta(hours=12):
                     self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.seasons = data["seasons"] if "seasons" in data else {}
+                    self.arcs = data["arcs"] if "arcs" in data else []
                     self.episodes = data["episodes"] if "episodes" in data else {}
 
                 elif now - last_update_local < datetime.timedelta(hours=1):
                     self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.seasons = data["seasons"] if "seasons" in data else {}
+                    self.arcs = data["arcs"] if "arcs" in data else []
                     self.episodes = data["episodes"] if "episodes" in data else {}
 
         yml_loaded = await self.cache_yml()
 
-        if yml_loaded == False or len(self.tvshow) == 0 or len(self.seasons) == 0 or len(self.episodes) == 0:
+        if yml_loaded == False or len(self.tvshow) == 0 or len(self.arcs) == 0 or len(self.episodes) == 0:
             try:
                 self.logger.success("Downloading: data.json")
-                await utils.download(f"{self.download_path}/data.json", data_file, self.progress_bar_func)
+                await utils.download(f"{self.download_path}/metadata/data.min.json", data_file, self.progress_bar_func)
 
                 data = await utils.load_json(data_file)
                 self.logger.trace(data)
 
                 if len(data) > 0:
                     self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.seasons = data["seasons"] if "seasons" in data else {}
+                    self.arcs = data["arcs"] if "arcs" in data else []
                     self.episodes = data["episodes"] if "episodes" in data else {}
 
             except:
                 self.logger.exception(f"Unable to download new metadata")
 
-        return len(self.tvshow) > 0 and len(self.seasons) > 0 and len(self.episodes) > 0
+        return len(self.tvshow) > 0 and len(self.arcs) > 0 and len(self.episodes) > 0
 
     async def glob_video_files(self):
         self.logger.success("Searching for .mkv and .mp4 files...")
@@ -740,7 +740,7 @@ class OnePaceOrganizer:
                         arc_name = match.group(1).strip()
                         ep_num = int(match.group(2))
 
-                        season_items = self.seasons.items() if isinstance(self.seasons, dict) else enumerate(self.seasons)
+                        season_items = self.arcs.items() if isinstance(self.arcs, dict) else enumerate(self.arcs)
                         for season, season_info in season_items:
                             if season_info["title"] == arc_name and crc32 not in self.episodes:
                                 self.logger.debug(f"found {season_info['title']} -> s{season} e{ep_num}")
@@ -751,14 +751,14 @@ class OnePaceOrganizer:
                         found_existing = False
 
                         for j, episode_info in self.episodes.items():
-                            if episode_info["season"] == m_season and episode_info["episode"] == m_episode:
+                            if episode_info["arc"] == m_season and episode_info["episode"] == m_episode:
                                 self.episodes[crc32] = episode_info
                                 found_existing = True
 
                         self.logger.trace(found_existing)
                         if not found_existing:
                             self.episodes[crc32] = {
-                                "season": m_season,
+                                "arc": m_season,
                                 "episode": m_episode,
                                 "title": ep_title,
                                 "description": "",
@@ -795,14 +795,14 @@ class OnePaceOrganizer:
 
     def get_season(self, season):
         if isinstance(season, dict):
-            if season in self.seasons:
-                return self.seasons[season]
-            elif str(season) in self.seasons:
-                return self.seasons[str(season)]
+            if season in self.arcs:
+                return self.arcs[season]
+            elif str(season) in self.arcs:
+                return self.arcs[str(season)]
 
             return None
 
-        return self.seasons[season]
+        return self.arcs[season]
 
     async def process_plex(self, files):
         section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
@@ -895,7 +895,7 @@ class OnePaceOrganizer:
                         await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                         continue
 
-                season = episode_info["season"]
+                season = episode_info["arc"]
                 episode = episode_info["episode"]
                 title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"]) if "title" in episode_info and episode_info["title"] != "" else ""
 
@@ -951,7 +951,7 @@ class OnePaceOrganizer:
             crc32, src, file, episode_info = item
             self.logger.debug(f"Start: [{crc32}] {file} ({episode_info})")
 
-            season = episode_info["season"]
+            season = episode_info["arc"]
             season_info = self.get_season(season)
             episode = episode_info["episode"]
             updated = False
@@ -1119,7 +1119,7 @@ class OnePaceOrganizer:
                 self.logger.debug(f"[{tvshow_nfo.name}] {k} = {v}")
                 ET.SubElement(root, str(k)).text = str(v)
 
-        _seasons = dict(sorted(self.seasons.items())).items() if isinstance(self.seasons, dict) else enumerate(self.seasons)
+        _seasons = dict(sorted(self.arcs.items())).items() if isinstance(self.arcs, dict) else enumerate(self.arcs)
         for k, v in _seasons:
             text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
             self.logger.debug(f"[{tvshow_nfo.name}] season {k} = {text}")
@@ -1231,7 +1231,7 @@ class OnePaceOrganizer:
                         await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                         continue
 
-                season = episode_info["season"]
+                season = episode_info["arc"]
                 season_info = self.get_season(season)
                 episode = episode_info["episode"]
                 title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"]) if "title" in episode_info and episode_info["title"] != "" else ""
@@ -1351,6 +1351,7 @@ class OnePaceOrganizer:
                 else:
                     _filename = self.filename_tmpl.format(
                         season=season,
+                        arc=season,
                         episode=episode,
                         title=title,
                         name=file.name,
@@ -1383,7 +1384,7 @@ class OnePaceOrganizer:
                         continue
 
                     nfo_file = Path(dst.parent, f"{dst.stem}.nfo")
-                    season = info["season"]
+                    season = info["arc"]
                     episode = info["episode"]
 
                     self.logger.info(f"Updating: Season {season} Episode {episode} ({info['title']})")

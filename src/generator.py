@@ -177,7 +177,7 @@ def update():
                             logger.success(f"-- Saved poster to {poster_path}")
 
                     if poster_path.exists():
-                        out_arcs[arc]['poster'] = f"https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/{arc}/{poster_path.name}"
+                        out_arcs[arc]['poster'] = f"https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/{arc}/{poster_path.name}"
 
                 except:
                     logger.exception("-- Skipping fetching poster")
@@ -619,9 +619,9 @@ def generate_json():
         tvshow_changed = dict_changed(old["tvshow"], tvshow)
     except Exception as e:
         print(f"Warning: {e}")
-    episodes_changed = True
-    arcs_changed = True
-    tvshow_changed = True
+        episodes_changed = True
+        arcs_changed = True
+        tvshow_changed = True
 
     _a = []
     for v in unicode_fix_dict(arcs).values():
