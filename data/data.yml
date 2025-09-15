@@ -1,4 +1,4 @@
-last_update: '2025-09-09T06:07:18.352621+00:00'
+last_update: '2025-09-15T12:11:02.884562+00:00'
 tvshow:
   title: One Pace
   sorttitle: One Pace
@@ -3628,6 +3628,20 @@ episodes:
     released: 2025-08-18
     hashes:
       crc32: 792BE789
+  79C6DC33:
+    season: 35
+    episode: 54
+    title: The Sake I Brewed to Drink With You
+    sorttitle: Sake I Brewed to Drink With You
+    description: Sanji gets himself caught in Black Maria's web, Jinbe faces Who's-Who,
+      and Yamato tells of the time Ace visited Onigashima. Elsewhere, Marco joins
+      the fray on the Performance Floor to help soothe the infected and to offer Zoro
+      a ride.
+    manga_chapters: 998-999
+    anime_episodes: 1012-1014
+    released: 2025-09-15
+    hashes:
+      crc32: 79C6DC33
   7A559716:
     season: 6
     episode: 4
@@ -6061,6 +6075,19 @@ episodes:
     released: 2023-09-02
     hashes:
       crc32: E3AB2BA0
+  E3B8A188:
+    season: 5
+    episode: 6
+    title: MH5
+    description: In a surprising twist, Gin finishes Pearl off himself, claiming Sanji
+      as his own target. Though still wounded, Sanji rises to the challenge and faces
+      off with Gin. As the battle draws to a close, Don Krieg unleashes a deadly toxin
+      into the air.
+    manga_chapters: 59-63
+    anime_episodes: 27-28
+    released: 2025-09-15
+    hashes:
+      crc32: E3B8A188
   E3C90B8B:
     season: 31
     episode: 14
