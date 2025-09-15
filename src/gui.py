@@ -1,21 +1,21 @@
 import asyncio
+import concurrent.futures
 import sys
 import traceback
 
-from aiopath import AsyncPath
 from functools import partial as func_partial
 from pathlib import Path
 from loguru import logger
+from qasync import QEventLoop, asyncWrap, asyncClose, asyncSlot
 from src import utils, organizer
 
-from PySide6 import QtAsyncio
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QLineEdit, QFileDialog, QCheckBox, QComboBox, QTextEdit, QProgressBar,
     QGroupBox, QMessageBox, QInputDialog, QMainWindow
 )
 from PySide6.QtGui import QAction
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 
 class Input:
     def __init__(self, layout, label, prop, width=250, button="", connect=None):
@@ -48,20 +48,25 @@ class Input:
             self.button.setVisible(is_visible)
 
 class GUI(QMainWindow):
+    _log_signal = Signal(str)
+
     def __init__(self, organizer=None, log_level="info"):
         super().__init__()
 
-        self.log_level = log_level.upper()
+        #self.log_level = log_level.upper()
+        self.log_level = "DEBUG"
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
+        self._log_scrollbar = self.log_output.verticalScrollBar()
+        self._log_signal.connect(self._log_output_append)
 
-        logger.add(
-            lambda msg: self.log_output.append(msg.rstrip("\n")),
-            level=self.log_level, 
-            format="[{time:YYYY-MM-DD HH:mm:ss.SSS}] [{level: <8}] {message}", 
-            colorize=False, 
-            enqueue=True
-        )
+        #logger.add(
+        #    self._log,
+        #    level=self.log_level, 
+        #    format="{time:YYYY-MM-DD HH:mm:ss.SSS},{level: <8},{message}", 
+        #    colorize=False, 
+        #    enqueue=True
+        #)
 
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.setWindowTitle(self.organizer.window_title)
@@ -75,6 +80,7 @@ class GUI(QMainWindow):
         widget = QWidget()
         self.setCentralWidget(widget)
         layout = QVBoxLayout(widget)
+        self.lock = asyncio.Lock()
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
@@ -122,40 +128,46 @@ class GUI(QMainWindow):
         self.plex_password.prop.setText(self.organizer.plex_config_password)
         self.plex_password.setVisible(not self.organizer.plex_config_use_token)
 
-        self.plex_remember_login = Input(self.plex_group_layout, "", QCheckBox("Remember"), button="Login", connect=lambda: asyncio.create_task(self.plex_login()))
+        self.plex_remember_login = Input(self.plex_group_layout, "", QCheckBox("Remember"), button="Login", connect=self.plex_login)
         self.plex_remember_login.prop.setChecked(self.organizer.plex_config_remember)
 
         self.plex_server = Input(self.plex_group_layout, "Plex Server:", QComboBox(), width=self.plex_width)
-        self.plex_server.prop.addItem("")
+        self.plex_server.prop.addItem("", userData=None)
 
+        i = 1
         for server_id, item in self.organizer.plex_config_servers.items():
-            self.plex_server.prop.addItem(item["name"])
+            self.plex_server.prop.addItem(item["name"], userData=server_id)
             if server_id == self.organizer.plex_config_server_id:
-                self.plex_server.prop.setCurrentText(item["name"])
+                self.plex_server.prop.setCurrentIndex(i)
+            i += 1
 
-        self.plex_server.prop.currentTextChanged.connect(lambda: asyncio.create_task(self.select_plex_server()))
+        self.plex_server.prop.activated.connect(self.select_plex_server)
         self.plex_server.setVisible(len(self.organizer.plex_config_servers) > 0)
 
         self.plex_library = Input(self.plex_group_layout, "Library:", QComboBox(), width=self.plex_width)
-        self.plex_library.prop.addItem("")
+        self.plex_library.prop.addItem("", userData=None)
 
+        i = 1
         for library_key, item in self.organizer.plex_config_libraries.items():
-            self.plex_library.prop.addItem(item["title"])
+            self.plex_library.prop.addItem(item["title"], userData=library_key)
             if library_key == self.organizer.plex_config_library_key:
-                self.plex_library.prop.setCurrentText(item["title"])
+                self.plex_library.prop.setCurrentIndex(i)
+            i += 1
 
-        self.plex_library.prop.currentTextChanged.connect(lambda: asyncio.create_task(self.select_plex_library()))
+        self.plex_library.prop.activated.connect(self.select_plex_library)
         self.plex_library.setVisible(self.organizer.plex_config_server_id != "" and len(self.organizer.plex_config_libraries) > 0)
 
         self.plex_show = Input(self.plex_group_layout, "Show:", QComboBox(), width=self.plex_width)
-        self.plex_show.prop.addItem("")
+        self.plex_show.prop.addItem("", userData=None)
 
+        i = 1
         for show_guid, item in self.organizer.plex_config_shows.items():
-            self.plex_show.prop.addItem(item["title"])
+            self.plex_show.prop.addItem(item["title"], userData=show_guid)
             if show_guid == self.organizer.plex_config_show_guid:
-                self.plex_show.prop.setCurrentText(item["title"])
+                self.plex_show.prop.setCurrentIndex(i)
+            i += 1
 
-        self.plex_show.prop.currentTextChanged.connect(lambda: asyncio.create_task(self.select_plex_show()))
+        self.plex_show.prop.activated.connect(self.select_plex_show)
         self.plex_show.setVisible(self.organizer.plex_config_library_key != "" and len(self.organizer.plex_config_shows) > 0)
 
         self.plex_group.setLayout(self.plex_group_layout)
@@ -169,7 +181,7 @@ class GUI(QMainWindow):
         menu_configuration = menu.addMenu("&Configuration")
 
         action_exit = QAction("Exit", self)
-        action_exit.triggered.connect(lambda: asyncio.create_task(self.exit()))
+        action_exit.triggered.connect(self.exit)
         menu_file.addAction(action_exit)
 
         action_after_sort = menu_configuration.addMenu("Action after Sorting/Renaming")
@@ -233,12 +245,21 @@ class GUI(QMainWindow):
         menu_configuration.addAction(self.action_edit_output_tmpl)
 
         self.start_button = QPushButton("Start")
-        self.start_button.clicked.connect(lambda: asyncio.create_task(self.start()))
+        self.start_button.clicked.connect(self.start)
         layout.addWidget(self.start_button)
 
         layout.addWidget(self.log_output, stretch=1)
         layout.addWidget(self.progress_bar)
         widget.setLayout(layout)
+
+    def _log_output_append(self, obj):
+        self.log_output.append(obj)
+        self._log_scrollbar.setValue(self._log_scrollbar.maximum())
+
+    def _log(self, msg):
+        m = msg.split(",")
+        text = " ".join(m[2:]).rstrip("\n")
+        self._log_signal.emit(f"[{m[0]}] [{m[1].replace(' ','')}] {text}")
 
     def _output_label_txt(self):
         _action = "Move"
@@ -252,16 +273,19 @@ class GUI(QMainWindow):
         self.output.label.setText(f"{_action} the sorted and renamed files to:")
         self.output.setVisible(self.organizer.file_action != 4)
 
-    def _input_dialog(self, text, default=""):
-        res, ok = QInputDialog.getText(None, self.organizer.window_title, text, QLineEdit.Normal, default)
+    async def _input_dialog(self, text, default=""):
+        res, ok = await asyncWrap(
+            lambda: QInputDialog.getText(None, self.organizer.window_title, text, QLineEdit.Normal, default)
+        )
         if ok:
             return res
 
         return ""
 
-    def _message_dialog(self, text):
-        logger.warning(text)
-        return QMessageBox.information(None, self.organizer.window_title, text) == QMessageBox.StandardButtons.Ok
+    async def _message_dialog(self, text):
+        return await asyncWrap(
+            lambda: QMessageBox.information(None, self.organizer.window_title, text) 
+        ) == QMessageBox.StandardButtons.Ok
 
     def browse_input_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Input Folder")
@@ -286,7 +310,7 @@ class GUI(QMainWindow):
             if not yn:
                 return
 
-        self.organizer.input_path = AsyncPath(Path(folder).resolve())
+        self.organizer.input_path = Path(folder).resolve()
         self.input.prop.setText(str(self.organizer.input_path))
 
         if self.organizer.file_action == 4:
@@ -299,7 +323,7 @@ class GUI(QMainWindow):
             return
 
         if Path(self.input.prop.text()).resolve() == Path(folder).resolve() and self.organizer.file_action != 4:
-            QMessageBox.error(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
+            QMessageBox.information(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
             return
 
         if len(folder) > 2 and (folder[:2] == "\\\\" or folder[:2] == "//"):
@@ -314,14 +338,26 @@ class GUI(QMainWindow):
             if not yn:
                 return
 
-        self.organizer.output_path = AsyncPath(Path(folder).resolve())
+        self.organizer.output_path = Path(folder).resolve()
         self.output.prop.setText(str(self.organizer.output_path))
 
     def edit_plex_url(self, text):
         self.organizer.plex_config_url = text
 
+    def _update_start_btn(self):
+        self.start_button.setEnabled(
+            not self.organizer.plex_config_enabled or (
+                self.organizer.plex_config_enabled and 
+                self.organizer.plex_config_server_id != "" and 
+                self.organizer.plex_config_library_key != "" and 
+                self.organizer.plex_config_show_guid != ""
+            )
+        )
+
     def set_method(self, text):
         self.organizer.plex_config_enabled = text == "Plex"
+        self._update_start_btn()
+
         self.plex_group.setVisible(self.organizer.plex_config_enabled)
         self.action_after_sort_metadata.setVisible(not self.organizer.plex_config_enabled)
         self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
@@ -337,8 +373,8 @@ class GUI(QMainWindow):
         self.plex_username.setVisible(not self.organizer.plex_config_use_token)
         self.plex_password.setVisible(not self.organizer.plex_config_use_token)
 
-    def _plex_toggle_enabled(self, enable_all: bool):
-        self.plex_method.setEnabled(enable_all)
+    async def _plex_toggle_enabled(self, enable_all: bool):
+        self.plex_method.prop.setEnabled(enable_all)
         self.plex_token.prop.setEnabled(enable_all)
         self.plex_username.prop.setEnabled(enable_all)
         self.plex_password.prop.setEnabled(enable_all)
@@ -347,56 +383,85 @@ class GUI(QMainWindow):
         self.plex_server.prop.setEnabled(enable_all)
         self.plex_library.prop.setEnabled(enable_all)
         self.plex_show.prop.setEnabled(enable_all)
+        self.plex_url.prop.setEnabled(enable_all)
 
-    def _plex_toggle_visible(self, enable_all: bool):
-        self.plex_method.setVisible(enable_all)
-        self.plex_token.prop.setVisible(enable_all)
-        self.plex_username.prop.setVisible(enable_all)
-        self.plex_password.prop.setVisible(enable_all)
-
+    @asyncSlot()
     async def plex_login(self):
-        self._plex_toggle_enabled(False)
-        self.plex_remember_login.button.setEnabled(False)
+        if not self.plex_remember_login.button.isEnabled():
+            return
 
-        self.organizer.plex_config_use_token = self.plex_method.prop.text() == "Authentication Token"
+        await self._plex_toggle_enabled(False)
+
+        self.organizer.plex_config_use_token = self.plex_method.prop.currentText() == "Authentication Token"
         self.organizer.plex_config_remember = self.plex_remember_login.prop.checkState() == Qt.Checked
         self.organizer.plex_config_auth_token = self.plex_token.prop.text()
         self.organizer.plex_config_username = self.plex_username.prop.text()
         self.organizer.plex_config_password = self.plex_password.prop.text()
 
+        self.organizer.logger.info(f"Logging in to Plex")
         if not await self.organizer.plex_login(True):
-            self._plex_toggle_enabled(True)
-            self.plex_remember_login.button.setEnabled(True)
+            self.organizer.logger.info(f"Login failed")
+            await self._plex_toggle_enabled(True)
+            self.plex_server.prop.setEnabled(False)
+            self.plex_server.setVisible(False)
+            self.plex_library.prop.setEnabled(False)
+            self.plex_library.setVisible(False)
+            self.plex_show.prop.setEnabled(False)
+            self.plex_show.setVisible(False)
             return
 
+        self.organizer.logger.info(f"Logged in")
         self.plex_remember_login.button.setEnabled(True)
         self.plex_remember_login.button.setText("Disconnect")
         self.start_button.setEnabled(False)
+
+        self.plex_server.prop.setEnabled(True)
+
         await self.plex_get_servers()
 
+    @asyncSlot()
     async def plex_get_servers(self):
+        if not self.plex_server.prop.isEnabled():
+            return
+
+        self.organizer.logger.info("Fetching Plex Servers")
+        self.plex_server.prop.setEnabled(False)
+
         self.plex_server.setVisible(True)
         self.plex_library.setVisible(False)
         self.plex_show.setVisible(False)
 
-        self.plex_server.prop.setEnabled(False)
         self.plex_server.prop.clear()
-        self.plex_server.prop.addItem("Loading...")
+        self.plex_server.prop.addItem("Loading...", userData=None)
 
         if not await self.organizer.plex_get_servers():
-            self.plex_server.prop.setVisible(False)
+            self.plex_server.prop.clear()
+            self.plex_server.prop.addItem("", userData=None)
+            self.plex_server.prop.setEnabled(True)
             return
 
-        self.plex_server.prop.setEnabled(True)
         self.plex_server.prop.clear()
-        self.plex_server.prop.addItem("")
+        self.plex_server.prop.addItem("", userData=None)
 
         for identifier, item in self.organizer.plex_config_servers.items():
-            self.plex_server.prop.addItem(item.name, userData=identifier)
+            self.plex_server.prop.addItem(item["name"], userData=identifier)
 
+        self._update_start_btn()
+        self.plex_server.prop.setEnabled(True)
+
+        #if len(self.organizer.plex_config_servers) == 1:
+        #    self.plex_server.prop.setCurrentIndex(1)
+        #    await self.select_plex_server()
+
+    @asyncSlot()
     async def select_plex_server(self):
+        if not self.plex_server.prop.isEnabled():
+            return
+
         _id = self.plex_server.prop.currentData()
         if _id is None or _id == "":
+            self.organizer.plexapi_server = None
+            self.organizer.plex_config_server_id = ""
             await self.plex_get_servers()
             self.plex_server.setVisible(True)
             self.plex_library.setVisible(False)
@@ -404,7 +469,14 @@ class GUI(QMainWindow):
             self.start_button.setEnabled(False)
             return
 
-        await self.organizer.plex_select_server(_id)
+        if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id == "" and not await self.organizer.select_plex_server(_id):
+            self.organizer.plexapi_server = None
+            self.organizer.plex_config_server_id = ""
+            self.plex_server.setVisible(True)
+            self.plex_library.setVisible(False)
+            self.plex_show.setVisible(False)
+            self.start_button.setEnabled(False)
+            return
 
         self.plex_server.setVisible(True)
         self.plex_library.setVisible(True)
@@ -412,19 +484,32 @@ class GUI(QMainWindow):
 
         self.plex_library.prop.setEnabled(False)
         self.plex_library.prop.clear()
-        self.plex_library.prop.addItem("Loading...")
+        self.plex_library.prop.addItem("Loading...", userData=None)
 
         if not await self.organizer.plex_get_libraries():
+            self.plex_library.prop.clear()
+            self.plex_library.prop.addItem("", userData=None)
+            self.plex_library.prop.setEnabled(True)
             return
 
-        self.plex_library.prop.setEnabled(True)
         self.plex_library.prop.clear()
-        self.plex_library.prop.addItem("")
+        self.plex_library.prop.addItem("", userData=None)
 
         for identifier, item in self.organizer.plex_config_libraries.items():
-            self.plex_library.prop.addItem(item.title, userData=identifier)
+            self.plex_library.prop.addItem(item["title"], userData=identifier)
 
+        self._update_start_btn()
+        self.plex_library.prop.setEnabled(True)
+
+        #if len(self.organizer.plex_config_libraries) == 1:
+        #    self.plex_library.prop.setCurrentIndex(1)
+        #    await self.select_plex_library()
+
+    @asyncSlot()
     async def select_plex_library(self):
+        if not self.plex_library.prop.isEnabled():
+            return
+
         _id = self.plex_library.prop.currentData()
         if _id is None or _id == "":
             self.plex_server.setVisible(True)
@@ -433,27 +518,38 @@ class GUI(QMainWindow):
             self.start_button.setEnabled(False)
             return
 
-        await self.organizer.plex_select_library(_id)
-
+        await self.organizer.plex_select_library(int(_id))
         self.plex_server.setVisible(True)
         self.plex_library.setVisible(True)
         self.plex_show.setVisible(True)
 
         self.plex_show.prop.setEnabled(False)
         self.plex_show.prop.clear()
-        self.plex_show.prop.addItem("Loading...")
+        self.plex_show.prop.addItem("Loading...", userData=None)
 
         if not await self.organizer.plex_get_shows():
+            self.plex_show.prop.clear()
+            self.plex_show.prop.addItem("", userData=None)
+            self.plex_show.prop.setEnabled(True)
             return
 
-        self.plex_show.prop.setEnabled(True)
         self.plex_show.prop.clear()
-        self.plex_show.prop.addItem("")
+        self.plex_show.prop.addItem("", userData=None)
 
         for identifier, item in self.organizer.plex_config_shows.items():
-            self.plex_show.prop.addItem(item.title, userData=identifier)
+            self.plex_show.prop.addItem(item["title"], userData=identifier)
 
+        self._update_start_btn()
+        self.plex_show.prop.setEnabled(True)
+
+        #if len(self.organizer.plex_config_shows) == 1:
+        #    self.plex_show.prop.setCurrentIndex(1)
+
+    @asyncSlot()
     async def select_plex_show(self):
+        if not self.plex_show.prop.isEnabled():
+            return
+
         _id = self.plex_show.prop.currentData()
         if _id is None or _id == "":
             self.plex_server.setVisible(True)
@@ -463,11 +559,13 @@ class GUI(QMainWindow):
             return
 
         await self.organizer.plex_select_show(_id)
-        self.start_button.setEnabled(True)
+        self._update_start_btn()
 
-    async def exit(self):
+    @asyncClose
+    async def exit(self, event=None):
         await self.organizer.save_config()
-        self.close()
+        if event is None:
+            self.close()
 
     def set_action(self, action):
         self.organizer.file_action = action
@@ -485,27 +583,33 @@ class GUI(QMainWindow):
         self.action_season_2.setChecked(season == 2)
 
     def edit_output_template(self):
-        self.organizer.filename_tmpl = self._input_dialog("Enter the template for the filename:", self.organizer.filename_tmpl)
+        _sp = " " * 100
+        _fn = self._input_dialog(f"Enter the template for the filename:{_sp}", self.organizer.filename_tmpl)
+        if _fn is not None and _fn != "":
+            self.organizer.filename_tmpl = _fn
 
-    def set_plex_url(self):
-        self.organizer.plex_config_url = self._input_dialog("Enter the URL to your Plex instance:", self.organizer.plex_config_url)
-
+    @asyncSlot()
     async def start(self):
         self.start_button.setEnabled(False)
         self.log_output.append(self.spacer)
 
+        print("1")
         if self.organizer.plex_config_enabled:
+            print("2")
             self.plex_server.prop.setEnabled(False)
             self.plex_library.prop.setEnabled(False)
             self.plex_show.prop.setEnabled(False)
             self.plex_remember_login.button.setEnabled(False)
             self.plex_remember_login.prop.setEnabled(False)
 
-            res = await self.organizer.start()
+            res = await asyncio.create_task(self.organizer.start())
             if isinstance(res, tuple):
-                queue, completed, skipped = res
+                print("3")
+                success, queue, completed, skipped = res
+                print("4")
 
                 if len(queue) > 0:
+                    print("5")
                     QMessageBox.information(None, self.organizer.window_title,
                         (
                             f"All of the One Pace files have been created in:\n"
@@ -516,10 +620,14 @@ class GUI(QMainWindow):
                             "Click OK once this has been done and you can see the One Pace video files in Plex."
                         )
                     )
+                    print("6")
 
-                    completed, skipped = await self.organizer.process_plex_episodes(queue)
+                    res = asyncio.create_task(self.organizer.process_plex_episodes(queue))
+                    success, queue, completed, skipped = await res
+                    print("7")
                     self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
                 else:
+                    print("8")
                     self.log_output.append(self.spacer)
                     self.log_output.append("Nothing to do")
 
@@ -531,24 +639,30 @@ class GUI(QMainWindow):
             self.start_button.setEnabled(True)
             return
 
-        completed, skipped = await self.organizer.start()
+        print("9")
+        res = asyncio.create_task(self.organizer.start())
+        success, queue, completed, skipped = await res
         self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
         self.start_button.setEnabled(True)
 
 def main(organizer, log_level):
     try:
         app = QApplication(sys.argv)
-        gui = GUI(organizer, log_level)
+        close_event = asyncio.Event()
+        app.aboutToQuit.connect(close_event.set)
 
-        logger.debug("loading configuration")
-        asyncio.run(organizer.load_config())
+        async def _run():
+            #organizer.logger = utils.AsyncLogWrapper(logger)
+            organizer.executor_func = concurrent.futures.ThreadPoolExecutor
+            await organizer.load_config()
 
-        logger.debug("launching Qt app")
-        gui.setWindowTitle(organizer.window_title)
-        gui.show()
+            gui = GUI(organizer, log_level)
+            gui.setWindowTitle(organizer.window_title)
+            gui.show()
 
-        QtAsyncio.run(handle_sigint=True)
-        asyncio.run(organizer.save_config())
+            await close_event.wait()
+
+        asyncio.run(_run(), loop_factory=QEventLoop)
 
     except:
         print(traceback.format_exc())

@@ -49,10 +49,10 @@ def update():
     PATTERN_CHAPTER_EPISODE = r'\b\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*\b'
     PATTERN_TITLE = r'\[One Pace\]\[\d+(?:[-,]\d+)*\]\s+(.+?)\s+(\d{2,})\s*(\w+)?\s*\[\d+p\]\[([A-Fa-f0-9]{8})\]\.mkv'
 
-    out_seasons = {}
+    out_arcs = {}
     out_episodes = {}
-    season_eps = {}
-    season_to_num = {}
+    arc_eps = {}
+    arc_to_num = {}
 
     try:
         retry = Retry(total=999, backoff_factor=0.5)
@@ -81,7 +81,7 @@ def update():
                         continue
 
                     arc_name = match.group("arc")
-                    ep_num = f"{int(match.group('num'))}"
+                    ep_num = f"{int(match.group("num"))}"
 
                     if arc_name not in arc_name_to_id:
                         if arc_name == "loguetown":
@@ -104,6 +104,7 @@ def update():
 
             logger.info("--------------------------")
 
+            _s = []
             with client.stream("GET", f"https://docs.google.com/spreadsheets/d/{ONE_PACE_EPISODE_DESC_ID}/export?gid=2010244982&format=csv", follow_redirects=True) as resp:
                 reader = CSVReader(resp.iter_lines())
 
@@ -123,41 +124,43 @@ def update():
                     elif part > 90:
                         continue
 
-                    out_seasons[part] = {
+                    out_arcs[part] = {
+                        "part": part,
                         "saga": row['saga_title'],
                         "title": title,
                         "originaltitle": "",
                         "description": row['description_en'],
-                        "poster": ""
-                    }
+                        "poster": "",
+                        "episodes": []
+                    })
 
                     logger.success(f"{part}. {title}")
 
-                    season_to_num[title] = part
+                    arc_to_num[title] = part
 
             logger.info("--------------------------")
 
             r = client.get(f"https://sheets.googleapis.com/v4/spreadsheets/{ONE_PACE_EPISODE_GUIDE_ID}?key={GCLOUD_API_KEY}")
             spreadsheet = orjson.loads(r.content)
 
-            for season, sheet in enumerate(spreadsheet['sheets']):
+            for arc, sheet in enumerate(spreadsheet['sheets']):
                 sheetId = sheet['properties']['sheetId']
                 if sheetId == 0:
                     continue
 
-                season_title = sheet['properties']['title']
+                arc_title = sheet['properties']['title']
 
-                logger.success(f"{season}. {season_title} ({sheetId})")
+                logger.success(f"{arc}. {arc_title} ({sheetId})")
 
-                if season_title != out_seasons[season]['title']:
-                    out_seasons[season]['originaltitle'] = out_seasons[season]['title']
-                    out_seasons[season]['title'] = season_title
-                    season_to_num[season_title] = season
+                if arc_title != out_arcs[arc]['title']:
+                    out_arcs[arc]['originaltitle'] = out_arcs[arc]['title']
+                    out_arcs[arc]['title'] = arc_title
+                    arc_to_num[arc_title] = arc
 
-                    logger.info(f"-- Renaming to: {out_seasons[season]['title']}")
+                    logger.info(f"-- Renaming to: {out_arcs[arc]['title']}")
 
                 try:
-                    poster_path = Path(".", "data", "posters", f"{season}", "poster.png")
+                    poster_path = Path(".", "data", "posters", f"{arc}", "poster.png")
 
                     if not poster_path.exists():
                         poster_path.parent.mkdir(exist_ok=True)
@@ -174,7 +177,7 @@ def update():
                             logger.success(f"-- Saved poster to {poster_path}")
 
                     if poster_path.exists():
-                        out_seasons[season]['poster'] = f"https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/{season}/{poster_path.name}"
+                        out_arcs[arc]['poster'] = f"https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/{arc}/{poster_path.name}"
 
                 except:
                     logger.exception("-- Skipping fetching poster")
@@ -232,12 +235,12 @@ def update():
                                 continue
 
                         out_episodes[mkv_crc32] = {
-                            "season": season,
+                            "arc": arc,
                             "episode": episode,
-                            "title": f"{out_seasons[season]['title']} {episode:02d}",
+                            "title": f"{out_arcs[arc]['title']} {episode:02d}",
                             "description": "",
-                            "manga_chapters": str(chapters),
-                            "anime_episodes": str(anime_episodes),
+                            "chapters": str(chapters),
+                            "episodes": str(anime_episodes),
                             "released": release_date.isoformat()
                         }
 
@@ -245,14 +248,25 @@ def update():
                             logger.info(f"-- Aliasing {mkv_crc32_ext} -> {mkv_crc32}")
                             out_episodes[mkv_crc32_ext] = out_episodes[mkv_crc32]
 
-                        key = f"{out_seasons[season]['originaltitle']} {episode}" if 'originaltitle' in out_seasons[season] and out_seasons[season]['originaltitle'] != "" else f"{out_seasons[season]['title']} {episode}"
-                        if key in season_eps:
-                            season_eps[key].append(mkv_crc32)
+                        key = f"{out_arcs[arc]['originaltitle']} {episode}" if 'originaltitle' in out_arcs[arc] and out_arcs[arc]['originaltitle'] != "" else f"{out_arcs[arc]['title']} {episode}"
+                        if key in arc_eps:
+                            arc_eps[key].append(mkv_crc32)
 
                             if mkv_crc32_ext != '':
-                                season_eps[key].append(mkv_crc32_ext)
+                                arc_eps[key].append(mkv_crc32_ext)
+
+                            out_arcs[arc]["episodes"][f"{episode:02d}"].append({
+                                "crc32": mkv_crc32,
+                                "crc32_extended": mkv_crc32_ext
+                            })
+
                         else:
-                            season_eps[key] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
+                            arc_eps[key] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
+
+                            out_arcs[arc]["episodes"] = {f"{episode:02d}":[{
+                                "crc32": mkv_crc32,
+                                "crc32_extended": mkv_crc32_ext
+                            }]}
 
             if ONE_PACE_RSS_FEED != '':
                 logger.info("--------------------------")
@@ -270,60 +284,116 @@ def update():
                             logger.warning(f"Skipping: {item}")
                             continue
 
-                        match = title_pattern.match(item.title.content)
-                        if not match:
-                            logger.warning(f"Skipping: {item.title.content} (title does not match)")
-                            continue
-
-                        arc_name, ep_num, extra, crc32 = match.groups()
-                        if Path(".", "data", "episodes", f"{crc32}.yml").exists():
-                            logger.warning(f"Skipping: {item.title.content} (crc32 file exists)")
-                            continue
-
+                        logger.info(item.title.content)
                         pub_date = datetime.strptime(item.pub_date.content, "%a, %d %b %Y %H:%M:%S %z")
-                        if now - pub_date > timedelta(hours=72):
-                            logger.warning(f"Skipping: {item.title.content} (more than 72 hours)")
-                            continue
 
-                        r = httpx.get(item.guid.content)
-                        div = BeautifulSoup(r.text, 'html.parser').find('div', { 'class': 'panel-body', 'id': 'torrent-description' })
-                        desc = div.get_text(strip=True).split("\n") if div else []
+                        if item.title.content.endswith(".mkv"):
+                            match = title_pattern.match(item.title.content)
+                            if not match:
+                                logger.warning("-- Skipping: regex does not match")
+                                continue
 
-                        chs = ""
-                        eps = ""
+                            arc_name, ep_num, extra, crc32 = match.groups()
+                            if Path(".", "data", "episodes", f"{crc32}.yml").exists():
+                                logger.warning("-- Skipping: crc32 file exists")
+                                continue
 
-                        for d in desc:
-                            if d.startswith("Chapters: "):
-                                chs = d.replace("Chapters: ", "")
-                            elif d.startswith("Episodes: "):
-                                eps = d.replace("Episodes: ", "")
+                            r = httpx.get(item.guid.content)
+                            div = BeautifulSoup(r.text, 'html.parser').find('div', { 'class': 'panel-body', 'id': 'torrent-description' })
+                            desc = div.get_text(strip=True).split("\n") if div else []
 
-                        if arc_name in season_to_num:
-                            ep_num = int(ep_num)
-                            released = (pub_date.isoformat().split("T"))[0]
-                            t = f"{arc_name} {ep_num:02d}"
+                            chs = ""
+                            eps = ""
 
-                            if crc32 not in out_episodes:
-                                out_episodes[crc32] = {
-                                    "season": season_to_num[arc_name],
-                                    "episode": ep_num,
-                                    "title": t,
-                                    "description": "",
-                                    "manga_chapters": chs,
-                                    "anime_episodes": eps,
-                                    "released": released
-                                }
+                            for d in desc:
+                                if d.startswith("Chapters: "):
+                                    chs = d.replace("Chapters: ", "")
+                                elif d.startswith("Episodes: "):
+                                    eps = d.replace("Episodes: ", "")
 
-                            key = f"{arc_name} {ep_num}"
-                            if key in season_eps:
-                                season_eps[key].append(crc32)
+                            if arc_name in arc_to_num:
+                                ep_num = int(ep_num)
+                                released = (pub_date.isoformat().split("T"))[0]
+                                t = f"{arc_name} {ep_num:02d}"
+
+                                if crc32 not in out_episodes:
+                                    out_episodes[crc32] = {
+                                        "arc": arc_to_num[arc_name],
+                                        "episode": ep_num,
+                                        "title": t,
+                                        "description": "",
+                                        "chapters": chs,
+                                        "episodes": eps,
+                                        "released": released
+                                    }
+
+                                key = f"{arc_name} {ep_num}"
+                                if key in arc_eps:
+                                    arc_eps[key].append(crc32)
+                                else:
+                                    arc_eps[key] = [crc32]
+
+                                logger.success(f"-- Added S{arc_to_num[arc_name]:02d}E{ep_num:02d} ({t}, {released})")
+
                             else:
-                                season_eps[key] = [crc32]
-
-                            logger.success(f"Added S{season_to_num[arc_name]}E{ep_num:02d} from RSS ({t}, {released})")
+                                logger.warning(f"-- Skipping: arc {arc_name} not found")
 
                         else:
-                            logger.warning(f"Skipping: {item.title.content} (arc {arc_name} not found)")
+                            r = httpx.get(item.guid.content)
+
+                            for item in BeautifulSoup(r.text, "html.parser").select("li i.fa-file"):
+                                li = item.find_parent("li")
+                                if not li:
+                                    continue
+
+                                filename = " ".join([t for t in li.stripped_strings if not t.startswith("(")])
+                                logger.info(f"-- {filename}")
+
+                                match = title_pattern.match(filename)
+                                if not match:
+                                    logger.warning("---- Skipping: regex does not match")
+                                    continue
+
+                                arc_name, ep_num, extra, crc32 = match.groups()
+                                if Path(".", "data", "episodes", f"{crc32}.yml").exists():
+                                    logger.warning("---- Skipping: crc32 file exists")
+                                    continue
+
+                                if arc_name in arc_to_num:
+                                    ep_num = int(ep_num)
+                                    released = (pub_date.isoformat().split("T"))[0]
+                                    t = f"{arc_name} {ep_num:02d}"
+
+                                    if crc32 not in out_episodes:
+                                        _s = arc_to_num[arc_name]
+                                        chs = ""
+                                        eps = ""
+
+                                        for v in out_episodes.values():
+                                            if v["arc"] == _s and v["episode"] == ep_num:
+                                                chs = v["chapters"]
+                                                eps = v["episodes"]
+                                                break
+
+                                        out_episodes[crc32] = {
+                                            "arc": _s,
+                                            "episode": ep_num,
+                                            "title": t,
+                                            "description": "",
+                                            "chapters": chs,
+                                            "episodes": eps,
+                                            "released": released
+                                        }
+
+                                    key = f"{arc_name} {ep_num}"
+                                    if key in arc_eps:
+                                        arc_eps[key].append(crc32)
+                                    else:
+                                        arc_eps[key] = [crc32]
+
+                                    logger.success(f"---- Added S{arc_to_num[arc_name]:02d}E{ep_num:02d} ({t}, {released})")
+                                else:
+                                    logger.warning(f"---- Skipping: arc {arc_name} not found")
 
                 except:
                     logger.error(f"Skipping RSS parsing\n{traceback.format_exc()}")
@@ -337,28 +407,28 @@ def update():
                     if 'arc_title' not in row:
                         continue
 
-                    season = row['arc_title']
+                    arc = row['arc_title']
                     episode = row['arc_part']
                     title = row['title_en']
                     description = row['description_en']
 
-                    if season == '' or episode == '' or title == '':
+                    if arc == '' or episode == '' or title == '':
                         continue
 
-                    key = f"{season} {episode}"
-                    if key not in season_eps:
+                    key = f"{arc} {episode}"
+                    if key not in arc_eps:
                         logger.warning(f"Skipping: {key} (not found)")
                         continue
 
-                    logger.info(f"{key}: Adding {len(season_eps[key])} episodes")
+                    logger.info(f"{key}: Adding {len(arc_eps[key])} episodes")
 
-                    for crc32 in season_eps[key]:
+                    for crc32 in arc_eps[key]:
                         out_episodes[crc32]["episode"] = int(episode)
                         out_episodes[crc32]["title"] = title
                         out_episodes[crc32]["description"] = description
 
                         try:
-                            _s = f"{out_episodes[crc32]['season']}"
+                            _s = f"{out_episodes[crc32]['arc']}"
                             _e = f"{out_episodes[crc32]['episode']}"
 
                             if _s != "0" and _s in mkv_titles and _e in mkv_titles[_s]:
@@ -375,21 +445,21 @@ def update():
         for crc32, data in out_episodes.items():
             file_path = Path(".", "data", "episodes", f"{crc32}.yml")
 
-            season = data['season']
+            arc = data['arc']
             episode = data['episode']
             released = data['released']
 
-            if season == 99:
-                season = 0
-            elif season > 90:
-                episode = season
-                season = 0
+            if arc == 99:
+                arc = 0
+            elif arc > 90:
+                episode = arc
+                arc = 0
 
             if isinstance(released, date) or isinstance(released, datetime):
                 released = released.isoformat()
 
             if file_path.exists():
-                old_data = {"episode": None, "title": "", "description": "", "manga_chapters": "", "anime_episodes": "", "released": ""}
+                old_data = {"episode": None, "title": "", "description": "", "chapters": "", "episodes": "", "released": ""}
 
                 with file_path.open(mode='r', encoding='utf-8') as f:
                     old_data = YamlLoad(stream=f)
@@ -400,19 +470,19 @@ def update():
                 if isinstance(old_data["released"], date) or isinstance(old_data["released"], datetime):
                     old_data["released"] = old_data["released"].isoformat()
 
-                if old_data["episode"] == episode and old_data["title"] != "" and old_data["description"] != "" and old_data["manga_chapters"] != "" and old_data["anime_episodes"] != "" and old_data["released"] == data["released"]:
+                if old_data["episode"] == episode and old_data["title"] != "" and old_data["description"] != "" and old_data["chapters"] != "" and old_data["episodes"] != "" and old_data["released"] == data["released"]:
                     continue
 
             out = (
-                f"season: {season}\n"
+                f"arc: {arc}\n"
                 f"episode: {episode}\n"
                 "\n"
                 "{title}"
                 "{originaltitle}"
                 "{sorttitle}\n"
                 "{description}"
-                f"manga_chapters: {data['manga_chapters']}\n"
-                f"anime_episodes: {data['anime_episodes']}\n"
+                f"chapters: {data['chapters']}\n"
+                f"episodes: {data['episodes']}\n"
                 "\n"
                 "# rating: TV-14\n"
                 f"released: {released}\n"
@@ -442,11 +512,11 @@ def update():
 
             logger.success(f"Wrote episode to {file_path}")
 
-        season_path = Path(".", "data", "seasons.yml")
-        with season_path.open(mode='w') as f:
-            YamlDump(data=out_seasons, stream=f, allow_unicode=True, sort_keys=False)
+        arc_path = Path(".", "data", "arcs.yml")
+        with arc_path.open(mode='w') as f:
+            YamlDump(data=out_arcs, stream=f, allow_unicode=True, sort_keys=False)
 
-        logger.success(f"Wrote seasons to {season_path}")
+        logger.success(f"Wrote arcs to {arc_path}")
 
     except:
         logger.critical(f"Uncaught Exception\n{traceback.format_exc()}")
@@ -476,28 +546,41 @@ def unicode_fix_dict(d):
                 new_dict[str_key][inner_key] = val.isoformat()
             elif isinstance(val, str):
                 new_dict[str_key][inner_key] = unicode_fix(val)
-            elif not (inner_key == "season" or inner_key == "episode") and (isinstance(val, int) or isinstance(val, float)):
+            elif not (inner_key == "arc" or inner_key == "episode") and (isinstance(val, int) or isinstance(val, float)):
                 new_dict[str_key][inner_key] = str(val)
             else:
                 new_dict[str_key][inner_key] = val
 
     return new_dict
 
+def val_convert_string(d):
+    if isinstance(d, list):
+        for k, v in enumerate(d):
+            d[k] = val_convert_string(v)
+        return d
+
+    elif isinstance(d, dict):
+        for k, v in d.items():
+            d[k] = val_convert_string(v)
+        return d
+
+    return str(d)
+
 def generate_json():
     tvshow_yml = Path(".", "data", "tvshow.yml")
-    seasons_yml = Path(".", "data", "seasons.yml")
+    arcs_yml = Path(".", "data", "arcs.yml")
     episodes_dir = Path(".", "data", "episodes")
     data_yml = Path(".", "data", "data.yml")
     json_file = Path(".", "data.json")
 
     tvshow = {}
-    seasons = {}
+    arcs = {}
 
     with tvshow_yml.open(mode='r', encoding='utf-8') as f:
-        tvshow = YamlLoad(stream=f)
+        tvshow = val_convert_string(YamlLoad(stream=f))
 
-    with seasons_yml.open(mode='r', encoding='utf-8') as f:
-        seasons = sort_dict(YamlLoad(stream=f))
+    with arcs_yml.open(mode='r', encoding='utf-8') as f:
+        arcs = sort_dict(YamlLoad(stream=f))
 
     episodes = {}
 
@@ -519,29 +602,36 @@ def generate_json():
             old = YamlLoad(stream=f)
 
         episodes_changed = dict_changed(old["episodes"], episodes)
-        seasons_changed = dict_changed(old["seasons"], seasons)
+        arcs_changed = dict_changed(old["arcs"], arcs)
         tvshow_changed = dict_changed(old["tvshow"], tvshow)
     except Exception as e:
         print(f"Warning: {e}")
         episodes_changed = True
-        seasons_changed = True
+        arcs_changed = True
         tvshow_changed = True
 
-    if episodes_changed or seasons_changed or tvshow_changed:
-        last_update = datetime.now(timezone.utc).isoformat()
+    if episodes_changed or arcs_changed or tvshow_changed:
+        now = datetime.now(timezone.utc)
+        last_update = now.isoformat()
+        last_update_ts = int(last_update.timestamp() * 1000)
 
         with data_yml.open(mode='w') as f:
             YamlDump(data={
                 "last_update": last_update,
+                "last_update_ts": last_update_ts,
                 "tvshow": tvshow,
-                "seasons": seasons,
+                "arcs": arcs,
                 "episodes": episodes
             }, stream=f, allow_unicode=True, sort_keys=False)
+
+        _a = []
+        for v in unicode_fix_dict(arcs).values():
+            _a.append(v)
 
         out = orjson.dumps({
             "last_update": last_update,
             "tvshow": tvshow,
-            "seasons": [v for v in unicode_fix_dict(seasons).values()],
+            "arcs": _a,
             "episodes": unicode_fix_dict(episodes)
         }, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2).replace(b"\\\\u", b"\\u")
         json_file.write_bytes(out)

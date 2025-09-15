@@ -2,7 +2,6 @@ import asyncio
 import sys
 import traceback
 
-from aiopath import AsyncPath
 from functools import partial as func_partial
 from pathlib import Path
 from loguru import logger
@@ -24,8 +23,8 @@ class Headless:
         self.organizer.progress_bar_func = logger.trace
 
     async def run(self):
-        c = AsyncPath("config.json")
-        if await c.exists():
+        c = Path(self.organizer.base_path, "config.json")
+        if await run(c.is_file):
             _action = "Action after Sorting: Move"
             if self.organizer.file_action == 1:
                 _action = "Action after Sorting: Copy"
