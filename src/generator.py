@@ -160,7 +160,7 @@ def update():
                     logger.info(f"-- Renaming to: {out_arcs[arc]['title']}")
 
                 try:
-                    poster_path = Path(".", "data", "posters", f"{arc}", "poster.png")
+                    poster_path = Path(".", "metadata", "posters", f"{arc}", "poster.png")
 
                     if not poster_path.exists():
                         poster_path.parent.mkdir(exist_ok=True)
@@ -297,7 +297,7 @@ def update():
                             if ep_num in out_arcs[arc_id]["episodes"]:
                                 out_arcs[arc_id]["episodes"][ep_num][crc_key] = crc32
 
-                            if Path(".", "data", "episodes", f"{crc32}.yml").exists():
+                            if Path(".", "metadata", "episodes", f"{crc32}.yml").exists():
                                 logger.warning("-- Skipping: crc32 file exists")
                                 continue
 
@@ -364,7 +364,7 @@ def update():
                                 if ep_num in out_arcs[arc_id]["episodes"]:
                                     out_arcs[arc_id]["episodes"][ep_num][crc_key] = crc32
 
-                                if Path(".", "data", "episodes", f"{crc32}.yml").exists():
+                                if Path(".", "metadata", "episodes", f"{crc32}.yml").exists():
                                     logger.warning("---- Skipping: crc32 file exists")
                                     continue
 
@@ -452,7 +452,7 @@ def update():
         logger.info("--------------------------")
 
         for crc32, data in out_episodes.items():
-            file_path = Path(".", "data", "episodes", f"{crc32}.yml")
+            file_path = Path(".", "metadata", "episodes", f"{crc32}.yml")
 
             arc = data['arc']
             episode = data['episode']
@@ -521,7 +521,7 @@ def update():
 
             logger.success(f"Wrote episode to {file_path}")
 
-        arc_path = Path(".", "data", "arcs.yml")
+        arc_path = Path(".", "metadata", "arcs.yml")
         with arc_path.open(mode='w') as f:
             YamlDump(data=out_arcs, stream=f, allow_unicode=True, sort_keys=False)
 
@@ -579,12 +579,12 @@ def val_convert_string(d):
     return unicode_fix(str(d))
 
 def generate_json():
-    tvshow_yml = Path(".", "data", "tvshow.yml")
-    arcs_yml = Path(".", "data", "arcs.yml")
-    episodes_dir = Path(".", "data", "episodes")
-    data_yml = Path(".", "data", "data.yml")
-    json_file = Path(".", "data.json")
-    json_min_file = Path(".", "data", "data.min.json")
+    tvshow_yml = Path(".", "metadata", "tvshow.yml")
+    arcs_yml = Path(".", "metadata", "arcs.yml")
+    episodes_dir = Path(".", "metadata", "episodes")
+    data_yml = Path(".", "metadata", "data.yml")
+    json_file = Path(".", "metadata", "data.json")
+    json_min_file = Path(".", "metadata", "data.min.json")
 
     tvshow = {}
     arcs = {}
@@ -619,9 +619,9 @@ def generate_json():
         tvshow_changed = dict_changed(old["tvshow"], tvshow)
     except Exception as e:
         print(f"Warning: {e}")
-        episodes_changed = True
-        arcs_changed = True
-        tvshow_changed = True
+    episodes_changed = True
+    arcs_changed = True
+    tvshow_changed = True
 
     _a = []
     for v in unicode_fix_dict(arcs).values():
