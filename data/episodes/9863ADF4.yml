@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 15
 
 title: Quintet
@@ -8,8 +8,8 @@ title: Quintet
 description: The lost ruins of Shandora are revealed in a spectacle of lightning,
   and the remaining survivors of Enel's twisted game begin their showdown with the
   self-styled deity. As the group faces him, "God" reveals his ultimate goal...
-manga_chapters: 273-276
-anime_episodes: 179-181
+chapters: 273-276
+episodes: 179-181
 
 # rating: TV-14
 released: 2024-07-20

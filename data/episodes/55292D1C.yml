@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 42
 
 title: Gear Fourth
@@ -9,8 +9,8 @@ description: The birdcage tightens its grip on Dressrosa, so Zoro sets off with 
   plan to stop it from slicing apart the country. Meanwhile, Luffy digs deep into
   his training to provide an answer born of rubber and haki to combat Doflamingo’s
   might.
-manga_chapters: 784-785
-anime_episodes: 726-728
+chapters: 784-785
+episodes: 726-728
 
 # rating: TV-14
 released: 2017-05-13

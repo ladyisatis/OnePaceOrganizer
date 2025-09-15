@@ -1,4 +1,4 @@
-season: 26
+arc: 26
 episode: 6
 
 title: The Prisoners of Impel Down
@@ -8,8 +8,8 @@ sorttitle: Prisoners of Impel Down
 description: Facing Kuma on the battlefield, Ivankov reveals their shared past, but
   his pleas to his old companion fall on deaf ears as Kuma continues his attacks.
   In a sea of confusion, only Doflamingo seems to know the truth.
-manga_chapters: 559-560
-anime_episodes: 468-469
+chapters: 559-560
+episodes: 468-469
 
 # rating: TV-14
 released: 2020-10-07

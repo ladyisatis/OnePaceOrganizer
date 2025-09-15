@@ -1,4 +1,4 @@
-season: 22
+arc: 22
 episode: 7
 
 title: An Island in Chaos
@@ -8,8 +8,8 @@ title: An Island in Chaos
 description: As chaos erupts inside the auction house, a mysterious man with an equally
   mysterious power emerges from backstage. But now, due to Luffy’s insolent actions,
   a Marine admiral is on his way to Sabaody.
-manga_chapters: 503-504
-anime_episodes: 397-398
+chapters: 503-504
+episodes: 397-398
 
 # rating: TV-14
 released: 2017-12-01

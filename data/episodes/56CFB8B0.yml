@@ -1,4 +1,4 @@
-season: 35
+arc: 35
 episode: 39
 
 title: Fool of a Lord
@@ -9,8 +9,8 @@ description: The Roger Pirates have completed their grand adventure, and the Kin
   of the Pirates is born! Gol D. Roger disbands his merry crew and Oden returns triumphant
   to his homeland of Wano. However, a sinister surprise awaits him upon his rightful
   throne.
-manga_chapters: 968-969
-anime_episodes: 969-971
+chapters: 968-969
+episodes: 969-971
 
 # rating: TV-14
 released: 2024-04-05

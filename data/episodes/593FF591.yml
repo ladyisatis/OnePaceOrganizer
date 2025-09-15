@@ -1,4 +1,4 @@
-season: 18
+arc: 18
 episode: 5
 
 title: Luffy vs. Usopp
@@ -8,8 +8,8 @@ title: Luffy vs. Usopp
 description: Usopp is unwilling to say farewell to the Going Merry… not without a
   fight, that is! He challenges his former captain to a duel between men, so Luffy
   honors the pride of his former crewmate and faces him in battle.
-manga_chapters: 332-333
-anime_episodes: 235-236
+chapters: 332-333
+episodes: 235-236
 
 # rating: TV-14
 released: 2021-03-30

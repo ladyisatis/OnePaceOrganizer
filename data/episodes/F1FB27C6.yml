@@ -1,4 +1,4 @@
-season: 35
+arc: 35
 episode: 44
 
 title: A Family Matter
@@ -8,8 +8,8 @@ title: A Family Matter
 description: The raid on Onigashima kicks off with Law's group sneaking around the
   back and Luffy's group moving straight through the front door, cleverly disguised
   as the enemy itself! Meanwhile, Kaido holds an audience with the Soaring Six.
-manga_chapters: 978-979
-anime_episodes: 983-985
+chapters: 978-979
+episodes: 983-985
 
 # rating: TV-14
 released: 2024-10-26

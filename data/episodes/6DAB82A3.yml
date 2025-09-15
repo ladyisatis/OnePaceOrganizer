@@ -1,4 +1,4 @@
-season: 15
+arc: 15
 episode: 2
 
 title: Never Dream
@@ -8,8 +8,8 @@ title: Never Dream
 description: Mock Town on western Jaya openly welcomes pirates, but that fact is accompanied
   by constant danger. While asking about the sky island, Luffy and Zoro have a run-in
   with the loud pirate Bellamy the Hyena who ridicules their dreams.
-manga_chapters: 221-224
-anime_episodes: 145-146
+chapters: 221-224
+episodes: 145-146
 
 # rating: TV-14
 released: 2023-02-10

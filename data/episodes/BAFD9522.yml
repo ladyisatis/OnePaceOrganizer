@@ -1,4 +1,4 @@
-season: 18
+arc: 18
 episode: 10
 
 title: Six Powers
@@ -8,8 +8,8 @@ originaltitle: The Six Powers
 description: Luffy's group finally catches up to Robin, but they are greeted by disappointment—Robin
   opts to stay with CP9 and leave the Straw Hats. As Robin turns away from Luffy,
   the members of CP9 confronts the pirates.
-manga_chapters: 346-348
-anime_episodes: 244-246
+chapters: 346-348
+episodes: 244-246
 
 # rating: TV-14
 released: 2021-12-05

@@ -1,4 +1,4 @@
-season: 34
+arc: 34
 episode: 1
 
 title: The Fifth Emperor
@@ -8,8 +8,8 @@ sorttitle: Fifth Emperor
 description: Luffy’s reputation grows as all eyes look toward the Straw Hats’ next
   move. Meanwhile, the royals of the world make their way to the Reverie, but their
   absence welcomes a raid by a vicious band of pirates on the Kingdom of Lulusia.
-manga_chapters: 903-904
-anime_episodes: 878-880
+chapters: 903-904
+episodes: 878-880
 
 # rating: TV-14
 released: 2024-10-05

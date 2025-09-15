@@ -1,4 +1,4 @@
-season: 32
+arc: 32
 episode: 2
 
 title: The Minks
@@ -8,8 +8,8 @@ sorttitle: Minks
 description: The mysterious "island" may hold more danger than was bargained for,
   as Luffy and co. learn they are not alone! Luffy pushes deeper into the mysterious
   forest, but he is treading territory where he is not welcome.
-manga_chapters: 804-805
-anime_episodes: 753-754
+chapters: 804-805
+episodes: 753-754
 
 # rating: TV-14
 released: 2016-09-09

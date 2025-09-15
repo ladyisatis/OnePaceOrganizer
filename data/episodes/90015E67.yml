@@ -1,4 +1,4 @@
-season: 30
+arc: 30
 episode: 1
 
 title: Punk Hazard
@@ -8,8 +8,8 @@ title: Punk Hazard
 description: Fresh off the adventure at Fishman Island, the Sunny is caught in a massive
   whirlpool and dragged off course. A desperate cry for help leads the Straw Hats
   to Punk Hazard, an island engulfed in flames and inhabited by a mythic beast.
-manga_chapters: 654-655
-anime_episodes: 574, 579
+chapters: 654-655
+episodes: 574, 579
 
 # rating: TV-14
 released: 2013-05-17

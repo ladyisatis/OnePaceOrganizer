@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 14
 
 title: Pirate Zoro vs. Priest Ohm
@@ -8,8 +8,8 @@ title: Pirate Zoro vs. Priest Ohm
 description: After being swallowed by the giant snake, Nami, Gan Fall, and Aisa meet
   someone they never expected would be in the serpent's stomach. As Priest Ohm’s Ordeal
   of Iron comes to a close in the Upper Ruins, Zoro unleashes a powerful new technique.
-manga_chapters: 270-273
-anime_episodes: 177-179
+chapters: 270-273
+episodes: 177-179
 
 # rating: TV-14
 released: 2024-06-08

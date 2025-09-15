@@ -1,4 +1,4 @@
-season: 30
+arc: 30
 episode: 11
 
 title: The Experiment Begins! Shinokuni Unleashed!
@@ -8,8 +8,8 @@ sorttitle: Experiment Begins! Shinokuni Unleashed!
 description: A candy addiction leads the children to return, and Caesar plans to show
   the world his new and improved Smiley! Luffy and the Straw Hats next find themselves
   pursued by a deadly cloud of gas that turns living things into statues of ash!
-manga_chapters: 675-676
-anime_episodes: 601-602
+chapters: 675-676
+episodes: 601-602
 
 # rating: TV-14
 released: 2013-07-08

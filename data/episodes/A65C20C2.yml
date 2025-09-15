@@ -1,4 +1,4 @@
-season: 17
+arc: 17
 episode: 6
 
 title: Marine HQ Admiral Aokiji
@@ -8,8 +8,8 @@ title: Marine HQ Admiral Aokiji
 description: Only three officers in all the Marines hold the position of admiral,
   literal powerhouses of the World Government. The icy Aokiji, one such admiral, catches
   up with the Straw Hats, but Luffy is not the one he is after.
-manga_chapters: 319-321
-anime_episodes: 227-228
+chapters: 319-321
+episodes: 227-228
 
 # rating: TV-14
 released: 2016-06-05

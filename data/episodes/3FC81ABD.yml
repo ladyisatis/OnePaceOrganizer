@@ -1,4 +1,4 @@
-season: 35
+arc: 35
 episode: 42
 
 title: Kin'emon's Clever Ruse
@@ -8,8 +8,8 @@ title: Kin'emon's Clever Ruse
 description: 'As the Scabbards and their comrades struggle to rescue the kidnapped
   Momo, two unforseen allies join the fight: one thought long gone 20 years ago and
   another pledging his loyalty to Luffy.'
-manga_chapters: 975-976
-anime_episodes: 978-980
+chapters: 975-976
+episodes: 978-980
 
 # rating: TV-14
 released: 2024-08-30

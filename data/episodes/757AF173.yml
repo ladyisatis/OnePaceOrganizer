@@ -1,4 +1,4 @@
-season: 5
+arc: 5
 episode: 5
 
 title: Because of a Dream
@@ -8,8 +8,8 @@ title: Because of a Dream
 description: Sanji continues to battle Pearl, but Gin cleverly holds Chef Zeff hostage,
   forcing Sanji an impossible situation. Sanji's childhood memories flood his mind,
   and he reflects on why Zeff means so much to him.
-manga_chapters: 56-59
-anime_episodes: 26
+chapters: 56-59
+episodes: 26
 
 # rating: TV-14
 released: 2023-05-28

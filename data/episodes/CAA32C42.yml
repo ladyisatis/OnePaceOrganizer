@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 43
 
 title: Gatz
@@ -8,8 +8,8 @@ title: Gatz
 description: Using Boundman drains Luffy of his haki, leaving him in need of a rest.
   Luckily, the colosseum combatants run interference while he recharges, and Sabo
   steps in at a crucial moment to defend his brother.
-manga_chapters: 786-787
-anime_episodes: 728-730
+chapters: 786-787
+episodes: 728-730
 
 # rating: TV-14
 released: 2017-05-20

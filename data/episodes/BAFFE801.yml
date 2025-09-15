@@ -1,4 +1,4 @@
-season: 35
+arc: 35
 episode: 36
 
 title: Oden's Adventure
@@ -8,8 +8,8 @@ title: Oden's Adventure
 description: As Oden began his voyage, he was in awe of all the things that he had
   never seen before, and for the first time in his life, he became a wanted person
   and made the headlines, catching the eye of a high-profile figure.
-manga_chapters: 964-965
-anime_episodes: 963-964
+chapters: 964-965
+episodes: 963-964
 
 # rating: TV-14
 released: 2023-12-08

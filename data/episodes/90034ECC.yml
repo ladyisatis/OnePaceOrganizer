@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 3
 
 title: The Colosseum of Many New Faces and Maynard the Pursuer!
@@ -9,8 +9,8 @@ description: Luffy enters the tournament at Corrida Colosseum to compete for Ace
   fruit, but with the mightiest warriors of the New World assembled and standing in
   his way, the competition will not be easy. The first stage of the competition is
   a battle royal!
-manga_chapters: 704-705
-anime_episodes: 633-635
+chapters: 704-705
+episodes: 633-635
 
 # rating: TV-14
 released: 2014-04-01

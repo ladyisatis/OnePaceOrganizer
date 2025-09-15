@@ -1,4 +1,4 @@
-season: 30
+arc: 30
 episode: 4
 
 title: The Lake of Bandits
@@ -8,8 +8,8 @@ sorttitle: Lake of Bandits
 description: Luffy’s group takes a deadly plunge into icy waters, and Trafalgar Law
   uses his unique abilities to rearrange Nami’s group and place the Straw Hats into
   a state of chaos! Then, things heat up when G-5 squares off with Law.
-manga_chapters: 661-662
-anime_episodes: 585-587
+chapters: 661-662
+episodes: 585-587
 
 # rating: TV-14
 released: 2013-05-24

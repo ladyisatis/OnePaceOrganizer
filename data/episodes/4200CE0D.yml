@@ -1,4 +1,4 @@
-season: 8
+arc: 8
 episode: 1
 
 title: The Town of Beginnings and Endings
@@ -8,8 +8,8 @@ sorttitle: Town of Beginnings and Endings
 description: Touting a fresh bounty issued by Marine HQ, Luffy and co. make landfall
   at Loguetown, the place where Gold Roger was both born and executed. Being the last
   stop before the Grand Line, the crew stocks up on supplies and sightsees.
-manga_chapters: 96-97
-anime_episodes: 45, 48-49
+chapters: 96-97
+episodes: 45, 48-49
 
 # rating: TV-14
 released: 2020-09-22

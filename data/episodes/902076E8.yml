@@ -1,4 +1,4 @@
-season: 13
+arc: 13
 episode: 4
 
 title: 'Enter: Tony Tony Chopper'
@@ -8,8 +8,8 @@ title: 'Enter: Tony Tony Chopper'
 description: 'Enter Chopper: a talking, transforming blue-nosed reindeer who was trained
   by Dr. Kureha in medicine. The Straw Hats immediately see the positives and want
   him on their crew, but Chopper must first deal with the monstrous pain in his heart.'
-manga_chapters: 139-140
-anime_episodes: 84
+chapters: 139-140
+episodes: 84
 
 # rating: TV-14
 released: 2022-09-26

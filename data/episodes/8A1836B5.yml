@@ -1,4 +1,4 @@
-season: 36
+arc: 36
 episode: 18
 
 title: The Final Lesson
@@ -8,8 +8,8 @@ sorttitle: Final Lesson
 description: At Pirate Island, Vice Admiral Garp continues the Koby extraction mission,
   but Avalo Pizarro's devil fruit powers threaten to sink the rescue ship. Garp, weakened
   from an attack by Shiryu, entrusts the operation's success to the next generation.
-manga_chapters: 1087-1089
-anime_episodes: 1121-1122
+chapters: 1087-1088
+episodes: 1121-1122
 
 # rating: TV-14
 released: 2025-04-04

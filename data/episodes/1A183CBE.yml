@@ -1,4 +1,4 @@
-season: 27
+arc: 27
 episode: 2
 
 title: Gray Terminal
@@ -8,8 +8,8 @@ title: Gray Terminal
 description: Before they were brothers, Ace and Luffy lived in the mountains, dreaming
   of the day when they would take to the sea. In the criminal-infested junkyard known
   as Gray Terminal, Ace and his partner-in-crime Sabo robbed the thieves and scavengers.
-manga_chapters: 583-584
-anime_episodes: 493-495
+chapters: 583-584
+episodes: 493-495
 
 # rating: TV-14
 released: 2020-07-24

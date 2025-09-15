@@ -1,4 +1,4 @@
-season: 30
+arc: 30
 episode: 12
 
 title: The Counterattack Begins!
@@ -9,8 +9,8 @@ description: Law has a trick up his sleeve that turns the tide in the alliance�
   to include an on-the-spot partnership with former foes. Zoro and company reunite
   with Nami and Sanji, and it is all Luffy’s group can do to ensure everyone’s safety
   in the lab.
-manga_chapters: 677-678
-anime_episodes: 603-604
+chapters: 677-678
+episodes: 603-604
 
 # rating: TV-14
 released: 2013-07-21

@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 6
 
 title: The Village Hidden in the Clouds
@@ -9,8 +9,8 @@ description: Luffy, Sanji, and Usopp are locked in a life-or-death struggle agai
   the Priest Satori. It's all they can do to withstand the random attributes of Satori's
   strange spheres and to overcome the power of mantra, which can seemingly predict
   their movements.
-manga_chapters: 247-249
-anime_episodes: 161-163
+chapters: 247-249
+episodes: 161-163
 
 # rating: TV-14
 released: 2023-10-14

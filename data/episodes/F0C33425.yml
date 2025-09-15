@@ -1,4 +1,4 @@
-season: 24
+arc: 24
 episode: 9
 
 title: To Sunshine and Freedom
@@ -8,8 +8,8 @@ title: To Sunshine and Freedom
 description: It is utter chaos in Impel Down, and between the sudden appearance of
   Blackbeard, the vice warden’s interference, and Magellan’s dogged attempts to restore
   order, the escape team just might see daylight yet!
-manga_chapters: 544-546
-anime_episodes: 446-450
+chapters: 544-546
+episodes: 446-450
 
 # rating: TV-14
 released: 2017-06-23

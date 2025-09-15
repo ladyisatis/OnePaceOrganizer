@@ -1,4 +1,4 @@
-season: 14
+arc: 14
 episode: 20
 
 title: Vivi's Adventure
@@ -9,8 +9,8 @@ description: As the Straw Hats make their escape from Arabasta, Bon Kurei and hi
   men serve to distract Black Cage Hina of the Marines. Meanwhile, Vivi must make
   a speech, but, more importantly, she must decide whether to stay with the Straw
   Hats.
-manga_chapters: 214-216
-anime_episodes: 128-129
+chapters: 214-216
+episodes: 128-129
 
 # rating: TV-14
 released: 2024-08-09

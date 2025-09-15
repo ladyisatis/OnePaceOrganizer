@@ -1,4 +1,4 @@
-season: 29
+arc: 29
 episode: 2
 
 title: Adventure in the Ocean Depths! 10 Kilometers Below the Surface!
@@ -9,8 +9,8 @@ description: Luffy, Zoro, and Sanji leave the relative safety of the Sunny to fa
   the Kraken in its own territory. Putting their powerful new skills to work, they
   survive the encounter but are swept away by a downward current and become lost in
   the murky depths.
-manga_chapters: 605-606
-anime_episodes: 524-526
+chapters: 605-606
+episodes: 524-526
 
 # rating: TV-14
 released: 2013-03-29

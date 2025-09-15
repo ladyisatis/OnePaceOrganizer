@@ -1,4 +1,4 @@
-season: 26
+arc: 26
 episode: 7
 
 title: The Whirl Spider
@@ -9,8 +9,8 @@ description: Luffy’s progress is halted by Mihawk, but the Whitebeard Pirates 
   with a swordsman of their own. Then, when an army of human weapons encircle the
   battlefield, Luffy and his allies find themselves overwhelmed by their explosive
   attacks.
-manga_chapters: 561-562
-anime_episodes: 470-471
+chapters: 561-562
+episodes: 470-471
 
 # rating: TV-14
 released: 2020-10-07

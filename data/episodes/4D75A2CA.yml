@@ -1,4 +1,4 @@
-season: 18
+arc: 18
 episode: 7
 
 title: Rumors
@@ -9,8 +9,8 @@ description: Things are hectic enough with Franky going after Luffy, but now the
   Hats are being framed for a crime seemingly committed by Nico Robin. As if to put
   the proverbial icing on the cake, the annual storm Aqua Laguna is on its way toward
   Water Seven.
-manga_chapters: 338-339
-anime_episodes: 239-240
+chapters: 338-339
+episodes: 239-240
 
 # rating: TV-14
 released: 2021-06-14

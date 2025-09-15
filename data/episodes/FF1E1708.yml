@@ -1,4 +1,4 @@
-season: 14
+arc: 14
 episode: 4
 
 title: Yuba, the Town of Rebels
@@ -8,8 +8,8 @@ title: Yuba, the Town of Rebels
 description: Vivi and co. finally reach Yuba, the last known location of the Rebel
   Army, but there is nary a soul in sight. Meanwhile, at the behest of their hidden
   leader, Baroque Works' officer agents begin to gather at the Spiders Cafe.
-manga_chapters: 159-164
-anime_episodes: 98, 100-101, 103
+chapters: 159-164
+episodes: 98, 100-101, 103
 
 # rating: TV-14
 released: 2023-11-25

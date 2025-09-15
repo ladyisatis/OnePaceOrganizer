@@ -1,4 +1,4 @@
-season: 20
+arc: 20
 episode: 3
 
 title: Forgive Yourself! Franky Departs!
@@ -9,8 +9,8 @@ description: 'The Straw Hats have barely had time to marvel at their new bountie
   when a new surprise awaits them: the unveiling of their magnificent new ship. The
   next step is bringing a shipwright into their ranks, and there is only one man for
   the job.'
-manga_chapters: 436-437
-anime_episodes: 321-322
+chapters: 436-437
+episodes: 321-322
 
 # rating: TV-14
 released: 2013-06-19

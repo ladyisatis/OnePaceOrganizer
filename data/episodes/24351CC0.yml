@@ -1,4 +1,4 @@
-season: 17
+arc: 17
 episode: 3
 
 title: Groggy Ring!!
@@ -8,8 +8,8 @@ title: Groggy Ring!!
 description: 'Unexpected interference from Foxy himself cost the Straw Hats more than
   they bargained for. Now, in a struggle against literal monsters, the unlikely duo
   of Sanji and Zoro must win round #2, the Groggy Ring.'
-manga_chapters: 310-312
-anime_episodes: 211-212
+chapters: 310-312
+episodes: 211-212
 
 # rating: TV-14
 released: 2017-12-01

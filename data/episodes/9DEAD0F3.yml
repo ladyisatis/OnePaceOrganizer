@@ -1,4 +1,4 @@
-season: 27
+arc: 27
 episode: 3
 
 title: Oath of Brotherhood
@@ -8,8 +8,8 @@ title: Oath of Brotherhood
 description: Ace, Sabo, and Luffy made a promise to one another over cups of sake
   that would shape their futures. Yet while the brothers' adventures continue, Sabo's
   unfortunate past catches up with him. Meanwhile, a horrific plot unfolds.
-manga_chapters: 585-586
-anime_episodes: 496-498, 500-501
+chapters: 585-586
+episodes: 496-498, 500-501
 
 # rating: TV-14
 released: 2020-07-24

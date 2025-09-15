@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 16
 
 title: SOP Strategy
@@ -9,8 +9,8 @@ description: 'Zoro and Kin''emon make a mad dash to save Law, but Admiral Fujito
   stands in their way, bringing his full power against them. The toy soldier lays
   out the plan to liberate the Tontattas and bring down the Doflamingo Family: Operation
   SOP.'
-manga_chapters: 730-731
-anime_episodes: 657, 662-663
+chapters: 730-731
+episodes: 657, 662-663
 
 # rating: TV-14
 released: 2014-11-08

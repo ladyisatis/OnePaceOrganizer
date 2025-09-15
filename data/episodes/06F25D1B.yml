@@ -1,4 +1,4 @@
-season: 6
+arc: 6
 episode: 6
 
 title: OK, LET'S STAND UP
@@ -8,8 +8,8 @@ title: OK, LET'S STAND UP
 description: Nami's audible sorrows have reached the ears of a certain Straw Hat captain,
   and he and his crew rise to action. The villagers look on in awe as the Straw Hats
   boldly enter Arlong Park to face the fishmen.
-manga_chapters: 82-84
-anime_episodes: 38-39
+chapters: 82-84
+episodes: 38-39
 
 # rating: TV-14
 released: 2020-09-12

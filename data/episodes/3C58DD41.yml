@@ -1,4 +1,4 @@
-season: 33
+arc: 33
 episode: 37
 
 title: One Last Thing
@@ -7,8 +7,8 @@ title: One Last Thing
 
 description: Luffy's dramatic battle finally draws to a close, and a whole host of
   the Big Mom Pirates watch the last mirror to see who will come through.
-manga_chapters: 896-897
-anime_episodes: 871-872
+chapters: 896-897
+episodes: 871-872
 
 # rating: TV-14
 released: 2020-12-11

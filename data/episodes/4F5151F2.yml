@@ -1,4 +1,4 @@
-season: 26
+arc: 26
 episode: 2
 
 title: Ace and Whitebeard
@@ -8,8 +8,8 @@ title: Ace and Whitebeard
 description: To the surprise of all, the Moby Dick surfaces in the middle of Marineford!
   On the deck stands Whitebeard, the man who Ace calls father, and his fourteen commanders,
   the pirates he calls family, who share Luffy’s determination to stop the execution.
-manga_chapters: 551-552
-anime_episodes: 459-462
+chapters: 551-552
+episodes: 459-462
 
 # rating: TV-14
 released: 2020-10-07

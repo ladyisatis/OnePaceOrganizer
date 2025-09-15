@@ -1,4 +1,4 @@
-season: 3
+arc: 3
 episode: 2
 
 title: Captain Kuro
@@ -7,8 +7,8 @@ title: Captain Kuro
 
 description: After uncovering a devious plot, Usopp warns the village and Kaya, but
   finds his years of lying make it difficult to convince people of the truth.
-manga_chapters: 26-27
-anime_episodes: 10-11
+chapters: 26-27
+episodes: 10-11
 
 # rating: TV-14
 released: 2025-06-06

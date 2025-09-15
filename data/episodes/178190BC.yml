@@ -1,4 +1,4 @@
-season: 27
+arc: 27
 episode: 8
 
 title: 3D2Y
@@ -8,8 +8,8 @@ title: 3D2Y
 description: The Straw Hat Pirates have interpreted their captain's message to meet
   up again in two years. During this time, they will prepare themselves for the New
   World! In the Calm Belt, Luffy arrives in Luscaina to begin training under Rayleigh.
-manga_chapters: 595-597
-anime_episodes: 513-516
+chapters: 595-597
+episodes: 513-516
 
 # rating: TV-14
 released: 2021-01-18

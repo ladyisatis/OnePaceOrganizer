@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 1
 
 title: Arriving at Dressrosa! The Country of Passion, Love, and Toys!
@@ -9,8 +9,8 @@ description: Dressrosa! The Straw Hats split up and set about their business on 
   passionate, enchanting island! But here, in the heart of enemy territory, danger
   lurks around every corner. Luffy’s group encounters an intriguing blind man whose
   luck has run dry.
-manga_chapters: 700-701
-anime_episodes: 628-631
+chapters: 700-701
+episodes: 628-631
 
 # rating: TV-14
 released: 2014-02-09

@@ -1,4 +1,4 @@
-season: 23
+arc: 23
 episode: 1
 
 title: Adventure on the Island of Women
@@ -8,8 +8,8 @@ title: Adventure on the Island of Women
 description: Luffy finds himself alone, stranded and starving on an unfamiliar island.
   After a run-in with some exotic mushrooms, he is approached by a team of female
   warriors who could be friend... or foe.
-manga_chapters: 514-515
-anime_episodes: 408-409
+chapters: 514-515
+episodes: 408-409
 
 # rating: TV-14
 released: 2016-01-26

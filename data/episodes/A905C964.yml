@@ -1,4 +1,4 @@
-season: 14
+arc: 14
 episode: 9
 
 title: Rush!!
@@ -8,8 +8,8 @@ originaltitle: Rush
 description: Thanks to Sanji's brave actions, the Straw Hats made their escape, and
   Captain Smoker graciously looks the other way as they flee. However, as they set
   out toward Alubarna, Crocodile waylays Luffy, and the two begin a vicious duel.
-manga_chapters: 175-178
-anime_episodes: 109-110
+chapters: 175-178
+episodes: 109-110
 
 # rating: TV-14
 released: 2021-11-27

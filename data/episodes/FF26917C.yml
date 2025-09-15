@@ -1,4 +1,4 @@
-season: 14
+arc: 14
 episode: 12
 
 title: Okama Kenpo
@@ -9,8 +9,8 @@ description: Usopp and Chopper combine their skills to finish off Mr. 4 and Miss
   Christmas, and Sanji engages Mr. 2 in a vicious foot-to-foot struggle. Meanwhile,
   as a last-ditch effort to save her people, Princess Vivi gives Chaka an unprecedented
   order.
-manga_chapters: 187-189
-anime_episodes: 115-116
+chapters: 187-189
+episodes: 115-116
 
 # rating: TV-14
 released: 2022-10-06

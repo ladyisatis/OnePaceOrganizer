@@ -1,4 +1,4 @@
-season: 19
+arc: 19
 episode: 3
 
 title: Express to the Main Island of Enies Lobby
@@ -8,8 +8,8 @@ originaltitle: Express to Enies Lobby, Main Island
 description: Robin and Franky are finally brought before Spandam while Luffy continues
   to blast through waves of marines. Galley-La and the Franky Family still have one
   giant to deal with, and the main gate closes to halt Rocketman's entry.
-manga_chapters: 379-380
-anime_episodes: 266-267
+chapters: 379-380
+episodes: 266-267
 
 # rating: TV-14
 released: 2020-06-23

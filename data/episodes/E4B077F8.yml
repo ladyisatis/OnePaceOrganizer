@@ -1,4 +1,4 @@
-season: 32
+arc: 32
 episode: 3
 
 title: At Rightflank Fortress
@@ -8,8 +8,8 @@ title: At Rightflank Fortress
 description: Luffy and co. ride out the rain-ruption and learn of its vital role in
   maintaining life on Zou. As they continue toward the fortress, they learn more about
   the mysterious minks, and are finally reunited with the others.
-manga_chapters: 806-807
-anime_episodes: 755-757
+chapters: 806-807
+episodes: 755-757
 
 # rating: TV-14
 released: 2016-09-30

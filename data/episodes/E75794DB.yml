@@ -1,4 +1,4 @@
-season: 7
+arc: 7
 episode: 1
 
 title: The Adventures of Buggy's Crew
@@ -8,8 +8,8 @@ sorttitle: Adventures of Buggy's Crew
 description: Buggy, after being defeated by Luffy, Zoro, and Nami, begins his quest
   to regain his body parts and his crew, and then he will get his flashy revenge on
   Luffy.
-manga_chapters: 35-75
-anime_episodes: 46-47
+chapters: 35-75
+episodes: 46-47
 
 # rating: TV-14
 released: 2023-10-07

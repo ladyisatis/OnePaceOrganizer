@@ -1,4 +1,4 @@
-season: 30
+arc: 30
 episode: 2
 
 title: Adventure on the Burning Island
@@ -8,8 +8,8 @@ title: Adventure on the Burning Island
 description: Luffy, Robin, Usopp, and Zoro face a powerful dragon, and Luffy gets
   up close and personal with a torso-less figure. Elsewhere, Nami, Sanji, Chopper,
   and Franky find themselves imprisoned with the pieces of a human face!
-manga_chapters: 656-658
-anime_episodes: 580-583
+chapters: 656-658
+episodes: 580-583
 
 # rating: TV-14
 released: 2013-05-20

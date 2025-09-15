@@ -1,4 +1,4 @@
-season: 25
+arc: 25
 episode: 1
 
 title: If You Could Go Anywhere... The Adventures of the Straw Hats
@@ -9,8 +9,8 @@ description: Somewhere in the world... Sanji resists, while Robin meets terrible
   Franky's not himself, and Usopp learns to survive. Chopper avoids becoming food,
   and Nami reports on the weather. Brook is repaid in underpants, and Zoro... is lost
   and annoyed.
-manga_chapters: 543-560
-anime_episodes: 453-456
+chapters: 543-560
+episodes: 453-456
 
 # rating: TV-14
 released: 2024-03-29

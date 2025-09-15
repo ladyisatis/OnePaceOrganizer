@@ -1,4 +1,4 @@
-season: 8
+arc: 8
 episode: 2
 
 title: Parallels
@@ -8,8 +8,8 @@ title: Parallels
 description: Usopp manages to anger the brat daughter of bounty hunter Daddy the Father
   and finds his own life at stake. When Daddy discovers that Usopp is the son of Red
   Hair Pirate Yasopp, the only man to beat him, he offers him a risky way out.
-manga_chapters: 97
-anime_episodes: 48, 50
+chapters: 97
+episodes: 48, 50
 
 # rating: TV-14
 released: 2020-09-22

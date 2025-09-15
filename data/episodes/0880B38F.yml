@@ -1,4 +1,4 @@
-season: 32
+arc: 32
 episode: 9
 
 title: Momonosuke, Heir of the Kozuki Family
@@ -8,8 +8,8 @@ title: Momonosuke, Heir of the Kozuki Family
 description: 'More mysteries of the Kozuki Clan are revealed, and its retainers propose
   an alliance to help topple one of the Four Emperors: Kaido of the Beast Pirates!
   But first, Luffy has some important Straw Hat business to attend to.'
-manga_chapters: 818-819
-anime_episodes: 769-772
+chapters: 818-819
+episodes: 769-772
 
 # rating: TV-14
 released: 2017-01-27

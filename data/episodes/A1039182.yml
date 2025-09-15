@@ -1,4 +1,4 @@
-season: 5
+arc: 5
 episode: 6
 
 title: MH5
@@ -9,8 +9,8 @@ description: In a surprising twist, Gin finishes Pearl off himself, claiming San
   as his own target. Though still wounded, Sanji rises to the challenge and faces
   off with Gin. As the battle draws to a close, Don Krieg unleashes a deadly toxin
   into the air.
-manga_chapters: 59-63
-anime_episodes: 27-28
+chapters: 59-63
+episodes: 27-28
 
 # rating: TV-14
 released: 2023-07-02

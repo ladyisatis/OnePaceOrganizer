@@ -1,4 +1,4 @@
-season: 14
+arc: 14
 episode: 16
 
 title: HOPE!!
@@ -9,8 +9,8 @@ description: 'Luffy vs. Crocodile: Round 2! Luffy has discovered Crocodile’s w
   but the power of the Sand-Sand Fruit is devastating regardless. Meanwhile, the remaining
   Straw Hats have ten minutes to find a hidden cannoneer before a bomb is launched
   into the city.'
-manga_chapters: 199-201
-anime_episodes: 121-122
+chapters: 199-201
+episodes: 121-122
 
 # rating: TV-14
 released: 2024-05-17

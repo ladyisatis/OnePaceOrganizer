@@ -1,4 +1,4 @@
-season: 13
+arc: 13
 episode: 2
 
 title: Adventure in a Nameless Country
@@ -8,8 +8,8 @@ title: Adventure in a Nameless Country
 description: If the Straw Hats have any chance of saving Nami, they must carry her
   up a mountain to see the sole doctor of a nameless, winter island. While Sanji and
   Luffy fight off the wilderness, a despicable king makes an unwanted return.
-manga_chapters: 132-135
-anime_episodes: 80-81
+chapters: 132-135
+episodes: 80-81
 
 # rating: TV-14
 released: 2022-09-26

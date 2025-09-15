@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 46
 
 title: Sabo's Adventure
@@ -8,8 +8,8 @@ title: Sabo's Adventure
 description: The combatants in the battle for Dressrosa can finally begin to recoup,
   but those who stay awake are treated to the story of how Sabo joined the Revolutionary
   Army and how he reunited with his brother Luffy at the colosseum.
-manga_chapters: 794-795
-anime_episodes: 737-739
+chapters: 794-795
+episodes: 737-739
 
 # rating: TV-14
 released: 2017-06-28

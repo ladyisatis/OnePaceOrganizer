@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 22
 
 title: Love Song
@@ -8,8 +8,8 @@ title: Love Song
 description: While Enel continues his thunderous barrage, Nami hatches a plan to give
   Luffy one more shot at a grudge match with God. With a nudge from Zoro, Wyper, and
   a snake, Straw Hat launches himself into the center of a sinister storm!
-manga_chapters: 295-298
-anime_episodes: 191-192
+chapters: 295-298
+episodes: 191-192
 
 # rating: TV-14
 released: 2025-02-22

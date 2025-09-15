@@ -1,4 +1,4 @@
-season: 18
+arc: 18
 episode: 14
 
 title: Bingo
@@ -9,8 +9,8 @@ description: CP9 hauls away Franky and Usopp, but not before giving a coldhearte
   farewell to the Merry. At Galley-La’s HQ, Nami learns from Iceburg the truth behind
   Robin's betrayal and the difficult choice she had to make to save the lives of the
   Straw Hats.
-manga_chapters: 358-359
-anime_episodes: 250-251, 256, 320
+chapters: 358-359
+episodes: 250-251, 256, 320
 
 # rating: TV-14
 released: 2023-11-04

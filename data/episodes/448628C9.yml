@@ -1,4 +1,4 @@
-season: 36
+arc: 36
 episode: 11
 
 title: Labophase Death Game
@@ -8,8 +8,8 @@ title: Labophase Death Game
 description: The search for Dr. Vegapunk's main body is threatened by the deadly seraphim,
   only this time the satellites' orders are unable to pacify them. Faced with a tough
   decision, Luffy and Zoro must team up with the most unlikely of allies.
-manga_chapters: 1075-1076
-anime_episodes: 1107-1109
+chapters: 1075-1076
+episodes: 1107-1109
 
 # rating: TV-14
 released: 2025-05-03

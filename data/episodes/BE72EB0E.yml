@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 20
 
 title: Captain
@@ -8,8 +8,8 @@ title: Captain
 description: With Operation SOP in its final stage, the Tontattas are devastated by
   Trebol’s furious attack, but as Usopp tries to convince Leo to abort the operation,
   Leo tells him about their commander’s stunning true identity.
-manga_chapters: 738-739
-anime_episodes: 670-672
+chapters: 738-739
+episodes: 670-672
 
 # rating: TV-14
 released: 2015-01-23

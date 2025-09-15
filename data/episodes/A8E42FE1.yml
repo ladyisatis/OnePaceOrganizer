@@ -1,4 +1,4 @@
-season: 33
+arc: 33
 episode: 16
 
 title: Not Here
@@ -9,8 +9,8 @@ description: Luffy fights through more obstacles in search of Sanji, and Brook h
   Big Mom's plan firsthand as she shares her intentions with Pudding. While Big Mom's
   agents believe most of the Straw Hats to be under their control, Mont d'Or has his
   doubts.
-manga_chapters: 853-854
-anime_episodes: 820-822
+chapters: 853-854
+episodes: 820-822
 
 # rating: TV-14
 released: 2020-12-11

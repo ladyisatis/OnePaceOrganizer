@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 3
 
 title: Divine Reckoning
@@ -8,8 +8,8 @@ title: Divine Reckoning
 description: Nami takes the waver out for a test ride and discovers the forbidden
   Upper Yard. Meanwhile, law enforcement arrives and rudely harasses the rest of the
   gang.
-manga_chapters: 241-242
-anime_episodes: 155-156
+chapters: 241-242
+episodes: 155-156
 
 # rating: TV-14
 released: 2023-06-12

@@ -1,4 +1,4 @@
-season: 33
+arc: 33
 episode: 32
 
 title: Way of Life
@@ -8,8 +8,8 @@ title: Way of Life
 description: When Chiffon comes under attack, Sanji must choose between defending
   her or revealing his whereabouts to his enemies. Elsewhere, Luffy uses Charlotte
   Brûlée as a human shield to avoid the wrath of Big Mom.
-manga_chapters: 885-886
-anime_episodes: 858-860
+chapters: 885-886
+episodes: 858-860
 
 # rating: TV-14
 released: 2020-12-11

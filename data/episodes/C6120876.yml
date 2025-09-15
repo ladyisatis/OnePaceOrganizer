@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 4
 
 title: Ordeal
@@ -8,8 +8,8 @@ title: Ordeal
 description: The pirates are fed up and ready to leave Skypiea, but Nami, Zoro, Robin,
   and Chopper are whisked away aboard the Merry. The remaining Straw Hat Pirates must
   face Enel’s challenge, so Conis shows them the way to Upper Yard.
-manga_chapters: 243-244
-anime_episodes: 157-158
+chapters: 243-244
+episodes: 157-158
 
 # rating: TV-14
 released: 2023-06-12

@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 6
 
 title: To Green Bit! The Adventure in the Land of Dwarves!
@@ -9,8 +9,8 @@ description: The Caesar Transfer Team is on approach to Green Bit, but the colos
   coastal fish of Dressrosa are biting, and the connecting bridge has collapsed! The
   team gathers their wits to make it across, but they soon discover they are not alone
   on the island.
-manga_chapters: 710-711
-anime_episodes: 639-642
+chapters: 710-711
+episodes: 639-642
 
 # rating: TV-14
 released: 2014-05-09

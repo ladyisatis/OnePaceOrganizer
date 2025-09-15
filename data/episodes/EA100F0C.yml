@@ -1,4 +1,4 @@
-season: 21
+arc: 21
 episode: 2
 
 title: Adventure on the Ghost Island and the Famous Doctor Hogback!
@@ -9,8 +9,8 @@ description: Brook bids the Straw Hats farewell, and they decide to explore the 
   ghost island Thriller Bark. Freakish danger awaits the landing party the moment
   they arrive, and, back on the Sunny, the rest of the crew is harassed by an unseen
   foe.
-manga_chapters: 444-445
-anime_episodes: 339-340
+chapters: 444-445
+episodes: 339-340
 
 # rating: TV-14
 released: 2013-07-10

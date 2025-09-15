@@ -1,4 +1,4 @@
-season: 12
+arc: 12
 episode: 1
 
 title: Adventure on Little Garden
@@ -8,8 +8,8 @@ title: Adventure on Little Garden
 description: The Straw Hats arrive at their destination and discover that the island
   is home to enormous creatures... and people. Meanwhile, the Baroque Works agents
   Mr. 3 and his partner Miss Golden Week receive new orders.
-manga_chapters: 115-117
-anime_episodes: 70-71
+chapters: 115-117
+episodes: 70-71
 
 # rating: TV-14
 released: 2025-03-22

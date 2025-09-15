@@ -1,4 +1,4 @@
-season: 14
+arc: 14
 episode: 17
 
 title: Croc-ish
@@ -8,8 +8,8 @@ title: Croc-ish
 description: Luffy and Crocodile enter the third phase of their duel, and, without
   water at his disposal, Luffy is forced to improvise. Back on the surface, Vivi uses
   her knowledge of the city to finally pinpoint the location of the bomb's cannoneer.
-manga_chapters: 202-205
-anime_episodes: 123-124
+chapters: 202-205
+episodes: 123-124
 
 # rating: TV-14
 released: 2024-06-14

@@ -1,4 +1,4 @@
-season: 18
+arc: 18
 episode: 1
 
 title: The City of Water, Water Seven
@@ -8,8 +8,8 @@ sorttitle: City of Water, Water Seven
 description: The keepers of Shift Station, Kokoro and her granddaughter Chimney, point
   the Straw Hats in the direction of the metropolitan Water Seven. The nearby city
   is regarded as the best place to find a decent shipwright for the Going Merry.
-manga_chapters: 322-324
-anime_episodes: 228-230
+chapters: 322-324
+episodes: 228-230
 
 # rating: TV-14
 released: 2020-09-03

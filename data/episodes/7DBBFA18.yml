@@ -1,4 +1,4 @@
-season: 29
+arc: 29
 episode: 22
 
 title: The Path Toward the Sun
@@ -8,8 +8,8 @@ sorttitle: Path Toward the Sun
 description: Hody is vanquished, the Noah is stopped, and Fishman Island is saved!
   Unfortunately, Luffy was gravely injured in the process. With no time to spare,
   a true friend steps forward to tear down the walls of the island's history.
-manga_chapters: 647-649
-anime_episodes: 567-569
+chapters: 647-649
+episodes: 567-569
 
 # rating: TV-14
 released: 2013-05-11

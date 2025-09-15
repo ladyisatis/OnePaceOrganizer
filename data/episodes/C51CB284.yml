@@ -1,4 +1,4 @@
-season: 14
+arc: 14
 episode: 11
 
 title: Molehill Zone Four
@@ -8,8 +8,8 @@ title: Molehill Zone Four
 description: 'Despite his severe injuries, Karoo picks up Vivi to flee the attacks
   of Mr. 2, and they dash madly through the battlefield. And at the southeast gate:
   Chopper and Usopp vs. Mr. 4 and Miss Merry Christmas!'
-manga_chapters: 183-186
-anime_episodes: 113-114
+chapters: 183-186
+episodes: 113-114
 
 # rating: TV-14
 released: 2022-08-25

@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 19
 
 title: Godkiller
@@ -8,8 +8,8 @@ title: Godkiller
 description: As Enel rains destruction upon Skypiea, Wyper remembers the tales passed
   down by the village elder about when his ancestor the warrior Kalgara met the explorer
   Mont Blanc Noland.
-manga_chapters: 286-289
-anime_episodes: 187-188
+chapters: 286-289
+episodes: 187-188
 
 # rating: TV-14
 released: 2025-01-04

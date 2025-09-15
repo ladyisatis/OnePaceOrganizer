@@ -1,4 +1,4 @@
-season: 15
+arc: 15
 episode: 6
 
 title: The Hundred Million Man
@@ -8,8 +8,8 @@ sorttitle: Hundred Million Man
 description: While the Straw Hats are in the forest attempting to catch a south bird,
   Bellamy and his crew attack Masira, Shoujou, and Cricket and steal every gold artifact
   they had collected over the years from the salvage work of the Saruyama Alliance.
-manga_chapters: 231-232
-anime_episodes: 150
+chapters: 231-232
+episodes: 150
 
 # rating: TV-14
 released: 2023-09-08

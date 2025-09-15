@@ -1,4 +1,4 @@
-season: 28
+arc: 28
 episode: 3
 
 title: Dive, Dive, Dive!
@@ -8,8 +8,8 @@ title: Dive, Dive, Dive!
 description: After two long years and one chaotic afternoon, the Straw Hats are finally
   ready to renew their voyage. However, before they can set off to Fishman Island,
   they must contend with a massive Marine force determined to stop them.
-manga_chapters: 601-602
-anime_episodes: 520-522
+chapters: 601-602
+episodes: 520-522
 
 # rating: TV-14
 released: 2022-05-04

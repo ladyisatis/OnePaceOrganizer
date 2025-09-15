@@ -1,4 +1,4 @@
-season: 17
+arc: 17
 episode: 2
 
 title: Donut Race!!
@@ -9,8 +9,8 @@ description: 'Luffy accepts Foxy’s challenge to a Davy Back Fight, a pirate co
   in which the stakes are the crews themselves! Round #1 is the Donut Race, where
   each team races around the island in tiny boats made from just the scraps of three
   barrels.'
-manga_chapters: 307-309
-anime_episodes: 209-210
+chapters: 307-309
+episodes: 209-210
 
 # rating: TV-14
 released: 2017-12-01

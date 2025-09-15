@@ -1,4 +1,4 @@
-season: 21
+arc: 21
 episode: 1
 
 title: The Mysterious Sea and The Skeleton Brook!
@@ -8,8 +8,8 @@ sorttitle: Mysterious Sea and The Skeleton Brook!
 description: The Thousand Sunny gets flung into the foggy Florian Triangle and the
   Straw Hats encounter a ruined ship. Speculating as to whether there are ghosts aboard,
   it turns out the pirates are not far from the truth.
-manga_chapters: 442-443
-anime_episodes: 326, 337-339
+chapters: 442-443
+episodes: 326, 337-339
 
 # rating: TV-14
 released: 2013-07-01

@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 1
 
 title: Heaven's Gate
@@ -9,8 +9,8 @@ description: The Straw Hats, having used the Knock-Up Stream to fly into the sky
   arrive on a white ocean above the clouds. While they marvel at the otherworldly
   sights, they are attacked by a powerful masked figure, and a mysterious flying knight
   comes to their aid.
-manga_chapters: 237-238
-anime_episodes: 153
+chapters: 237-238
+episodes: 153
 
 # rating: TV-14
 released: 2023-06-12

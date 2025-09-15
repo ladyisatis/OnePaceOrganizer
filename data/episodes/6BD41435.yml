@@ -1,4 +1,4 @@
-season: 26
+arc: 26
 episode: 12
 
 title: The Execution Platform
@@ -8,8 +8,8 @@ sorttitle: Execution Platform
 description: Having borne witness to Luffy’s latent powers, the Marines send everything
   they have at him. But thanks to Ivankov’s quick thinking, Luffy ascends toward Ace.
   Garp, unable to watch any longer, leaps into Luffy’s path.
-manga_chapters: 570-571
-anime_episodes: 479-480
+chapters: 570-571
+episodes: 479-480
 
 # rating: TV-14
 released: 2020-10-07

@@ -1,4 +1,4 @@
-season: 34
+arc: 34
 episode: 3
 
 title: The Empty Throne
@@ -8,8 +8,8 @@ sorttitle: Empty Throne
 description: As the Reverie commences, Emperors Big Mom and Kaido both set their sights
   on Luffy! Meanwhile, a mysterious outsider visits the highest authority in the world,
   and the Revolutionary Army confirms its desire to save Kuma.
-manga_chapters: 907-908
-anime_episodes: 886-889
+chapters: 907-908
+episodes: 886-889
 
 # rating: TV-14
 released: 2024-10-05

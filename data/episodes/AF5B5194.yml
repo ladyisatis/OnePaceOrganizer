@@ -1,4 +1,4 @@
-season: 18
+arc: 18
 episode: 16
 
 title: Aqua Laguna
@@ -8,8 +8,8 @@ title: Aqua Laguna
 description: Sanji coolly fights his way through the sea train and locates Usopp and
   Franky. Back in Water Seven, Kokoro sees how determined Luffy is to save Robin,
   so she and Iceburg lend the Straw Hat crew an unexpected helping hand.
-manga_chapters: 363-365
-anime_episodes: 254-255
+chapters: 363-365
+episodes: 254-255
 
 # rating: TV-14
 released: 2024-02-02

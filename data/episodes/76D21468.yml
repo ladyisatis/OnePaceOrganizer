@@ -1,4 +1,4 @@
-season: 22
+arc: 22
 episode: 4
 
 title: Adventure on the Archipelago of Dancing Soap Bubbles
@@ -8,8 +8,8 @@ title: Adventure on the Archipelago of Dancing Soap Bubbles
 description: The Straw Hats make their way to Sabaody Archipelago to prepare the Sunny
   for its undersea voyage to Fishman Island. During their search for a coating mechanic,
   the Straw Hats encounter the Celestial Dragons, the cruel rulers of the World Government.
-manga_chapters: 496-497
-anime_episodes: 390-391
+chapters: 496-497
+episodes: 390-391
 
 # rating: TV-14
 released: 2015-02-25

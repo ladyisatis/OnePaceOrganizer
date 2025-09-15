@@ -1,4 +1,4 @@
-season: 32
+arc: 32
 episode: 10
 
 title: Understood
@@ -8,8 +8,8 @@ title: Understood
 description: 'The Straw Hats divide and conquer: one group to go save Sanji, and the
   other to Wano! But just before their departure, the tremendous elephant quakes as
   Jack’s fleet launches an aggressive attack on the monstrous Zunesha.'
-manga_chapters: 820-822
-anime_episodes: 772-774, 776
+chapters: 820-822
+episodes: 772-774, 776
 
 # rating: TV-14
 released: 2017-03-03

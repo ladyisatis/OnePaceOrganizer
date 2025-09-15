@@ -1,4 +1,4 @@
-season: 4
+arc: 4
 episode: 1
 
 title: You're the Rare Breed
@@ -9,8 +9,8 @@ description: With Usopp now on the crew and their new ship, the Going Merry, und
   their command, the Straw Hats head to an island said to hold a fabled treasure.
   There they encounter a strange man stuck in a box who has been looking for the same
   treasure.
-manga_chapters: 42, 22
-anime_episodes: 18
+chapters: 42, 22
+episodes: 18
 
 # rating: TV-14
 released: 2023-01-28

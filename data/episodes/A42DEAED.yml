@@ -1,4 +1,4 @@
-season: 36
+arc: 36
 episode: 7
 
 title: Punk Records
@@ -8,8 +8,8 @@ title: Punk Records
 description: After Vegapunk shares his dream with Luffy's group, he asks the Straw
   Hat captain for a big favor. Meanwhile, CP0 ignores their lack of invitation to
   Egghead and get around the island defenses to make landfall.
-manga_chapters: 1067-1068
-anime_episodes: 1097-1099
+chapters: 1067-1068
+episodes: 1097-1099
 
 # rating: TV-14
 released: 2025-02-22

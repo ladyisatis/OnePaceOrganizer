@@ -1,4 +1,4 @@
-season: 19
+arc: 19
 episode: 7
 
 title: Gear Second
@@ -8,8 +8,8 @@ title: Gear Second
 description: The Straw Hats storm the courthouse where the three-headed judge Baskerville
   awaits to enact violent judgment upon them. On the roof, Luffy thanks CP9's Blueno
   for the strength of his opponents, and he activates a new ability.
-manga_chapters: 388-390
-anime_episodes: 273-274
+chapters: 388-390
+episodes: 273-274
 
 # rating: TV-14
 released: 2019-05-13

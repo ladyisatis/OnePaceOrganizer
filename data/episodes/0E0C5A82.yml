@@ -1,4 +1,4 @@
-season: 22
+arc: 22
 episode: 9
 
 title: Kizaru Arrives
@@ -8,8 +8,8 @@ title: Kizaru Arrives
 description: Luffy and his crew decide to lay low in town while Rayleigh coats the
   Sunny. Meanwhile, Admiral Kizaru from Marine HQ arrives on the archipelago in search
   of those responsible for threatening the Celestial Dragons.
-manga_chapters: 507-508
-anime_episodes: 400-401
+chapters: 507-508
+episodes: 400-401
 
 # rating: TV-14
 released: 2017-12-01

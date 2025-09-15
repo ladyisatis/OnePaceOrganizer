@@ -1,4 +1,4 @@
-season: 21
+arc: 21
 episode: 16
 
 title: The Mysterious Visitor! The Two Warlords Meet!
@@ -8,8 +8,8 @@ sorttitle: Mysterious Visitor! The Two Warlords Meet!
 description: While the Straw Hats continue to wear away at Oars, Nami confronts Perona
   attempting to escape on board the Thousand Sunny, but the sudden appearance of a
   large, mysterious figure soon makes her efforts moot.
-manga_chapters: 473-474
-anime_episodes: 368-369
+chapters: 473-474
+episodes: 368-369
 
 # rating: TV-14
 released: 2014-01-18

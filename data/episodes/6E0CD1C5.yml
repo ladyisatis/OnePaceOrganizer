@@ -1,4 +1,4 @@
-season: 34
+arc: 34
 episode: 2
 
 title: A Beautiful World
@@ -9,8 +9,8 @@ description: At New Marineford, Fleet Admiral Sakazuki hears the news about Luff
   while nobles from around the world gather for the Reverie! At the Red Line, Garp
   is escorting King Neptune’s family when Shirahoshi sees the surface world for the
   first time.
-manga_chapters: 905-906
-anime_episodes: 881-885
+chapters: 905-906
+episodes: 881-885
 
 # rating: TV-14
 released: 2024-10-05

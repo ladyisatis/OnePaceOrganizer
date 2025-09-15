@@ -1,4 +1,4 @@
-season: 29
+arc: 29
 episode: 20
 
 title: Phantom
@@ -8,8 +8,8 @@ title: Phantom
 description: Neptune’s army aids the Straw Hats against the New Fishman Pirates, finally
   accepting the crew as allies. As the fight continues, Fukaboshi’s transponder snail
   reveals the bone chilling truth behind Hody's motivations.
-manga_chapters: 642-645
-anime_episodes: 563-567
+chapters: 642-645
+episodes: 563-567
 
 # rating: TV-14
 released: 2013-05-03

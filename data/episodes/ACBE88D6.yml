@@ -1,4 +1,4 @@
-season: 36
+arc: 36
 episode: 4
 
 title: Adventure in the Land of Science
@@ -9,8 +9,8 @@ description: Franky and Luffy's groups are split up, but each encounter a person
   to be Dr. Vegapunk. On the island, Luffy and co. find convenient food and futuristic
   clothing, but when a pacifista shows up, Bonney reveals her shocking relationship
   with Kuma.
-manga_chapters: 1062-1063
-anime_episodes: 1091-1093
+chapters: 1062-1063
+episodes: 1091-1093
 
 # rating: TV-14
 released: 2025-01-11

@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 17
 
 title: The Underground World
@@ -9,8 +9,8 @@ description: Usopp and Robin travel via an underground tunnel dug by the tiny pe
   of the Tontatta Tribe. On the surface, Franky makes his way to the Toys House to
   cause a distraction to help his crewmates, but standing in his way is quite the
   guy!
-manga_chapters: 732-733
-anime_episodes: 664-665
+chapters: 732-733
+episodes: 664-665
 
 # rating: TV-14
 released: 2014-11-10

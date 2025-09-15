@@ -1,4 +1,4 @@
-season: 35
+arc: 35
 episode: 32
 
 title: Ultimate
@@ -8,8 +8,8 @@ title: Ultimate
 description: Admiral Issho and Fleet Admiral Sakazuki argue over the abolition of
   the Seven Warlord system and the alliance between two Emperors. Meanwhile, ex-Fleet
   Admiral Sengoku teaches the young Marines about the legendary Rocks Pirates.
-manga_chapters: 957
-anime_episodes: 958
+chapters: 957
+episodes: 958
 
 # rating: TV-14
 released: 2023-07-08

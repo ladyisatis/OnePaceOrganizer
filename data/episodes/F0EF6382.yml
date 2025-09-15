@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 11
 
 title: Pirate Chopper vs. Priest Gedatsu
@@ -8,8 +8,8 @@ title: Pirate Chopper vs. Priest Gedatsu
 description: Luffy's fight with Wyper lands him in a dark cavern filled with ruins,
   Enel leaves a deadly pair of new enemies to deal with Nami and Gan Fall, and Chopper
   comes face to face with Sky Punk Gedatsu.
-manga_chapters: 261-263
-anime_episodes: 171-173
+chapters: 261-263
+episodes: 171-173
 
 # rating: TV-14
 released: 2024-04-12

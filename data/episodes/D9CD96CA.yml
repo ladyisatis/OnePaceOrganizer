@@ -1,4 +1,4 @@
-season: 16
+arc: 16
 episode: 23
 
 title: Fantasia
@@ -8,8 +8,8 @@ title: Fantasia
 description: In the aftermath of Luffy's epic battle with Enel, sunny skies chase
   away the storms, and the cloud-dwelling citizens of Angel Island turn their attention
   to rebuilding their homeland.
-manga_chapters: 299-300
-anime_episodes: 193
+chapters: 299-300
+episodes: 193
 
 # rating: TV-14
 released: 2025-03-01

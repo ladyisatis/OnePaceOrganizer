@@ -1,4 +1,4 @@
-season: 2
+arc: 2
 episode: 2
 
 title: Treasure
@@ -8,8 +8,8 @@ title: Treasure
 description: Luffy meets a small dog guarding his late master’s store. Meanwhile,
   Beast Tamer Mohji, Cabaji the Acrobat, and the lion Richie show up in the streets
   of Orange Town to get revenge for Captain Buggy's humiliating loss.
-manga_chapters: 12-19
-anime_episodes: 6-7
+chapters: 12-19
+episodes: 6-7
 
 # rating: TV-14
 released: 2025-04-25

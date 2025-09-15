@@ -1,4 +1,4 @@
-season: 33
+arc: 33
 episode: 29
 
 title: Zero Escape
@@ -8,8 +8,8 @@ title: Zero Escape
 description: In the Mirro-world, Luffy confronts the formidable Charlotte Katakuri,
   Big Mom’s strongest child. Meanwhile, Pudding and Sanji arrive at Cacao Island to
   remake the cake, but they bicker like a married couple the whole time.
-manga_chapters: 879-880
-anime_episodes: 851-853
+chapters: 879-880
+episodes: 851-853
 
 # rating: TV-14
 released: 2020-12-11

@@ -1,4 +1,4 @@
-season: 19
+arc: 19
 episode: 20
 
 title: Buster Call
@@ -9,8 +9,8 @@ description: Luffy gives Franky the opening he needs to head for Robin. The cybo
   runs into trouble at the start of the bridge, but all is not lost as a lone sniper
   appears atop the Tower of Justice. Despite these minor victories, the buster call
   commences.
-manga_chapters: 419-420
-anime_episodes: 301-302
+chapters: 419-420
+episodes: 301-302
 
 # rating: TV-14
 released: 2020-05-29

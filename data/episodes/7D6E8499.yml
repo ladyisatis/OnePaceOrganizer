@@ -1,4 +1,4 @@
-season: 22
+arc: 22
 episode: 5
 
 title: The Embers of History
@@ -8,8 +8,8 @@ sorttitle: Embers of History
 description: While at Shakky’s Rip-off Bar, the Straw Hats learn that Luffy, Zoro
   and nine other rookie pirates on Sabaody have reached a certain level of infamy.
   Later, Zoro has a close call with an insufferable and sadistic Celestial Dragon.
-manga_chapters: 498-500
-anime_episodes: 392-394
+chapters: 498-500
+episodes: 392-394
 
 # rating: TV-14
 released: 2017-12-01

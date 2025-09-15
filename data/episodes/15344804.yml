@@ -1,4 +1,4 @@
-season: 31
+arc: 31
 episode: 45
 
 title: Prostration
@@ -8,8 +8,8 @@ title: Prostration
 description: The people of Dressrosa shed tears of joy as they remember the hardships
   endured and the actions taken to free them. As they beg King Riku to resume the
   crown, Admiral Fujitora shocks onlookers with an unexpected display of humility.
-manga_chapters: 791-793
-anime_episodes: 734-736
+chapters: 791-793
+episodes: 734-736
 
 # rating: TV-14
 released: 2017-06-10

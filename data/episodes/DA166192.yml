@@ -1,4 +1,4 @@
-season: 19
+arc: 19
 episode: 12
 
 title: Pirates vs. CP9
@@ -8,8 +8,8 @@ title: Pirates vs. CP9
 description: The Straw Hats split up to find the correct key before Robin’s fate is
   sealed. Zoro finds and engages Kaku in battle, and Sogeking attempts to steal a
   key from the sleeping Jabra.
-manga_chapters: 401-402
-anime_episodes: 286-287
+chapters: 401-402
+episodes: 286-287
 
 # rating: TV-14
 released: 2020-03-11

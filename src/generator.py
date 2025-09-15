@@ -131,8 +131,8 @@ def update():
                         "originaltitle": "",
                         "description": row['description_en'],
                         "poster": "",
-                        "episodes": []
-                    })
+                        "episodes": {}
+                    }
 
                     logger.success(f"{part}. {title}")
 
@@ -211,8 +211,10 @@ def update():
 
                         match = re.search(PATTERN_END_NUMBER, id)
                         if match:
-                            episode = int(match.group(1))
+                            _e = match.group(1)
+                            episode = int(_e)
                         else:
+                            _e = "01"
                             episode = 1
 
                         match = re.search(PATTERN_CHAPTER_EPISODE, chapters)
@@ -244,6 +246,17 @@ def update():
                             "released": release_date.isoformat()
                         }
 
+                        if _e in out_arcs[arc]["episodes"]:
+                            out_arcs[arc]["episodes"][_e].append({
+                                "crc32": mkv_crc32,
+                                "crc32_extended": mkv_crc32_ext
+                            })
+                        else:
+                            out_arcs[arc]["episodes"][_e] = [{
+                                "crc32": mkv_crc32,
+                                "crc32_extended": mkv_crc32_ext
+                            }]
+
                         if len(mkv_crc32_ext) > 0:
                             logger.info(f"-- Aliasing {mkv_crc32_ext} -> {mkv_crc32}")
                             out_episodes[mkv_crc32_ext] = out_episodes[mkv_crc32]
@@ -255,18 +268,8 @@ def update():
                             if mkv_crc32_ext != '':
                                 arc_eps[key].append(mkv_crc32_ext)
 
-                            out_arcs[arc]["episodes"][f"{episode:02d}"].append({
-                                "crc32": mkv_crc32,
-                                "crc32_extended": mkv_crc32_ext
-                            })
-
                         else:
                             arc_eps[key] = [mkv_crc32] if mkv_crc32_ext == '' else [mkv_crc32, mkv_crc32_ext]
-
-                            out_arcs[arc]["episodes"] = {f"{episode:02d}":[{
-                                "crc32": mkv_crc32,
-                                "crc32_extended": mkv_crc32_ext
-                            }]}
 
             if ONE_PACE_RSS_FEED != '':
                 logger.info("--------------------------")
@@ -470,6 +473,12 @@ def update():
                 if isinstance(old_data["released"], date) or isinstance(old_data["released"], datetime):
                     old_data["released"] = old_data["released"].isoformat()
 
+                if "chapters" not in old_data:
+                    old_data["chapters"] = ""
+
+                if "episodes" not in old_data:
+                    old_data["episodes"] = ""
+
                 if old_data["episode"] == episode and old_data["title"] != "" and old_data["description"] != "" and old_data["chapters"] != "" and old_data["episodes"] != "" and old_data["released"] == data["released"]:
                     continue
 
@@ -546,7 +555,7 @@ def unicode_fix_dict(d):
                 new_dict[str_key][inner_key] = val.isoformat()
             elif isinstance(val, str):
                 new_dict[str_key][inner_key] = unicode_fix(val)
-            elif not (inner_key == "arc" or inner_key == "episode") and (isinstance(val, int) or isinstance(val, float)):
+            elif not (inner_key == "arc" or inner_key == "episode" or inner_key == "part") and (isinstance(val, int) or isinstance(val, float)):
                 new_dict[str_key][inner_key] = str(val)
             else:
                 new_dict[str_key][inner_key] = val
@@ -564,7 +573,10 @@ def val_convert_string(d):
             d[k] = val_convert_string(v)
         return d
 
-    return str(d)
+    elif isinstance(d, bool):
+        return "true" if d else "false"
+
+    return unicode_fix(str(d))
 
 def generate_json():
     tvshow_yml = Path(".", "data", "tvshow.yml")
@@ -610,26 +622,27 @@ def generate_json():
         arcs_changed = True
         tvshow_changed = True
 
+    _a = []
+    for v in unicode_fix_dict(arcs).values():
+        _a.append(v)
+
     if episodes_changed or arcs_changed or tvshow_changed:
         now = datetime.now(timezone.utc)
         last_update = now.isoformat()
-        last_update_ts = int(last_update.timestamp() * 1000)
+        last_update_ts = int(now.timestamp() * 1000)
 
         with data_yml.open(mode='w') as f:
             YamlDump(data={
                 "last_update": last_update,
                 "last_update_ts": last_update_ts,
                 "tvshow": tvshow,
-                "arcs": arcs,
+                "arcs": _a,
                 "episodes": episodes
             }, stream=f, allow_unicode=True, sort_keys=False)
 
-        _a = []
-        for v in unicode_fix_dict(arcs).values():
-            _a.append(v)
-
         out = orjson.dumps({
             "last_update": last_update,
+            "last_update_ts": last_update_ts,
             "tvshow": tvshow,
             "arcs": _a,
             "episodes": unicode_fix_dict(episodes)

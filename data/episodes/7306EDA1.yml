@@ -1,4 +1,4 @@
-season: 24
+arc: 24
 episode: 2
 
 title: First Son of the Sea
@@ -8,8 +8,8 @@ title: First Son of the Sea
 description: After forming an unlikely alliance, Luffy rushes through Impel Down aided
   by Buggy's powers. Meanwhile, Ace finds himself with an unlikely companion as well
   when he exchanges words with a powerful pirate prisoner.
-manga_chapters: 527-528
-anime_episodes: 424-425, 430
+chapters: 527-528
+episodes: 424-425, 430
 
 # rating: TV-14
 released: 2016-12-30

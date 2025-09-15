@@ -1,4 +1,4 @@
-season: 35
+arc: 35
 episode: 24
 
 title: Olin
@@ -8,8 +8,8 @@ originaltitle: Partners
 description: A very big and hungry visitor arrives at Udon looking for Superstar Queen’s
   sweet red bean oshiruko, and Rasetsu town is in a full-blown riot with the Straw
   Hats at the center!
-manga_chapters: 945
-anime_episodes: 942-944
+chapters: 945
+episodes: 942-944
 
 # rating: TV-14
 released: 2022-01-18

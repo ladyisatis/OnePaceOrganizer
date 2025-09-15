@@ -1,4 +1,4 @@
-season: 24
+arc: 24
 episode: 10
 
 title: Thank You
@@ -9,8 +9,8 @@ description: Thanks to Jinbe’s quick thinking, Luffy and co. narrowly escape I
   Down. However, the Gates of Justice remain closed, and a horde of Marine ships is
   gaining on them. Then, just when all hope seems lost, a dear friend makes an all-or-nothing
   gamble.
-manga_chapters: 547-548
-anime_episodes: 450-451
+chapters: 547-548
+episodes: 450-451
 
 # rating: TV-14
 released: 2017-06-23

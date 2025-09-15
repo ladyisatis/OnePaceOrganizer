@@ -1,4 +1,4 @@
-season: 18
+arc: 18
 episode: 2
 
 title: Mr. Iceburg
@@ -8,8 +8,8 @@ originaltitle: Iceburg-san
 description: The Straw Hats cash in their Skypiean gold and meet up with Iceburg,
   the celebrity mayor of Water Seven, to see about an appraisal for their ship's repairs.
   While the foreman Kaku checks the Merry, dubious people eye the pirates' money.
-manga_chapters: 324-326
-anime_episodes: 229-231
+chapters: 324-326
+episodes: 229-231
 
 # rating: TV-14
 released: 2020-11-25

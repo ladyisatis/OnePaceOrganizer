@@ -1,4 +1,4 @@
-season: 33
+arc: 33
 episode: 30
 
 title: Wave Room
@@ -8,8 +8,8 @@ title: Wave Room
 description: Nami and Luffy discuss a rendezvous point while the others break the
   mirrors on the Sunny. Little do they know their plan is overheard, and Luffy’s grueling
   battle against Katakuri—haki vs. haki, rubber vs. mochi—intensifies.
-manga_chapters: 881-883
-anime_episodes: 853-855, 858
+chapters: 881-883
+episodes: 853-855, 858
 
 # rating: TV-14
 released: 2020-12-11

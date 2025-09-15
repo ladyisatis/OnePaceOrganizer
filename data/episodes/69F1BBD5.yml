@@ -1,4 +1,4 @@
-season: 36
+arc: 36
 episode: 6
 
 title: The Will of Ohara
@@ -9,8 +9,8 @@ description: Vegapunk Shaka shares his theory about an ancient kingdom and the V
   Century. He also reminisces about the foundation of Dragon's Revolutionary Army.
   Meanwhile, Luffy and Chopper try to activate the giant robot when something surprising
   happens.
-manga_chapters: 1066
-anime_episodes: 1096-1097
+chapters: 1066
+episodes: 1096-1097
 
 # rating: TV-14
 released: 2025-02-07
