@@ -246,16 +246,10 @@ def update():
                             "released": release_date.isoformat()
                         }
 
-                        if _e in out_arcs[arc]["episodes"]:
-                            out_arcs[arc]["episodes"][_e].append({
-                                "crc32": mkv_crc32,
-                                "crc32_extended": mkv_crc32_ext
-                            })
-                        else:
-                            out_arcs[arc]["episodes"][_e] = [{
-                                "crc32": mkv_crc32,
-                                "crc32_extended": mkv_crc32_ext
-                            }]
+                        out_arcs[arc]["episodes"][_e] = {
+                            "crc32": mkv_crc32,
+                            "crc32_extended": mkv_crc32_ext
+                        }
 
                         if len(mkv_crc32_ext) > 0:
                             logger.info(f"-- Aliasing {mkv_crc32_ext} -> {mkv_crc32}")
@@ -280,7 +274,7 @@ def update():
                     now = datetime.now().astimezone(timezone.utc)
 
                     for i, item in enumerate(RSSParser.parse(r.text).channel.items):
-                        if i == 10:
+                        if i == 25:
                             break
 
                         if not item.title or not item.title.content or item.title.content == "":
@@ -297,6 +291,12 @@ def update():
                                 continue
 
                             arc_name, ep_num, extra, crc32 = match.groups()
+                            arc_id = arc_to_num[arc_name]
+                            crc_key = "crc32_extended" if "Extended" in item.title.content else "crc32"
+
+                            if ep_num in out_arcs[arc_id]["episodes"]:
+                                out_arcs[arc_id]["episodes"][ep_num][crc_key] = crc32
+
                             if Path(".", "data", "episodes", f"{crc32}.yml").exists():
                                 logger.warning("-- Skipping: crc32 file exists")
                                 continue
@@ -358,6 +358,12 @@ def update():
                                     continue
 
                                 arc_name, ep_num, extra, crc32 = match.groups()
+                                arc_id = arc_to_num[arc_name]
+                                crc_key = "crc32_extended" if "Extended" in filename else "crc32"
+
+                                if ep_num in out_arcs[arc_id]["episodes"]:
+                                    out_arcs[arc_id]["episodes"][ep_num][crc_key] = crc32
+
                                 if Path(".", "data", "episodes", f"{crc32}.yml").exists():
                                     logger.warning("---- Skipping: crc32 file exists")
                                     continue
@@ -472,12 +478,6 @@ def update():
 
                 if isinstance(old_data["released"], date) or isinstance(old_data["released"], datetime):
                     old_data["released"] = old_data["released"].isoformat()
-
-                if "chapters" not in old_data:
-                    old_data["chapters"] = ""
-
-                if "episodes" not in old_data:
-                    old_data["episodes"] = ""
 
                 if old_data["episode"] == episode and old_data["title"] != "" and old_data["description"] != "" and old_data["chapters"] != "" and old_data["episodes"] != "" and old_data["released"] == data["released"]:
                     continue

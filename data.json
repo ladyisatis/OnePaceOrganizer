@@ -1,6 +1,6 @@
 {
-  "last_update": "2025-09-15T02:30:02.856669+00:00",
-  "last_update_ts": 1757903402856,
+  "last_update": "2025-09-15T03:09:34.905618+00:00",
+  "last_update_ts": 1757905774905,
   "tvshow": {
     "title": "One Piece",
     "sorttitle": "One Piece",
@@ -40,30 +40,22 @@
       "description": "Monkey D. Luffy sets out on an adventure to form a crew, find the legendary One Piece, and become the pirate king.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/1/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "E5F09F49",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "A465972A",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "2DEB2701",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "6E46167D",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "E5F09F49",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "A465972A",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "2DEB2701",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "6E46167D",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -74,24 +66,18 @@
       "description": "Luffy and Zoro run afoul of a flashy crew of pirates and their captain, Buggy the Clown. They are joined by a young girl named Nami who helps them navigate this predicament.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/2/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "C23AC8D3",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "D7327225",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "1809DA8A",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "CBFE01C7",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "FAFCDE38",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "9C115EE6",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -102,48 +88,34 @@
       "description": "Luffy's fledgling pirate crew arrives at the slopes of Syrup Village. There they find a liar and a conspiracy to steal a young lady's fortune.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/3/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "A6DDEC2C",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "0433686D",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "35E9CFA6",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "89B18321",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "0D3E2158",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "D08B41AE",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "D0A51040",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "A6DDEC2C",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "0433686D",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "35E9CFA6",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "89B18321",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "0D3E2158",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "D08B41AE",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "EFCC14E1",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -154,12 +126,10 @@
       "description": "With Usopp now on the crew and their new ship, the Going Merry, under their command, the Straw Hats head to an island said to hold a fabled treasure. There they encounter a strange man stuck in a box who has been looking for the same treasure.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/4/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "0C2DBF75",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "9269F40F",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -170,54 +140,38 @@
       "description": "The Straw Hats head to the ocean-going restaurant, Baratie, with the hopes of recruiting one of their cooks. In the meantime, hungry yet powerful forces gather to lay siege to the restaurant \u2014 all while a menacing swordsman from the Grand Line steadily approaches.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/5/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "BE634289",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "9BD35F80",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "15D77CB3",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "792BE789",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "757AF173",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "A1039182",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "F850EAFD",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "D8C1FD62",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "BE634289",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "9BD35F80",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "E90342F6",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "792BE789",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "ACEA0537",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "A1039182",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "F850EAFD",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "D8C1FD62",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -228,66 +182,46 @@
       "description": "Nami's hometown has long been overrun by Arlong and his band of fishmen from the Grand Line. When the Straw Hats arrive, they find that their prospective navigator has left out a few key details about herself.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/6/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "AD09145D",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "432F7EDF",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "C060DA73",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "DB23E2E6",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "1CC0DA84",
-            "crc32_extended": "ACD6AA5F"
-          }
-        ],
-        "06": [
-          {
-            "crc32": "06F25D1B",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "9599889C",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "83E6D2A7",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "A57211D1",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "5AF7A9B1",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "AD09145D",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "432F7EDF",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "C060DA73",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "DB23E2E6",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "1CC0DA84",
+          "crc32_extended": "ACD6AA5F"
+        },
+        "06": {
+          "crc32": "06F25D1B",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "9599889C",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "83E6D2A7",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "A57211D1",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "5AF7A9B1",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -298,12 +232,10 @@
       "description": "Buggy, after being defeated by Luffy, Zoro, and Nami, begins his quest to regain his body parts and his crew, and then he will get his flashy revenge on Luffy.",
       "poster": "",
       "episodes": {
-        "01": [
-          {
-            "crc32": "E75794DB",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "E75794DB",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -314,24 +246,18 @@
       "description": "The final island before entering the Grand Line: Loguetown. Luffy and his crew drop anchor to stock up, sightsee, and pay their respects to the place where Gold Roger drew his last breath.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/8/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "4200CE0D",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "8E970FD4",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "23E3E489",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "4200CE0D",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "8E970FD4",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "23E3E489",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -342,18 +268,14 @@
       "description": "Reverse Mountain is the entrance to the Grand Line. What await the Straw Hats are impossible water currents, a giant whale, and dubious people going by codenames.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/9/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "CE01A533",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "5195CDBC",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "CE01A533",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "5195CDBC",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -364,18 +286,14 @@
       "description": "The first island on the Grand Line is surprisingly welcoming to pirates. But as night falls, a deadly plot unravels.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/10/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "26D6F22A",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "3677DB27",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "26D6F22A",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "3677DB27",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -386,12 +304,10 @@
       "description": "Koby and Helmeppo are new cabin boys for the marines, but they become unwillingly involved in an escape attempt by Morgan. Their bravery will either earn them the respect of their superiors\u2014as well as Vice Admiral Garp\u2014or it will spell their doom.",
       "poster": "",
       "episodes": {
-        "01": [
-          {
-            "crc32": "4B56844F",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "4B56844F",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -402,36 +318,26 @@
       "description": "The Straw Hats vow to bring Princess Vivi to Arabasta, and their journey brings them to Little Garden, an island from prehistoria that is home to creatures and people larger than life.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/12/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "FA63AC14",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "64714640",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "0AB937B1",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "8BE7A415",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "51105EBB",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "FA63AC14",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "64714640",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "0AB937B1",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "8BE7A415",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "51105EBB",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -442,54 +348,38 @@
       "description": "When Nami falls ill, the crew makes a detour from Arabasta to seek medical help. They happen upon a winter island inhabited by a distrusting populace and a single doctor with a mysterious reindeer companion.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/13/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "FD2B4F32",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "8FDCC832",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "2971EF62",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "902076E8",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "E7044DBE",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "A5145C90",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "B1D913B9",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "9794072D",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "FD2B4F32",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "8FDCC832",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "2971EF62",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "902076E8",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "E7044DBE",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "A5145C90",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "B1D913B9",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "9794072D",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -500,132 +390,90 @@
       "description": "Arabasta teeters on the edge of civil war, and it's up to Princess Vivi and the Straw Hats to stem the rebellion, uncover the plot of Baroque Works, and beat the Warlord Crocodile.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/14/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "BB1D093C",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "E4BA97D6",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "73003149",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "FF1E1708",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "E9E8604E",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "58865EA7",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "CFA091A0",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "726FD61C",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "A905C964",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "4B8CC4E7",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "C51CB284",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "FF26917C",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "58649840",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "0F3017E1",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "2AD355ED",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "5E646504",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "B5A40AD2",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "E4F68497",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "845C0D1D",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "0C5E9A92",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "EAA06203",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "BB1D093C",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "E4BA97D6",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "73003149",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "FF1E1708",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "E9E8604E",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "58865EA7",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "CFA091A0",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "726FD61C",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "A905C964",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "4B8CC4E7",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "C51CB284",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "FF26917C",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "58649840",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "0F3017E1",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "2AD355ED",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "5E646504",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "B5A40AD2",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "E4F68497",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "845C0D1D",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "0C5E9A92",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "EAA06203",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -636,54 +484,38 @@
       "description": "The Straw Hats seek the fabled sky island Skypiea and head to Jaya for information on its whereabouts. Their convictions are tested by the pirates of Mock Town, but not everyone on the island is a hardline skeptic.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/15/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "2BBCD106",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "6DAB82A3",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "B4950266",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "86DC8F38",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "E468A31D",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "8783E1B0",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "580A0C3B",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "FA2E5ADD",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "2BBCD106",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "6DAB82A3",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "B4950266",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "86DC8F38",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "E468A31D",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "8783E1B0",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "580A0C3B",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "FA2E5ADD",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -694,160 +526,106 @@
       "description": "Arriving at Skypiea, the Straw Hats are instantly met with unfamiliar sights, objects, and customs. What's more, the god of the sky island deems the Blue Sea dwellers to be trespassing and casts his judgment upon them.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/16/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "CA5552FC",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "EB6E8FF5",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "A50167E6",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "C6120876",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "FEA121C3",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "BF59EB14",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "3C665F73",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "236CCF51",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "CF0B1E5A",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "602704E6",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "F0EF6382",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "99260C5A",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "460CC2CD",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "702231E9",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "9863ADF4",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "088462CB",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "FBEA8001",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "60E51C8A",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "88263203",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "481A9A9D",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "9B126B00",
-            "crc32_extended": ""
-          }
-        ],
-        "22": [
-          {
-            "crc32": "62938616",
-            "crc32_extended": ""
-          }
-        ],
-        "23": [
-          {
-            "crc32": "D9CD96CA",
-            "crc32_extended": ""
-          }
-        ],
-        "24": [
-          {
-            "crc32": "3F695862",
-            "crc32_extended": ""
-          }
-        ],
-        "25": [
-          {
-            "crc32": "C951349C",
-            "crc32_extended": ""
-          },
-          {
-            "crc32": "90C45C25",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "CA5552FC",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "EB6E8FF5",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "A50167E6",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "C6120876",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "FEA121C3",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "BF59EB14",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "3C665F73",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "236CCF51",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "CF0B1E5A",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "602704E6",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "F0EF6382",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "99260C5A",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "460CC2CD",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "702231E9",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "9863ADF4",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "088462CB",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "FBEA8001",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "60E51C8A",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "88263203",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "481A9A9D",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "9B126B00",
+          "crc32_extended": ""
+        },
+        "22": {
+          "crc32": "62938616",
+          "crc32_extended": ""
+        },
+        "23": {
+          "crc32": "D9CD96CA",
+          "crc32_extended": ""
+        },
+        "24": {
+          "crc32": "3F695862",
+          "crc32_extended": ""
+        },
+        "25": {
+          "crc32": "90C45C25",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -858,48 +636,34 @@
       "description": "On Long Ring Long Land, the Straw Hats are challenged to a Davy Back Fight. As they dive headfirst into a series of games with serious outcomes, the best the Navy has to offer has meanwhile begun to pay closer attention to certain Straw Hat crewmembers.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/17/poster.png",
       "episodes": {
-        "00": [
-          {
-            "crc32": "E85B9E9D",
-            "crc32_extended": ""
-          }
-        ],
-        "01": [
-          {
-            "crc32": "B692FD08",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "57F75027",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "24351CC0",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "72C0B595",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "BCF2E97B",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "A65C20C2",
-            "crc32_extended": ""
-          }
-        ]
+        "00": {
+          "crc32": "E85B9E9D",
+          "crc32_extended": ""
+        },
+        "01": {
+          "crc32": "B692FD08",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "57F75027",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "24351CC0",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "72C0B595",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "BCF2E97B",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "A65C20C2",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -910,126 +674,86 @@
       "description": "The Straw Hats make landfall at the glorious city of Water Seven, known worldwide for its unparalleled shipyards. The pirates go to inquire about repairs for their ship, but the city threatens to take their money, their ship, and their crewmates.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/18/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "9101CF0E",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "763C1FA8",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "01874097",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "D5D6D5BA",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "593FF591",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "D17BD2C5",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "4D75A2CA",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "6E2DB1B9",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "F96F0A4A",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "BAFD9522",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "0D273612",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "0017358A",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "B4592974",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "203E5D6E",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "87F0C48B",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "AF5B5194",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "AB231A9E",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "47D68652",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "1206A42A",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "F0FBC907",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "9101CF0E",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "763C1FA8",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "01874097",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "D5D6D5BA",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "593FF591",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "D17BD2C5",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "4D75A2CA",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "6E2DB1B9",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "F96F0A4A",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "BAFD9522",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "0D273612",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "0017358A",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "B4592974",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "203E5D6E",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "87F0C48B",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "AF5B5194",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "AB231A9E",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "47D68652",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "1206A42A",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "F0FBC907",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1040,156 +764,106 @@
       "description": "In order to free Nico Robin from the clutches of the World Government, the Straw Hats and their allies must invade the judicial island, Enies Lobby, and take on the government's premiere clandestine unit: CP9.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/19/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "A6CD3EBB",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "EBBD7693",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "747CF45E",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "194603B0",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "56E89B6A",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "0E201E28",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "3BBE532B",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "DECF4267",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "952F5BEB",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "6C908F32",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "CF6F1505",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "DA166192",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "FE0F64E2",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "A9C9701B",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "160B1E51",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "158476AB",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "7562EF8D",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "64207B1A",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "C4106519",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "5AC534CA",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "13D874FD",
-            "crc32_extended": ""
-          }
-        ],
-        "22": [
-          {
-            "crc32": "C0B33E05",
-            "crc32_extended": ""
-          }
-        ],
-        "23": [
-          {
-            "crc32": "25AFC3E5",
-            "crc32_extended": ""
-          }
-        ],
-        "24": [
-          {
-            "crc32": "7F76CDD9",
-            "crc32_extended": ""
-          }
-        ],
-        "25": [
-          {
-            "crc32": "3251D51B",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "A6CD3EBB",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "EBBD7693",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "747CF45E",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "194603B0",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "56E89B6A",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "0E201E28",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "3BBE532B",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "DECF4267",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "952F5BEB",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "6C908F32",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "CF6F1505",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "DA166192",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "FE0F64E2",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "A9C9701B",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "160B1E51",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "158476AB",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "7562EF8D",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "64207B1A",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "C4106519",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "5AC534CA",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "13D874FD",
+          "crc32_extended": ""
+        },
+        "22": {
+          "crc32": "C0B33E05",
+          "crc32_extended": ""
+        },
+        "23": {
+          "crc32": "25AFC3E5",
+          "crc32_extended": ""
+        },
+        "24": {
+          "crc32": "7F76CDD9",
+          "crc32_extended": ""
+        },
+        "25": {
+          "crc32": "3251D51B",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1200,36 +874,26 @@
       "description": "The Straw Hats return to Water Seven after the ordeal at Enies Lobby. While there, they are met by a familial vice admiral, and they await news of their new ship.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/20/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "216595EE",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "344EA844",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "2C843A0F",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "659EF70C",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "CEF78887",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "216595EE",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "344EA844",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "2C843A0F",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "659EF70C",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "CEF78887",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1240,138 +904,94 @@
       "description": "The Straw Hats' next destination is Fishman Island, but first they must traverse the dreaded Florian Triangle which is known for many eerie and mysterious things such as disappearing crews, conversational skeletons, and a floating island full of zombies and other horrors.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/21/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "30D0916C",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "EA100F0C",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "C2AAAAF7",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "EB4DA5F4",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "5B4DF29D",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "60E33665",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "1E847368",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "694AD702",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "19D3B6A3",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "38BBF05C",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "D538CFD7",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "8B836836",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "3AEE90B8",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "7CAE5640",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "A9784E2B",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "EF1D7B5F",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "6AAC9B33",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "2295F0A1",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "099FB95D",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "AD2D4BCD",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "22E58F96",
-            "crc32_extended": ""
-          }
-        ],
-        "22": [
-          {
-            "crc32": "F23079ED",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "30D0916C",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "EA100F0C",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "C2AAAAF7",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "EB4DA5F4",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "5B4DF29D",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "60E33665",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "1E847368",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "694AD702",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "19D3B6A3",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "38BBF05C",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "D538CFD7",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "8B836836",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "3AEE90B8",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "7CAE5640",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "A9784E2B",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "EF1D7B5F",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "6AAC9B33",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "2295F0A1",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "099FB95D",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "AD2D4BCD",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "22E58F96",
+          "crc32_extended": ""
+        },
+        "22": {
+          "crc32": "F23079ED",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1382,72 +1002,50 @@
       "description": "The second half of the Grand Line lays just ahead, so the Straw Hats stop at Sabaody Archipelago to plan the way forward. But being so close to the Holy Land and Navy Headquarters, Luffy's crew comes face-to-face with the darkest forces of the World Government.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/22/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "066FD68B",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "F0334710",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "C19CADF5",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "76D21468",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "7D6E8499",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "234CBFDC",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "63A829E4",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "873CB57E",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "0E0C5A82",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "20ADEE90",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "1306F53D",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "066FD68B",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "F0334710",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "C19CADF5",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "76D21468",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "7D6E8499",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "234CBFDC",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "63A829E4",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "873CB57E",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "0E0C5A82",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "20ADEE90",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "1306F53D",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1458,36 +1056,26 @@
       "description": "Luffy is separated from his crew, and he finds himself on an unfamiliar island in the middle of the Calm Belt... an island inhabited only by women where men are prohibited from entering.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/23/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "06BF070D",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "E817809A",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "C2835057",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "A5F0A507",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "0F8517DC",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "06BF070D",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "E817809A",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "C2835057",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "A5F0A507",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "0F8517DC",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1498,66 +1086,46 @@
       "description": "Luffy launches a daring rescue mission to break his big brother Ace from the government prison, Impel Down. It's a race to the prison's lowest levels \u2014 a literal journey through hell itself.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/24/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "479D510C",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "7306EDA1",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "FB406E73",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "5DD0859D",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "B46EDD50",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "5D5D24DF",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "379DD054",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "683EDC5C",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "F0C33425",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "540A9642",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "479D510C",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "7306EDA1",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "FB406E73",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "5DD0859D",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "B46EDD50",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "5D5D24DF",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "379DD054",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "683EDC5C",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "F0C33425",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "540A9642",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1568,12 +1136,10 @@
       "description": "Somewhere in the world... Sanji resists, while Robin meets terrible people. Franky's not himself, and Usopp learns to survive. Chopper avoids becoming food, and Nami reports on the weather. Brook is repaid in underpants, and Zoro... is lost and annoyed.",
       "poster": "",
       "episodes": {
-        "01": [
-          {
-            "crc32": "2BC41092",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "2BC41092",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1584,108 +1150,74 @@
       "description": "Pirate Whitebeard and his allies on one side; the Navy and its Seven Warlords on the other. At the center of it all: Portgas D. Ace and his unspeakable past and heritage. Luffy races to Ace's execution scaffold as a battle between the world's most powerful people unfolds.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/26/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "92956F40",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "4F5151F2",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "D16C3A7A",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "738B1A3B",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "66006702",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "E46F5F07",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "511BA151",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "2A3B3264",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "1638FE88",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "C65F13AA",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "A84B5499",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "6BD41435",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "66E68054",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "29DBF233",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "00768DB7",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "91EEA92E",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "2DC3ECF7",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "92956F40",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "4F5151F2",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "D16C3A7A",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "738B1A3B",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "66006702",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "E46F5F07",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "511BA151",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "2A3B3264",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "1638FE88",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "C65F13AA",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "A84B5499",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "6BD41435",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "66E68054",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "29DBF233",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "00768DB7",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "91EEA92E",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "2DC3ECF7",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1696,54 +1228,38 @@
       "description": "The war has taken its toll on the world, and Luffy reminisces about younger days when he first met Ace and became his brother. To become strong enough to withstand the New World, Luffy must make a critical decision for himself and his crew.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/27/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "E7B15590",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "1A183CBE",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "9DEAD0F3",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "5FA1920A",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "FA5B3DCD",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "735F9F49",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "D85BC22C",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "178190BC",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "E7B15590",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "1A183CBE",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "9DEAD0F3",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "5FA1920A",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "FA5B3DCD",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "735F9F49",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "D85BC22C",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "178190BC",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1754,24 +1270,18 @@
       "description": "Two years have passed since the Straw Hats were forcibly separated, and they reconvene back at Sabaody stronger and even more committed to the journey ahead.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/28/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "5FBDCD0F",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "9677C63E",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "2FFA5720",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "5FBDCD0F",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "9677C63E",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "2FFA5720",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1782,150 +1292,102 @@
       "description": "The path the to the New World takes the Straw Hats thousands of leagues under the sea to the underwater Fishman Island. However, the island's dark past is reaching a breaking point, and Luffy and his crew are caught in the middle of the conflict.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/29/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "FBA08093",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "BD7169C3",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "5636E014",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "9E0A91E9",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "DA5B5D04",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "64FB3990",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "29A10280",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "DBA50B89",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "FCF7F7E4",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "F4BB17EB",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "7926F9B5",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "F134C10A",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "04C7B716",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "35A189E2",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "8014A332",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "DF3A7006",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "EB0BC95C",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "B6BD1A60",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "C19D5680",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "94E2099D",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "85AD9C81",
-            "crc32_extended": ""
-          }
-        ],
-        "22": [
-          {
-            "crc32": "7DBBFA18",
-            "crc32_extended": ""
-          }
-        ],
-        "23": [
-          {
-            "crc32": "65BD682D",
-            "crc32_extended": ""
-          }
-        ],
-        "24": [
-          {
-            "crc32": "99A61805",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "FBA08093",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "BD7169C3",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "5636E014",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "9E0A91E9",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "DA5B5D04",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "64FB3990",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "29A10280",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "DBA50B89",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "FCF7F7E4",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "F4BB17EB",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "7926F9B5",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "F134C10A",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "04C7B716",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "35A189E2",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "8014A332",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "DF3A7006",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "EB0BC95C",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "B6BD1A60",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "C19D5680",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "94E2099D",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "85AD9C81",
+          "crc32_extended": ""
+        },
+        "22": {
+          "crc32": "7DBBFA18",
+          "crc32_extended": ""
+        },
+        "23": {
+          "crc32": "65BD682D",
+          "crc32_extended": ""
+        },
+        "24": {
+          "crc32": "99A61805",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -1936,138 +1398,94 @@
       "description": "The first island of the New World is a strange place covered in flames on one half, and freezing temperatures on the other. What seems at first to be an unlivable place later reveals a laboratory, a maniac scientist, and a certain Warlord of the Sea.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/30/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "90015E67",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "5A3CE523",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "FE661F6E",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "666061E3",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "ACF1C889",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "CC88315A",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "F0B1F815",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "658D36CE",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "AD550761",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "72E3E794",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "398915C6",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "CD83F1E9",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "964FB36B",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "75CC1F6E",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "9CE5B9DD",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "4CD92CFC",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "0A2624D5",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "D56597BC",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "54AC1705",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "5012E091",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "0CBF5258",
-            "crc32_extended": ""
-          }
-        ],
-        "22": [
-          {
-            "crc32": "021A8886",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "90015E67",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "5A3CE523",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "FE661F6E",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "666061E3",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "ACF1C889",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "CC88315A",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "F0B1F815",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "658D36CE",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "AD550761",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "72E3E794",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "398915C6",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "CD83F1E9",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "964FB36B",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "75CC1F6E",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "9CE5B9DD",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "4CD92CFC",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "0A2624D5",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "D56597BC",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "54AC1705",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "5012E091",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "0CBF5258",
+          "crc32_extended": ""
+        },
+        "22": {
+          "crc32": "021A8886",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -2078,294 +1496,198 @@
       "description": "Luffy's alliance with Law brings him next to Dressrosa to take down Doflamingo's booming business. But the crazed warlord and self-proclaimed ruler of Dressrosa has control over everyone and everything.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/31/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "2A35B710",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "E058DEF9",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "90034ECC",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "E98FA912",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "A95DE47B",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "F7CB97CD",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "EACE397D",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "777DE97C",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "C2C37921",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "50143351",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "D8E8370A",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "F20B5423",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "C29E5C35",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "E3C90B8B",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "6A3CE0EA",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "7073A62F",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "174F92DD",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "C9362978",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "77081AEE",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "BE72EB0E",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "C21EC74A",
-            "crc32_extended": ""
-          }
-        ],
-        "22": [
-          {
-            "crc32": "5FC46535",
-            "crc32_extended": ""
-          }
-        ],
-        "23": [
-          {
-            "crc32": "5A38EC3B",
-            "crc32_extended": ""
-          }
-        ],
-        "24": [
-          {
-            "crc32": "11DA7BCB",
-            "crc32_extended": ""
-          }
-        ],
-        "25": [
-          {
-            "crc32": "1CADC5DC",
-            "crc32_extended": ""
-          }
-        ],
-        "26": [
-          {
-            "crc32": "71CA89FC",
-            "crc32_extended": ""
-          }
-        ],
-        "27": [
-          {
-            "crc32": "DC6C3C54",
-            "crc32_extended": ""
-          }
-        ],
-        "28": [
-          {
-            "crc32": "04186119",
-            "crc32_extended": ""
-          }
-        ],
-        "29": [
-          {
-            "crc32": "ACC7852E",
-            "crc32_extended": ""
-          }
-        ],
-        "30": [
-          {
-            "crc32": "4F16C5DC",
-            "crc32_extended": ""
-          }
-        ],
-        "31": [
-          {
-            "crc32": "9C3360D6",
-            "crc32_extended": ""
-          }
-        ],
-        "32": [
-          {
-            "crc32": "E98F852E",
-            "crc32_extended": ""
-          }
-        ],
-        "33": [
-          {
-            "crc32": "53AEB13C",
-            "crc32_extended": ""
-          }
-        ],
-        "34": [
-          {
-            "crc32": "0CA47011",
-            "crc32_extended": ""
-          }
-        ],
-        "35": [
-          {
-            "crc32": "1B5DC33C",
-            "crc32_extended": ""
-          }
-        ],
-        "36": [
-          {
-            "crc32": "F218F0E4",
-            "crc32_extended": ""
-          }
-        ],
-        "37": [
-          {
-            "crc32": "777A9A6A",
-            "crc32_extended": ""
-          }
-        ],
-        "38": [
-          {
-            "crc32": "0429451F",
-            "crc32_extended": ""
-          }
-        ],
-        "39": [
-          {
-            "crc32": "7391ECD4",
-            "crc32_extended": ""
-          }
-        ],
-        "40": [
-          {
-            "crc32": "ECD80B22",
-            "crc32_extended": ""
-          }
-        ],
-        "41": [
-          {
-            "crc32": "3E9F11F9",
-            "crc32_extended": ""
-          }
-        ],
-        "42": [
-          {
-            "crc32": "55292D1C",
-            "crc32_extended": ""
-          }
-        ],
-        "43": [
-          {
-            "crc32": "CAA32C42",
-            "crc32_extended": ""
-          }
-        ],
-        "44": [
-          {
-            "crc32": "4DDF4C07",
-            "crc32_extended": ""
-          }
-        ],
-        "45": [
-          {
-            "crc32": "15344804",
-            "crc32_extended": ""
-          }
-        ],
-        "46": [
-          {
-            "crc32": "81C4666C",
-            "crc32_extended": ""
-          }
-        ],
-        "47": [
-          {
-            "crc32": "01C40FA1",
-            "crc32_extended": ""
-          }
-        ],
-        "48": [
-          {
-            "crc32": "5F035A13",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "2A35B710",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "E058DEF9",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "90034ECC",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "E98FA912",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "A95DE47B",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "F7CB97CD",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "EACE397D",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "777DE97C",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "C2C37921",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "50143351",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "D8E8370A",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "F20B5423",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "C29E5C35",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "E3C90B8B",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "6A3CE0EA",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "7073A62F",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "174F92DD",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "C9362978",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "77081AEE",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "BE72EB0E",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "C21EC74A",
+          "crc32_extended": ""
+        },
+        "22": {
+          "crc32": "5FC46535",
+          "crc32_extended": ""
+        },
+        "23": {
+          "crc32": "5A38EC3B",
+          "crc32_extended": ""
+        },
+        "24": {
+          "crc32": "11DA7BCB",
+          "crc32_extended": ""
+        },
+        "25": {
+          "crc32": "1CADC5DC",
+          "crc32_extended": ""
+        },
+        "26": {
+          "crc32": "71CA89FC",
+          "crc32_extended": ""
+        },
+        "27": {
+          "crc32": "DC6C3C54",
+          "crc32_extended": ""
+        },
+        "28": {
+          "crc32": "04186119",
+          "crc32_extended": ""
+        },
+        "29": {
+          "crc32": "ACC7852E",
+          "crc32_extended": ""
+        },
+        "30": {
+          "crc32": "4F16C5DC",
+          "crc32_extended": ""
+        },
+        "31": {
+          "crc32": "9C3360D6",
+          "crc32_extended": ""
+        },
+        "32": {
+          "crc32": "E98F852E",
+          "crc32_extended": ""
+        },
+        "33": {
+          "crc32": "53AEB13C",
+          "crc32_extended": ""
+        },
+        "34": {
+          "crc32": "0CA47011",
+          "crc32_extended": ""
+        },
+        "35": {
+          "crc32": "1B5DC33C",
+          "crc32_extended": ""
+        },
+        "36": {
+          "crc32": "F218F0E4",
+          "crc32_extended": ""
+        },
+        "37": {
+          "crc32": "777A9A6A",
+          "crc32_extended": ""
+        },
+        "38": {
+          "crc32": "0429451F",
+          "crc32_extended": ""
+        },
+        "39": {
+          "crc32": "7391ECD4",
+          "crc32_extended": ""
+        },
+        "40": {
+          "crc32": "ECD80B22",
+          "crc32_extended": ""
+        },
+        "41": {
+          "crc32": "3E9F11F9",
+          "crc32_extended": ""
+        },
+        "42": {
+          "crc32": "55292D1C",
+          "crc32_extended": ""
+        },
+        "43": {
+          "crc32": "CAA32C42",
+          "crc32_extended": ""
+        },
+        "44": {
+          "crc32": "4DDF4C07",
+          "crc32_extended": ""
+        },
+        "45": {
+          "crc32": "15344804",
+          "crc32_extended": ""
+        },
+        "46": {
+          "crc32": "81C4666C",
+          "crc32_extended": ""
+        },
+        "47": {
+          "crc32": "01C40FA1",
+          "crc32_extended": ""
+        },
+        "48": {
+          "crc32": "5F035A13",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -2376,66 +1698,46 @@
       "description": "Zou cannot be reached by conventional means, nor is it easy to enter once one finds it. Within its secretive walls lie the Mink Tribe, and the Straw Hats soon discover that the people of Zou hold a piece of the puzzle that unlocks the mysteries of the world.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/32/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "E70913D9",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "32150FF4",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "E4B077F8",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "A4F76B13",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "7149D13F",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "7F73DB45",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "55837445",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "5B2AAFBF",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "0880B38F",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "4A52B138",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "E70913D9",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "32150FF4",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "E4B077F8",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "A4F76B13",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "7149D13F",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "7F73DB45",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "55837445",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "5B2AAFBF",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "0880B38F",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "4A52B138",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -2446,240 +1748,162 @@
       "description": "Luffy will not sail the seas without his cook, so he stubbornly goes after Sanji to Whole Cake Island. However, knocking on an emperor's door is easier said than done.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/33/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "3F24A1D8",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "6FFCB482",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "3F6633B5",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "02C6FC2B",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "4CF30353",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "410C8F0C",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "FC2376A1",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "31018FCB",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "94E3481F",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "E123D314",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "8B5E1006",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "36D0F622",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "D9EEB564",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "CCCBEFC0",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "0E2022E4",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "A8E42FE1",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "0CF96D5A",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "3F5E7FD3",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "0F125E00",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "4F38961B",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "5FDB702D",
-            "crc32_extended": ""
-          }
-        ],
-        "22": [
-          {
-            "crc32": "39D94718",
-            "crc32_extended": ""
-          }
-        ],
-        "23": [
-          {
-            "crc32": "437F9E8D",
-            "crc32_extended": ""
-          }
-        ],
-        "24": [
-          {
-            "crc32": "6E422CFB",
-            "crc32_extended": ""
-          }
-        ],
-        "25": [
-          {
-            "crc32": "32CC4AB9",
-            "crc32_extended": ""
-          }
-        ],
-        "26": [
-          {
-            "crc32": "71827EF0",
-            "crc32_extended": ""
-          }
-        ],
-        "27": [
-          {
-            "crc32": "2CDA8E9D",
-            "crc32_extended": ""
-          }
-        ],
-        "28": [
-          {
-            "crc32": "22B16322",
-            "crc32_extended": ""
-          }
-        ],
-        "29": [
-          {
-            "crc32": "270A4ABD",
-            "crc32_extended": ""
-          }
-        ],
-        "30": [
-          {
-            "crc32": "ABB0AC56",
-            "crc32_extended": ""
-          }
-        ],
-        "31": [
-          {
-            "crc32": "529AE554",
-            "crc32_extended": ""
-          }
-        ],
-        "32": [
-          {
-            "crc32": "8313ECE3",
-            "crc32_extended": ""
-          }
-        ],
-        "33": [
-          {
-            "crc32": "6FBBD350",
-            "crc32_extended": ""
-          }
-        ],
-        "34": [
-          {
-            "crc32": "A3939979",
-            "crc32_extended": ""
-          }
-        ],
-        "35": [
-          {
-            "crc32": "1753F7D1",
-            "crc32_extended": ""
-          }
-        ],
-        "36": [
-          {
-            "crc32": "3AF37912",
-            "crc32_extended": ""
-          }
-        ],
-        "37": [
-          {
-            "crc32": "3C58DD41",
-            "crc32_extended": ""
-          }
-        ],
-        "38": [
-          {
-            "crc32": "E9317CBD",
-            "crc32_extended": ""
-          }
-        ],
-        "39": [
-          {
-            "crc32": "172F5F20",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "3F24A1D8",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "6FFCB482",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "3F6633B5",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "02C6FC2B",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "4CF30353",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "410C8F0C",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "FC2376A1",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "31018FCB",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "94E3481F",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "E123D314",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "8B5E1006",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "36D0F622",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "D9EEB564",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "CCCBEFC0",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "0E2022E4",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "A8E42FE1",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "0CF96D5A",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "3F5E7FD3",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "0F125E00",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "4F38961B",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "5FDB702D",
+          "crc32_extended": ""
+        },
+        "22": {
+          "crc32": "39D94718",
+          "crc32_extended": ""
+        },
+        "23": {
+          "crc32": "437F9E8D",
+          "crc32_extended": ""
+        },
+        "24": {
+          "crc32": "6E422CFB",
+          "crc32_extended": ""
+        },
+        "25": {
+          "crc32": "32CC4AB9",
+          "crc32_extended": ""
+        },
+        "26": {
+          "crc32": "71827EF0",
+          "crc32_extended": ""
+        },
+        "27": {
+          "crc32": "2CDA8E9D",
+          "crc32_extended": ""
+        },
+        "28": {
+          "crc32": "22B16322",
+          "crc32_extended": ""
+        },
+        "29": {
+          "crc32": "270A4ABD",
+          "crc32_extended": ""
+        },
+        "30": {
+          "crc32": "ABB0AC56",
+          "crc32_extended": ""
+        },
+        "31": {
+          "crc32": "529AE554",
+          "crc32_extended": ""
+        },
+        "32": {
+          "crc32": "8313ECE3",
+          "crc32_extended": ""
+        },
+        "33": {
+          "crc32": "6FBBD350",
+          "crc32_extended": ""
+        },
+        "34": {
+          "crc32": "A3939979",
+          "crc32_extended": ""
+        },
+        "35": {
+          "crc32": "1753F7D1",
+          "crc32_extended": ""
+        },
+        "36": {
+          "crc32": "3AF37912",
+          "crc32_extended": ""
+        },
+        "37": {
+          "crc32": "3C58DD41",
+          "crc32_extended": ""
+        },
+        "38": {
+          "crc32": "E9317CBD",
+          "crc32_extended": ""
+        },
+        "39": {
+          "crc32": "172F5F20",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -2690,24 +1914,18 @@
       "description": "Every four years, the leaders of the world gather at the Holy Land to discuss a mutually agreed upon path for the government. During this particular Reverie, many parties with their own agendas arrive... and some are uninvited.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/34/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "C5FB1123",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "6E0CD1C5",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "0B51015F",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "C5FB1123",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "6E0CD1C5",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "0B51015F",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -2718,324 +1936,218 @@
       "description": "The Straw Hats finally regroup in Wano to carry out theirs and their allies' ultimate goal: to see to the Emperor Kaido's downfall and restore the Kozuki family to its rightful place of power.",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/35/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "F15AFDE0",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "8538EDC4",
-            "crc32_extended": "6F26FDAB"
-          }
-        ],
-        "03": [
-          {
-            "crc32": "410FD111",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "23CF2FA6",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "B51C53E9",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "13E4ABCF",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "F71F9B71",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "6DA86F5F",
-            "crc32_extended": ""
-          }
-        ],
-        "09": [
-          {
-            "crc32": "5A5E65B1",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "91BE23B7",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "6A9CF454",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "5ACE812A",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "DCF7AD65",
-            "crc32_extended": ""
-          }
-        ],
-        "14": [
-          {
-            "crc32": "BF92DCAF",
-            "crc32_extended": ""
-          }
-        ],
-        "15": [
-          {
-            "crc32": "AE6ABE84",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "9FA61F60",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "D2E02F36",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "94F78CF3",
-            "crc32_extended": ""
-          }
-        ],
-        "19": [
-          {
-            "crc32": "6C9E8055",
-            "crc32_extended": ""
-          }
-        ],
-        "20": [
-          {
-            "crc32": "93376225",
-            "crc32_extended": ""
-          }
-        ],
-        "21": [
-          {
-            "crc32": "0B965026",
-            "crc32_extended": ""
-          }
-        ],
-        "22": [
-          {
-            "crc32": "9F63AF78",
-            "crc32_extended": ""
-          }
-        ],
-        "23": [
-          {
-            "crc32": "37670A03",
-            "crc32_extended": ""
-          }
-        ],
-        "24": [
-          {
-            "crc32": "6173BCE1",
-            "crc32_extended": ""
-          }
-        ],
-        "25": [
-          {
-            "crc32": "C3825063",
-            "crc32_extended": ""
-          }
-        ],
-        "26": [
-          {
-            "crc32": "F3E829E8",
-            "crc32_extended": ""
-          }
-        ],
-        "27": [
-          {
-            "crc32": "3CC8226D",
-            "crc32_extended": ""
-          }
-        ],
-        "28": [
-          {
-            "crc32": "22F81B0E",
-            "crc32_extended": ""
-          }
-        ],
-        "29": [
-          {
-            "crc32": "5C7E0604",
-            "crc32_extended": ""
-          }
-        ],
-        "30": [
-          {
-            "crc32": "43A0D1DF",
-            "crc32_extended": ""
-          }
-        ],
-        "31": [
-          {
-            "crc32": "F6C7EB83",
-            "crc32_extended": ""
-          }
-        ],
-        "32": [
-          {
-            "crc32": "29B91F56",
-            "crc32_extended": ""
-          }
-        ],
-        "33": [
-          {
-            "crc32": "E3AB2BA0",
-            "crc32_extended": ""
-          }
-        ],
-        "34": [
-          {
-            "crc32": "224B7846",
-            "crc32_extended": ""
-          }
-        ],
-        "35": [
-          {
-            "crc32": "98B5E26D",
-            "crc32_extended": ""
-          }
-        ],
-        "36": [
-          {
-            "crc32": "BAFFE801",
-            "crc32_extended": ""
-          }
-        ],
-        "37": [
-          {
-            "crc32": "AD8C9C16",
-            "crc32_extended": ""
-          }
-        ],
-        "38": [
-          {
-            "crc32": "298A4284",
-            "crc32_extended": ""
-          }
-        ],
-        "39": [
-          {
-            "crc32": "56CFB8B0",
-            "crc32_extended": ""
-          }
-        ],
-        "40": [
-          {
-            "crc32": "713F7916",
-            "crc32_extended": ""
-          }
-        ],
-        "41": [
-          {
-            "crc32": "C89B4C1E",
-            "crc32_extended": ""
-          }
-        ],
-        "42": [
-          {
-            "crc32": "3FC81ABD",
-            "crc32_extended": ""
-          }
-        ],
-        "43": [
-          {
-            "crc32": "26D98629",
-            "crc32_extended": ""
-          }
-        ],
-        "44": [
-          {
-            "crc32": "F1FB27C6",
-            "crc32_extended": ""
-          }
-        ],
-        "45": [
-          {
-            "crc32": "DFB30A71",
-            "crc32_extended": ""
-          }
-        ],
-        "46": [
-          {
-            "crc32": "7392F65E",
-            "crc32_extended": ""
-          }
-        ],
-        "47": [
-          {
-            "crc32": "D78E29CD",
-            "crc32_extended": ""
-          }
-        ],
-        "48": [
-          {
-            "crc32": "F47C3EDD",
-            "crc32_extended": ""
-          }
-        ],
-        "49": [
-          {
-            "crc32": "FE878EE8",
-            "crc32_extended": "58469AB0"
-          }
-        ],
-        "50": [
-          {
-            "crc32": "0144BBBA",
-            "crc32_extended": ""
-          }
-        ],
-        "51": [
-          {
-            "crc32": "E004EDB5",
-            "crc32_extended": ""
-          }
-        ],
-        "52": [
-          {
-            "crc32": "D985734A",
-            "crc32_extended": ""
-          }
-        ],
-        "53": [
-          {
-            "crc32": "C99E7631",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "F15AFDE0",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "8538EDC4",
+          "crc32_extended": "6F26FDAB"
+        },
+        "03": {
+          "crc32": "410FD111",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "23CF2FA6",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "B51C53E9",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "13E4ABCF",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "F71F9B71",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "6DA86F5F",
+          "crc32_extended": ""
+        },
+        "09": {
+          "crc32": "5A5E65B1",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "91BE23B7",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "6A9CF454",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "5ACE812A",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "DCF7AD65",
+          "crc32_extended": ""
+        },
+        "14": {
+          "crc32": "BF92DCAF",
+          "crc32_extended": ""
+        },
+        "15": {
+          "crc32": "AE6ABE84",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "9FA61F60",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "D2E02F36",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "94F78CF3",
+          "crc32_extended": ""
+        },
+        "19": {
+          "crc32": "6C9E8055",
+          "crc32_extended": ""
+        },
+        "20": {
+          "crc32": "93376225",
+          "crc32_extended": ""
+        },
+        "21": {
+          "crc32": "0B965026",
+          "crc32_extended": ""
+        },
+        "22": {
+          "crc32": "9F63AF78",
+          "crc32_extended": ""
+        },
+        "23": {
+          "crc32": "37670A03",
+          "crc32_extended": ""
+        },
+        "24": {
+          "crc32": "6173BCE1",
+          "crc32_extended": ""
+        },
+        "25": {
+          "crc32": "C3825063",
+          "crc32_extended": ""
+        },
+        "26": {
+          "crc32": "F3E829E8",
+          "crc32_extended": ""
+        },
+        "27": {
+          "crc32": "3CC8226D",
+          "crc32_extended": ""
+        },
+        "28": {
+          "crc32": "22F81B0E",
+          "crc32_extended": ""
+        },
+        "29": {
+          "crc32": "5C7E0604",
+          "crc32_extended": ""
+        },
+        "30": {
+          "crc32": "43A0D1DF",
+          "crc32_extended": ""
+        },
+        "31": {
+          "crc32": "F6C7EB83",
+          "crc32_extended": ""
+        },
+        "32": {
+          "crc32": "29B91F56",
+          "crc32_extended": ""
+        },
+        "33": {
+          "crc32": "E3AB2BA0",
+          "crc32_extended": ""
+        },
+        "34": {
+          "crc32": "224B7846",
+          "crc32_extended": ""
+        },
+        "35": {
+          "crc32": "98B5E26D",
+          "crc32_extended": ""
+        },
+        "36": {
+          "crc32": "BAFFE801",
+          "crc32_extended": ""
+        },
+        "37": {
+          "crc32": "AD8C9C16",
+          "crc32_extended": ""
+        },
+        "38": {
+          "crc32": "298A4284",
+          "crc32_extended": ""
+        },
+        "39": {
+          "crc32": "56CFB8B0",
+          "crc32_extended": ""
+        },
+        "40": {
+          "crc32": "713F7916",
+          "crc32_extended": ""
+        },
+        "41": {
+          "crc32": "C89B4C1E",
+          "crc32_extended": ""
+        },
+        "42": {
+          "crc32": "3FC81ABD",
+          "crc32_extended": ""
+        },
+        "43": {
+          "crc32": "26D98629",
+          "crc32_extended": ""
+        },
+        "44": {
+          "crc32": "F1FB27C6",
+          "crc32_extended": ""
+        },
+        "45": {
+          "crc32": "DFB30A71",
+          "crc32_extended": ""
+        },
+        "46": {
+          "crc32": "7392F65E",
+          "crc32_extended": ""
+        },
+        "47": {
+          "crc32": "D78E29CD",
+          "crc32_extended": ""
+        },
+        "48": {
+          "crc32": "F47C3EDD",
+          "crc32_extended": ""
+        },
+        "49": {
+          "crc32": "FE878EE8",
+          "crc32_extended": "58469AB0"
+        },
+        "50": {
+          "crc32": "0144BBBA",
+          "crc32_extended": ""
+        },
+        "51": {
+          "crc32": "E004EDB5",
+          "crc32_extended": ""
+        },
+        "52": {
+          "crc32": "D985734A",
+          "crc32_extended": ""
+        },
+        "53": {
+          "crc32": "CE6E899D",
+          "crc32_extended": ""
+        }
       }
     },
     {
@@ -3046,114 +2158,78 @@
       "description": "Futuristic tech, giant alien monsters, battle robots, superhuman clones... Who are all these people calling themselves Dr. Vegapunk, and why is the government after one of their own?",
       "poster": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/data/posters/36/poster.png",
       "episodes": {
-        "01": [
-          {
-            "crc32": "CA3F14A8",
-            "crc32_extended": ""
-          }
-        ],
-        "02": [
-          {
-            "crc32": "D511F339",
-            "crc32_extended": ""
-          }
-        ],
-        "03": [
-          {
-            "crc32": "5B546203",
-            "crc32_extended": ""
-          }
-        ],
-        "04": [
-          {
-            "crc32": "ACBE88D6",
-            "crc32_extended": ""
-          }
-        ],
-        "05": [
-          {
-            "crc32": "C6E79353",
-            "crc32_extended": ""
-          }
-        ],
-        "06": [
-          {
-            "crc32": "69F1BBD5",
-            "crc32_extended": ""
-          }
-        ],
-        "07": [
-          {
-            "crc32": "A42DEAED",
-            "crc32_extended": ""
-          }
-        ],
-        "08": [
-          {
-            "crc32": "4C1997F3",
-            "crc32_extended": "1FDB8A9C"
-          }
-        ],
-        "09": [
-          {
-            "crc32": "29B2D72D",
-            "crc32_extended": ""
-          }
-        ],
-        "10": [
-          {
-            "crc32": "2B00E24B",
-            "crc32_extended": ""
-          }
-        ],
-        "11": [
-          {
-            "crc32": "448628C9",
-            "crc32_extended": ""
-          }
-        ],
-        "12": [
-          {
-            "crc32": "6FEADFF5",
-            "crc32_extended": ""
-          }
-        ],
-        "13": [
-          {
-            "crc32": "6C170189",
-            "crc32_extended": "482F69B7"
-          }
-        ],
-        "14": [
-          {
-            "crc32": "3C0010BE",
-            "crc32_extended": "CA3683BA"
-          }
-        ],
-        "15": [
-          {
-            "crc32": "B9537A27",
-            "crc32_extended": ""
-          }
-        ],
-        "16": [
-          {
-            "crc32": "78ED23DF",
-            "crc32_extended": ""
-          }
-        ],
-        "17": [
-          {
-            "crc32": "7F625586",
-            "crc32_extended": ""
-          }
-        ],
-        "18": [
-          {
-            "crc32": "8A1836B5",
-            "crc32_extended": ""
-          }
-        ]
+        "01": {
+          "crc32": "CA3F14A8",
+          "crc32_extended": ""
+        },
+        "02": {
+          "crc32": "D511F339",
+          "crc32_extended": ""
+        },
+        "03": {
+          "crc32": "5B546203",
+          "crc32_extended": ""
+        },
+        "04": {
+          "crc32": "ACBE88D6",
+          "crc32_extended": ""
+        },
+        "05": {
+          "crc32": "C6E79353",
+          "crc32_extended": ""
+        },
+        "06": {
+          "crc32": "69F1BBD5",
+          "crc32_extended": ""
+        },
+        "07": {
+          "crc32": "A42DEAED",
+          "crc32_extended": ""
+        },
+        "08": {
+          "crc32": "4C1997F3",
+          "crc32_extended": "1FDB8A9C"
+        },
+        "09": {
+          "crc32": "29B2D72D",
+          "crc32_extended": ""
+        },
+        "10": {
+          "crc32": "2B00E24B",
+          "crc32_extended": ""
+        },
+        "11": {
+          "crc32": "448628C9",
+          "crc32_extended": ""
+        },
+        "12": {
+          "crc32": "6FEADFF5",
+          "crc32_extended": ""
+        },
+        "13": {
+          "crc32": "6C170189",
+          "crc32_extended": "482F69B7"
+        },
+        "14": {
+          "crc32": "3C0010BE",
+          "crc32_extended": "CA3683BA"
+        },
+        "15": {
+          "crc32": "21BF9495",
+          "crc32_extended": ""
+        },
+        "16": {
+          "crc32": "7A93DCC5",
+          "crc32_extended": ""
+        },
+        "17": {
+          "crc32": "76281ED9",
+          "crc32_extended": ""
+        },
+        "18": {
+          "crc32": "8A1836B5",
+          "crc32_extended": ""
+        }
       }
     }
   ],
