@@ -514,7 +514,7 @@ class OnePaceOrganizer:
 
         if "reference" in parsed:
             ref = parsed["reference"].upper()
-            self.logger.debug(f"{crc32}.yml -> {ref}.yml")
+            self.logger.trace(f"{crc32}.yml -> {ref}.yml")
 
             if ref in self.episodes and isinstance(self.episodes[ref], dict):
                 return self.episodes[ref]
@@ -670,7 +670,7 @@ class OnePaceOrganizer:
                     results.append((match.group(1), await utils.resolve(file)))
 
                 else:
-                    self.logger.debug(f"Add to CRC32 Queue: {file}")
+                    self.logger.trace(f"Add to CRC32 Queue: {file}")
                     tasks.append(loop.run_in_executor(executor, utils.crc32, str(await utils.resolve(file))))
 
             if len(tasks) > 0:
@@ -707,7 +707,7 @@ class OnePaceOrganizer:
 
         for index, info in enumerate(results):
             if info[0] in self.episodes:
-                self.logger.debug(f"Queue: {info[0]} {info[1]}")
+                self.logger.trace(f"Queue: {info[0]} {info[1]}")
                 video_files.append(info)
 
             elif info[1].suffix.lower() == '.mkv':
@@ -743,7 +743,7 @@ class OnePaceOrganizer:
                         season_items = self.arcs.items() if isinstance(self.arcs, dict) else enumerate(self.arcs)
                         for season, season_info in season_items:
                             if season_info["title"] == arc_name and crc32 not in self.episodes:
-                                self.logger.debug(f"found {season_info['title']} -> s{season} e{ep_num}")
+                                self.logger.trace(f"found {season_info['title']} -> s{season} e{ep_num}")
                                 m_season = season
                                 m_episode = ep_num
 
@@ -762,8 +762,8 @@ class OnePaceOrganizer:
                                 "episode": m_episode,
                                 "title": ep_title,
                                 "description": "",
-                                "manga_chapters": "",
-                                "anime_episodes": "",
+                                "chapters": "",
+                                "episodes": "",
                                 "released": ep_date.isoformat()
                             }
 
@@ -810,23 +810,25 @@ class OnePaceOrganizer:
 
         if "title" in self.tvshow and self.tvshow["title"] != "" and show.title != self.tvshow["title"]:
             self.logger.info(f"Set Title: {show.title} -> {self.tvshow['title']}")
-            show.editTitle(self.tvshow["title"])
+            await utils.run(show.editTitle, self.tvshow["title"])
 
         if "originaltitle" in self.tvshow and self.tvshow["originaltitle"] != "" and show.originalTitle != self.tvshow["originaltitle"]:
             self.logger.info(f"Set Original Title: {show.originalTitle} -> {self.tvshow['originaltitle']}")
-            show.editOriginalTitle(self.tvshow["originaltitle"])
+            await utils.run(show.editOriginalTitle, self.tvshow["originaltitle"])
 
         if "sorttitle" in self.tvshow and self.tvshow["sorttitle"] != "" and show.titleSort != self.tvshow["sorttitle"]:
             self.logger.info(f"Set Sort Title: {show.titleSort} -> {self.tvshow['sorttitle']}")
-            show.editSortTitle(self.tvshow["sorttitle"])
+            await utils.run(show.editSortTitle, self.tvshow["sorttitle"])
 
         if "customrating" in self.tvshow and self.tvshow["customrating"] != "" and show.contentRating != self.tvshow["customrating"]:
             self.logger.info(f"Set Rating: {show.contentRating} -> {self.tvshow['customrating']}")
-            show.editContentRating(self.tvshow["customrating"])
+            await utils.run(show.editContentRating, self.tvshow["customrating"])
 
         if "plot" in self.tvshow and show.summary != self.tvshow["plot"]:
-            show.editSummary(self.tvshow["plot"])
-            show.editOriginallyAvailable(self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"])
+            await utils.run(show.editSummary, self.tvshow["plot"])
+            await utils.run(show.editOriginallyAvailable,
+                self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"]
+            )
 
             poster = await utils.run(utils.find_from_list, self.base_path, [
                 ("posters", "poster.*"),
@@ -867,7 +869,7 @@ class OnePaceOrganizer:
 
             for crc32, file in files:
                 episode_info = self.episodes[crc32]
-                self.logger.debug(f"{crc32}: {episode_info}")
+                self.logger.trace(f"{crc32}: {episode_info}")
 
                 if isinstance(episode_info, list):
                     stop = True
@@ -969,11 +971,11 @@ class OnePaceOrganizer:
 
                         if plex_season.title != season_title:
                             self.logger.debug(f"Season {season} Title: {season_title}")
-                            plex_season.editTitle(season_title)
+                            await utils.run(plex_season.editTitle, season_title)
 
                         if season_desc != "" and plex_season.summary != season_desc:
                             self.logger.debug(f"Season {season} Summary: {season_desc}")
-                            plex_season.editSummary(season_desc)
+                            await utils.run(plex_season.editSummary, season_desc)
 
                         poster = await utils.run(utils.find_from_list, self.base_path, [
                             (f"posters/{season}", "poster.*"),
@@ -1016,48 +1018,48 @@ class OnePaceOrganizer:
 
                 if plex_episode.title != episode_info["title"]:
                     self.logger.debug(f"S{season}E{episode} Title: {plex_episode.title} -> {episode_info['title']}")
-                    plex_episode.editTitle(episode_info["title"])
+                    await utils.run(plex_episode.editTitle, episode_info["title"])
                     updated = True
 
                 if "rating" in episode_info and plex_episode.contentRating != episode_info["rating"]:
                     self.logger.debug(f"S{season}E{episode} Rating: {plex_episode.contentRating} -> {episode_info['rating']}")
-                    plex_episode.editContentRating(episode_info["rating"])
+                    await utils.run(plex_episode.editContentRating, episode_info["rating"])
                     updated = True
 
-                if "sorttitle" in episode_info and plex_episode.sortTitle != episode_info["sorttitle"]:
-                    self.logger.debug(f"S{season}E{episode} Sort Title: {plex_episode.sortTitle} -> {episode_info['sorttitle']}")
-                    plex_episode.editSortTitle(episode_info["sorttitle"])
+                if "sorttitle" in episode_info and plex_episode.titleSort != episode_info["sorttitle"]:
+                    self.logger.debug(f"S{season}E{episode} Sort Title: {plex_episode.titleSort} -> {episode_info['sorttitle']}")
+                    await utils.run(plex_episode.editSortTitle, episode_info["sorttitle"])
                     updated = True
 
                 if "released" in episode_info:
-                    r = datetime.datetime.strptime(episode_info["released"], "%Y-%m-%d") if isinstance(episode_info["released"], str) else episode_info["released"]
+                    r = datetime.datetime.strptime(episode_info["released"], "%Y-%m-%d").date() if isinstance(episode_info["released"], str) else episode_info["released"]
 
-                    if plex_episode.originallyAvailableAt.date() != r.date():
+                    if plex_episode.originallyAvailableAt.date() != r:
                         self.logger.debug(f"S{season}E{episode} Release Date: {plex_episode.originallyAvailableAt} -> {r}")
-                        plex_episode.editOriginallyAvailable(r)
+                        await utils.run(plex_episode.editOriginallyAvailable, r)
                         updated = True
 
                 desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
                 manga_str = ""
                 anime_str = ""
 
-                if episode_info["manga_chapters"] != "":
+                if episode_info["chapters"] != "":
                     if desc_str != "":
-                        manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
+                        manga_str = f"\n\nChapter(s): {episode_info['chapters']}"
                     else:
-                        manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
+                        manga_str = f"Chapter(s): {episode_info['chapters']}"
 
-                if episode_info["anime_episodes"] != "":
+                if episode_info["episodes"] != "":
                     if desc_str != "" or manga_str != "":
-                        anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
+                        anime_str = f"\n\nEpisode(s): {episode_info['episodes']}"
                     else:
-                        anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
+                        anime_str = f"Episode(s): {episode_info['episodes']}"
 
                 description = f"{desc_str}{manga_str}{anime_str}"
 
                 if plex_episode.summary != description:
                     self.logger.debug(f"S{season}E{episode} Description Updated")
-                    plex_episode.editSummary(description)
+                    await utils.run(plex_episode.editSummary, description)
                     updated = True
 
                 poster = await utils.run(utils.find_from_list, self.base_path, [
@@ -1095,7 +1097,7 @@ class OnePaceOrganizer:
             await utils.run_func(self.progress_bar_func, int((index / total) * 100))
 
         await utils.run_func(self.progress_bar_func, 100)
-        return (completed, skipped)
+        return (True, None, completed, skipped)
 
     async def _nfo_empty_task(self, src, dst, episode_info):
         return (src, dst, episode_info, "")
@@ -1288,7 +1290,7 @@ class OnePaceOrganizer:
                                     src = Path(self.base_path, "posters", str(season), "poster.png")
                                     try:
                                         self.logger.info(f"Downloading: posters/{src.name}")
-                                        await utils.download(f"posters/{src.name}", src, self.progress_bar_func)
+                                        await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
                                     except Exception as e:
                                         self.logger.warning(f"Skipping downloading: {e}")
 
@@ -1407,17 +1409,17 @@ class OnePaceOrganizer:
                     manga_str = ""
                     anime_str = ""
 
-                    if info["manga_chapters"] != "":
+                    if info["chapters"] != "":
                         if desc_str != "":
-                            manga_str = f"\n\nManga Chapter(s): {info['manga_chapters']}"
+                            manga_str = f"\n\nChapter(s): {info['chapters']}"
                         else:
-                            manga_str = f"Manga Chapter(s): {info['manga_chapters']}"
+                            manga_str = f"Chapter(s): {info['chapters']}"
 
-                    if info["anime_episodes"] != "":
+                    if info["episodes"] != "":
                         if desc_str != "" or manga_str != "":
-                            anime_str = f"\n\nAnime Episode(s): {info['anime_episodes']}"
+                            anime_str = f"\n\nEpisode(s): {info['episodes']}"
                         else:
-                            anime_str = f"Anime Episode(s): {info['anime_episodes']}"
+                            anime_str = f"Episode(s): {info['episodes']}"
 
                     ET.SubElement(root, "plot").text = f"{desc_str}{manga_str}{anime_str}"
 

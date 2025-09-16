@@ -4,9 +4,10 @@ import sys
 import traceback
 
 from functools import partial as func_partial
+from os import process_cpu_count
 from pathlib import Path
 from loguru import logger
-from qasync import QEventLoop, asyncWrap, asyncClose, asyncSlot
+from qasync import QEventLoop, QThreadExecutor, asyncWrap, asyncClose, asyncSlot
 from src import utils, organizer
 
 from PySide6.QtWidgets import (
@@ -54,7 +55,7 @@ class GUI(QMainWindow):
         super().__init__()
 
         #self.log_level = log_level.upper()
-        self.log_level = "DEBUG"
+        self.log_level = "INFO"
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
         self._log_scrollbar = self.log_output.verticalScrollBar()
@@ -593,9 +594,10 @@ class GUI(QMainWindow):
         self.start_button.setEnabled(False)
         self.log_output.append(self.spacer)
 
-        print("1")
+        self.organizer.input_path = Path(self.input.prop.text())
+        self.organizer.output_path = Path(self.output.prop.text())
+
         if self.organizer.plex_config_enabled:
-            print("2")
             self.plex_server.prop.setEnabled(False)
             self.plex_library.prop.setEnabled(False)
             self.plex_show.prop.setEnabled(False)
@@ -604,12 +606,9 @@ class GUI(QMainWindow):
 
             res = await asyncio.create_task(self.organizer.start())
             if isinstance(res, tuple):
-                print("3")
                 success, queue, completed, skipped = res
-                print("4")
 
                 if len(queue) > 0:
-                    print("5")
                     QMessageBox.information(None, self.organizer.window_title,
                         (
                             f"All of the One Pace files have been created in:\n"
@@ -620,14 +619,11 @@ class GUI(QMainWindow):
                             "Click OK once this has been done and you can see the One Pace video files in Plex."
                         )
                     )
-                    print("6")
 
                     res = asyncio.create_task(self.organizer.process_plex_episodes(queue))
                     success, queue, completed, skipped = await res
-                    print("7")
                     self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
                 else:
-                    print("8")
                     self.log_output.append(self.spacer)
                     self.log_output.append("Nothing to do")
 
@@ -637,12 +633,13 @@ class GUI(QMainWindow):
             self.plex_remember_login.button.setEnabled(True)
             self.plex_remember_login.prop.setEnabled(True)
             self.start_button.setEnabled(True)
+            await self.organizer.save_config()
             return
 
-        print("9")
         res = asyncio.create_task(self.organizer.start())
         success, queue, completed, skipped = await res
         self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
+        await self.organizer.save_config()
         self.start_button.setEnabled(True)
 
 def main(organizer, log_level):
@@ -652,15 +649,15 @@ def main(organizer, log_level):
         app.aboutToQuit.connect(close_event.set)
 
         async def _run():
-            #organizer.logger = utils.AsyncLogWrapper(logger)
-            organizer.executor_func = concurrent.futures.ThreadPoolExecutor
             await organizer.load_config()
+            organizer.executor_func = concurrent.futures.ThreadPoolExecutor
 
             gui = GUI(organizer, log_level)
             gui.setWindowTitle(organizer.window_title)
             gui.show()
 
             await close_event.wait()
+            await organizer.save_config()
 
         asyncio.run(_run(), loop_factory=QEventLoop)
 
