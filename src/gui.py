@@ -392,6 +392,7 @@ class GUI(QMainWindow):
             return
 
         await self._plex_toggle_enabled(False)
+        await self.organizer.save_config()
 
         self.organizer.plex_config_use_token = self.plex_method.prop.currentText() == "Authentication Token"
         self.organizer.plex_config_remember = self.plex_remember_login.prop.checkState() == Qt.Checked
@@ -402,6 +403,7 @@ class GUI(QMainWindow):
         self.organizer.logger.info(f"Logging in to Plex")
         if not await self.organizer.plex_login(True):
             self.organizer.logger.info(f"Login failed")
+            await self.organizer.save_config()
             await self._plex_toggle_enabled(True)
             self.plex_server.prop.setEnabled(False)
             self.plex_server.setVisible(False)
@@ -438,6 +440,7 @@ class GUI(QMainWindow):
         if not await self.organizer.plex_get_servers():
             self.plex_server.prop.clear()
             self.plex_server.prop.addItem("", userData=None)
+            await self.organizer.save_config()
             self.plex_server.prop.setEnabled(True)
             return
 
@@ -447,6 +450,7 @@ class GUI(QMainWindow):
         for identifier, item in self.organizer.plex_config_servers.items():
             self.plex_server.prop.addItem(item["name"], userData=identifier)
 
+        await self.organizer.save_config()
         self._update_start_btn()
         self.plex_server.prop.setEnabled(True)
 
@@ -473,6 +477,7 @@ class GUI(QMainWindow):
         if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id == "" and not await self.organizer.select_plex_server(_id):
             self.organizer.plexapi_server = None
             self.organizer.plex_config_server_id = ""
+            await self.organizer.save_config()
             self.plex_server.setVisible(True)
             self.plex_library.setVisible(False)
             self.plex_show.setVisible(False)
@@ -499,6 +504,7 @@ class GUI(QMainWindow):
         for identifier, item in self.organizer.plex_config_libraries.items():
             self.plex_library.prop.addItem(item["title"], userData=identifier)
 
+        await self.organizer.save_config()
         self._update_start_btn()
         self.plex_library.prop.setEnabled(True)
 
@@ -513,6 +519,7 @@ class GUI(QMainWindow):
 
         _id = self.plex_library.prop.currentData()
         if _id is None or _id == "":
+            await self.organizer.save_config()
             self.plex_server.setVisible(True)
             self.plex_library.setVisible(True)
             self.plex_show.setVisible(False)
@@ -540,6 +547,7 @@ class GUI(QMainWindow):
         for identifier, item in self.organizer.plex_config_shows.items():
             self.plex_show.prop.addItem(item["title"], userData=identifier)
 
+        await self.organizer.save_config()
         self._update_start_btn()
         self.plex_show.prop.setEnabled(True)
 
@@ -560,6 +568,7 @@ class GUI(QMainWindow):
             return
 
         await self.organizer.plex_select_show(_id)
+        await self.organizer.save_config()
         self._update_start_btn()
 
     @asyncClose
@@ -632,8 +641,8 @@ class GUI(QMainWindow):
             self.plex_show.prop.setEnabled(True)
             self.plex_remember_login.button.setEnabled(True)
             self.plex_remember_login.prop.setEnabled(True)
-            self.start_button.setEnabled(True)
             await self.organizer.save_config()
+            self.start_button.setEnabled(True)
             return
 
         res = asyncio.create_task(self.organizer.start())

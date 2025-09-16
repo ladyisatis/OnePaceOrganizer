@@ -24,7 +24,7 @@ class Headless:
 
     async def run(self):
         c = Path(self.organizer.base_path, "config.json")
-        if await run(c.is_file):
+        if await utils.run(c.is_file):
             _action = "Action after Sorting: Move"
             if self.organizer.file_action == 1:
                 _action = "Action after Sorting: Copy"
@@ -116,7 +116,7 @@ class Headless:
                 logger.info(f"Pausing {self.plex_wait_secs} seconds to allow file transfers")
                 await asyncio.sleep(float(self.plex_wait_secs))
 
-                completed, skipped = await self.organizer.process_plex_episodes(queue)
+                success, queue, completed, skipped = await self.organizer.process_plex_episodes(queue)
 
             logger.success(f"Completed: {completed} processed, {skipped} skipped")
 
