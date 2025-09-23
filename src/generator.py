@@ -36,8 +36,6 @@ def unicode_fix(s):
     return ''.join(escape_char(c) for c in s)
 
 def update():
-    BASE_URL = os.environ['GIT_BASE_URL']
-
     GCLOUD_API_KEY=os.environ['GCLOUD_API_KEY'] if 'GCLOUD_API_KEY' in os.environ else ''
     if GCLOUD_API_KEY == "":
         logger.critical("Skipping: GCLOUD_API_KEY is empty")
@@ -638,7 +636,7 @@ def generate_json():
             YamlDump(data={
                 "last_update": last_update,
                 "last_update_ts": last_update_ts,
-                "base_url": os.environ['GIT_BASE_URL'],
+                "base_url": f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/refs/heads/main",
                 "tvshow": tvshow,
                 "arcs": _a,
                 "episodes": episodes
@@ -647,7 +645,7 @@ def generate_json():
         out = {
             "last_update": last_update,
             "last_update_ts": last_update_ts,
-            "base_url": os.environ['GIT_BASE_URL'],
+            "base_url": f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/refs/heads/main",
             "tvshow": tvshow,
             "arcs": _a,
             "episodes": unicode_fix_dict(episodes)
@@ -659,9 +657,6 @@ def generate_json():
         json_min_file.write_bytes(_data_min_json)
 
 def main():
-    if "GIT_BASE_URL" not in os.environ:
-        os.environ['GIT_BASE_URL'] = "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main"
-
     if len(sys.argv) > 1 and sys.argv[1] == 'update':
         update()
         return

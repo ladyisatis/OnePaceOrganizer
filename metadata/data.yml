@@ -1,5 +1,6 @@
-last_update: '2025-09-23T01:21:04.685724+00:00'
-last_update_ts: 1758590464685
+last_update: '2025-09-23T06:34:57.053142+00:00'
+last_update_ts: 1758609297053
+base_url: https://raw.githubusercontent.com/ladyisatis/onepaceorganizer/refs/heads/main
 tvshow:
   title: One Piece
   sorttitle: One Piece
@@ -42,7 +43,7 @@ arcs:
   originaltitle: ''
   description: Monkey D. Luffy sets out on an adventure to form a crew, find the legendary
     One Piece, and become the pirate king.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/1/poster.png
+  poster: metadata/posters/1/poster.png
   episodes:
     '01':
       crc32: E5F09F49
@@ -63,7 +64,7 @@ arcs:
   description: Luffy and Zoro run afoul of a flashy crew of pirates and their captain,
     Buggy the Clown. They are joined by a young girl named Nami who helps them navigate
     this predicament.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/2/poster.png
+  poster: metadata/posters/2/poster.png
   episodes:
     '01':
       crc32: CBFE01C7
@@ -80,7 +81,7 @@ arcs:
   originaltitle: ''
   description: Luffy's fledgling pirate crew arrives at the slopes of Syrup Village.
     There they find a liar and a conspiracy to steal a young lady's fortune.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/3/poster.png
+  poster: metadata/posters/3/poster.png
   episodes:
     '01':
       crc32: A6DDEC2C
@@ -111,7 +112,7 @@ arcs:
     their command, the Straw Hats head to an island said to hold a fabled treasure.
     There they encounter a strange man stuck in a box who has been looking for the
     same treasure.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/4/poster.png
+  poster: metadata/posters/4/poster.png
   episodes:
     '01':
       crc32: 9269F40F
@@ -124,7 +125,7 @@ arcs:
     hopes of recruiting one of their cooks. In the meantime, hungry yet powerful forces
     gather to lay siege to the restaurant \u2014 all while a menacing swordsman from
     the Grand Line steadily approaches.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/5/poster.png
+  poster: metadata/posters/5/poster.png
   episodes:
     '01':
       crc32: BE634289
@@ -157,7 +158,7 @@ arcs:
   description: Nami's hometown has long been overrun by Arlong and his band of fishmen
     from the Grand Line. When the Straw Hats arrive, they find that their prospective
     navigator has left out a few key details about herself.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/6/poster.png
+  poster: metadata/posters/6/poster.png
   episodes:
     '01':
       crc32: AD09145D
@@ -208,7 +209,7 @@ arcs:
   description: 'The final island before entering the Grand Line: Loguetown. Luffy
     and his crew drop anchor to stock up, sightsee, and pay their respects to the
     place where Gold Roger drew his last breath.'
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/8/poster.png
+  poster: metadata/posters/8/poster.png
   episodes:
     '01':
       crc32: 4200CE0D
@@ -226,7 +227,7 @@ arcs:
   description: Reverse Mountain is the entrance to the Grand Line. What await the
     Straw Hats are impossible water currents, a giant whale, and dubious people going
     by codenames.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/9/poster.png
+  poster: metadata/posters/9/poster.png
   episodes:
     '01':
       crc32: CE01A533
@@ -240,7 +241,7 @@ arcs:
   originaltitle: ''
   description: The first island on the Grand Line is surprisingly welcoming to pirates.
     But as night falls, a deadly plot unravels.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/10/poster.png
+  poster: metadata/posters/10/poster.png
   episodes:
     '01':
       crc32: 26D6F22A
@@ -268,7 +269,7 @@ arcs:
   description: The Straw Hats vow to bring Princess Vivi to Arabasta, and their journey
     brings them to Little Garden, an island from prehistoria that is home to creatures
     and people larger than life.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/12/poster.png
+  poster: metadata/posters/12/poster.png
   episodes:
     '01':
       crc32: FA63AC14
@@ -292,7 +293,7 @@ arcs:
   description: When Nami falls ill, the crew makes a detour from Arabasta to seek
     medical help. They happen upon a winter island inhabited by a distrusting populace
     and a single doctor with a mysterious reindeer companion.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/13/poster.png
+  poster: metadata/posters/13/poster.png
   episodes:
     '01':
       crc32: FD2B4F32
@@ -325,7 +326,7 @@ arcs:
   description: Arabasta teeters on the edge of civil war, and it's up to Princess
     Vivi and the Straw Hats to stem the rebellion, uncover the plot of Baroque Works,
     and beat the Warlord Crocodile.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/14/poster.png
+  poster: metadata/posters/14/poster.png
   episodes:
     '01':
       crc32: BB1D093C
@@ -397,7 +398,7 @@ arcs:
   description: The Straw Hats seek the fabled sky island Skypiea and head to Jaya
     for information on its whereabouts. Their convictions are tested by the pirates
     of Mock Town, but not everyone on the island is a hardline skeptic.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/15/poster.png
+  poster: metadata/posters/15/poster.png
   episodes:
     '01':
       crc32: 2BBCD106
@@ -430,7 +431,7 @@ arcs:
   description: Arriving at Skypiea, the Straw Hats are instantly met with unfamiliar
     sights, objects, and customs. What's more, the god of the sky island deems the
     Blue Sea dwellers to be trespassing and casts his judgment upon them.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/16/poster.png
+  poster: metadata/posters/16/poster.png
   episodes:
     '01':
       crc32: CA5552FC
@@ -515,7 +516,7 @@ arcs:
     Fight. As they dive headfirst into a series of games with serious outcomes, the
     best the Navy has to offer has meanwhile begun to pay closer attention to certain
     Straw Hat crewmembers.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/17/poster.png
+  poster: metadata/posters/17/poster.png
   episodes:
     '00':
       crc32: E85B9E9D
@@ -546,7 +547,7 @@ arcs:
     worldwide for its unparalleled shipyards. The pirates go to inquire about repairs
     for their ship, but the city threatens to take their money, their ship, and their
     crewmates.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/18/poster.png
+  poster: metadata/posters/18/poster.png
   episodes:
     '01':
       crc32: 9101CF0E
@@ -615,7 +616,7 @@ arcs:
   description: 'In order to free Nico Robin from the clutches of the World Government,
     the Straw Hats and their allies must invade the judicial island, Enies Lobby,
     and take on the government''s premiere clandestine unit: CP9.'
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/19/poster.png
+  poster: metadata/posters/19/poster.png
   episodes:
     '01':
       crc32: A6CD3EBB
@@ -699,7 +700,7 @@ arcs:
   description: The Straw Hats return to Water Seven after the ordeal at Enies Lobby.
     While there, they are met by a familial vice admiral, and they await news of their
     new ship.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/20/poster.png
+  poster: metadata/posters/20/poster.png
   episodes:
     '01':
       crc32: 216595EE
@@ -724,7 +725,7 @@ arcs:
     must traverse the dreaded Florian Triangle which is known for many eerie and mysterious
     things such as disappearing crews, conversational skeletons, and a floating island
     full of zombies and other horrors.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/21/poster.png
+  poster: metadata/posters/21/poster.png
   episodes:
     '01':
       crc32: 30D0916C
@@ -800,7 +801,7 @@ arcs:
     stop at Sabaody Archipelago to plan the way forward. But being so close to the
     Holy Land and Navy Headquarters, Luffy's crew comes face-to-face with the darkest
     forces of the World Government.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/22/poster.png
+  poster: metadata/posters/22/poster.png
   episodes:
     '01':
       crc32: 066FD68B
@@ -842,7 +843,7 @@ arcs:
   description: Luffy is separated from his crew, and he finds himself on an unfamiliar
     island in the middle of the Calm Belt... an island inhabited only by women where
     men are prohibited from entering.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/23/poster.png
+  poster: metadata/posters/23/poster.png
   episodes:
     '01':
       crc32: 06BF070D
@@ -866,7 +867,7 @@ arcs:
   description: Luffy launches a daring rescue mission to break his big brother Ace
     from the government prison, Impel Down. It's a race to the prison's lowest levels
     \u2014 a literal journey through hell itself.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/24/poster.png
+  poster: metadata/posters/24/poster.png
   episodes:
     '01':
       crc32: 479D510C
@@ -919,7 +920,7 @@ arcs:
     Warlords on the other. At the center of it all: Portgas D. Ace and his unspeakable
     past and heritage. Luffy races to Ace''s execution scaffold as a battle between
     the world''s most powerful people unfolds.'
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/26/poster.png
+  poster: metadata/posters/26/poster.png
   episodes:
     '01':
       crc32: 92956F40
@@ -980,7 +981,7 @@ arcs:
     younger days when he first met Ace and became his brother. To become strong enough
     to withstand the New World, Luffy must make a critical decision for himself and
     his crew.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/27/poster.png
+  poster: metadata/posters/27/poster.png
   episodes:
     '01':
       crc32: E7B15590
@@ -1013,7 +1014,7 @@ arcs:
   description: Two years have passed since the Straw Hats were forcibly separated,
     and they reconvene back at Sabaody stronger and even more committed to the journey
     ahead.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/28/poster.png
+  poster: metadata/posters/28/poster.png
   episodes:
     '01':
       crc32: 5FBDCD0F
@@ -1032,7 +1033,7 @@ arcs:
     under the sea to the underwater Fishman Island. However, the island's dark past
     is reaching a breaking point, and Luffy and his crew are caught in the middle
     of the conflict.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/29/poster.png
+  poster: metadata/posters/29/poster.png
   episodes:
     '01':
       crc32: FBA08093
@@ -1114,7 +1115,7 @@ arcs:
     on one half, and freezing temperatures on the other. What seems at first to be
     an unlivable place later reveals a laboratory, a maniac scientist, and a certain
     Warlord of the Sea.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/30/poster.png
+  poster: metadata/posters/30/poster.png
   episodes:
     '01':
       crc32: 90015E67
@@ -1189,7 +1190,7 @@ arcs:
   description: Luffy's alliance with Law brings him next to Dressrosa to take down
     Doflamingo's booming business. But the crazed warlord and self-proclaimed ruler
     of Dressrosa has control over everyone and everything.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/31/poster.png
+  poster: metadata/posters/31/poster.png
   episodes:
     '01':
       crc32: 2A35B710
@@ -1343,7 +1344,7 @@ arcs:
     once one finds it. Within its secretive walls lie the Mink Tribe, and the Straw
     Hats soon discover that the people of Zou hold a piece of the puzzle that unlocks
     the mysteries of the world.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/32/poster.png
+  poster: metadata/posters/32/poster.png
   episodes:
     '01':
       crc32: E70913D9
@@ -1382,7 +1383,7 @@ arcs:
   description: Luffy will not sail the seas without his cook, so he stubbornly goes
     after Sanji to Whole Cake Island. However, knocking on an emperor's door is easier
     said than done.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/33/poster.png
+  poster: metadata/posters/33/poster.png
   episodes:
     '01':
       crc32: 3F24A1D8
@@ -1508,7 +1509,7 @@ arcs:
   description: Every four years, the leaders of the world gather at the Holy Land
     to discuss a mutually agreed upon path for the government. During this particular
     Reverie, many parties with their own agendas arrive... and some are uninvited.
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/34/poster.png
+  poster: metadata/posters/34/poster.png
   episodes:
     '01':
       crc32: C5FB1123
@@ -1526,7 +1527,7 @@ arcs:
   description: 'The Straw Hats finally regroup in Wano to carry out theirs and their
     allies'' ultimate goal: to see to the Emperor Kaido''s downfall and restore the
     Kozuki family to its rightful place of power.'
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/35/poster.png
+  poster: metadata/posters/35/poster.png
   episodes:
     '01':
       crc32: F15AFDE0
@@ -1697,7 +1698,7 @@ arcs:
   description: Futuristic tech, giant alien monsters, battle robots, superhuman clones...
     Who are all these people calling themselves Dr. Vegapunk, and why is the government
     after one of their own?
-  poster: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main/metadata/posters/36/poster.png
+  poster: metadata/posters/36/poster.png
   episodes:
     '01':
       crc32: CA3F14A8
