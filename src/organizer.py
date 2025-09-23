@@ -83,7 +83,7 @@ class OnePaceOrganizer:
 
     async def load_config(self):
         if self.toml is None or self.toml["version"] == "?":
-            self.toml = utils.get_toml_info()
+            self.toml = utils.get_toml_info(self.base_path)
 
         self.window_title = f"One Pace Organizer v{self.toml['version']} - github.com/ladyisatis/OnePaceOrganizer"
 

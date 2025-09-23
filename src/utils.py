@@ -6,12 +6,13 @@ import orjson
 import os
 import shutil
 import sys
-import yaml
 import tomllib
 import traceback
+import yaml
 import zlib
 from inspect import iscoroutinefunction, iscoroutine
 from pathlib import Path, UnsupportedOperation
+from packaging.version import Version
 from loguru import logger
 
 def check_none(val):
@@ -19,9 +20,9 @@ def check_none(val):
         print("User clicked Cancel")
         sys.exit(1)
 
-def get_toml_info():
+def get_toml_info(base_path="."):
     in_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
-    toml_path = Path(sys._MEIPASS, 'pyproject.toml') if in_bundle else Path('.', 'pyproject.toml')
+    toml_path = Path(sys._MEIPASS, 'pyproject.toml') if in_bundle else Path(base_path, 'pyproject.toml')
 
     try:
         if toml_path.is_file():
@@ -34,6 +35,32 @@ def get_toml_info():
         pass
 
     return {"description": "", "version": "?"}
+
+def is_up_to_date(version="", base_path="."):
+    if version == "":
+        toml = get_toml_info(base_path)
+        version = toml["version"]
+
+        if version == "?":
+            version = "0.0.0"
+
+    version = Version(version)
+    release_json = {"tag_name": ""}
+
+    try:
+        resp = httpx.get("https://api.github.com/repos/ladyisatis/onepaceorganizer/releases/latest", follow_redirects=True)
+        if resp.status_code >= 400:
+            return (True, None)
+
+        release_json = orjson.loads(resp.content)
+    except:
+        logger.warning(f"Version check failure\n{traceback.format_exc()}")
+
+    if not release_json["tag_name"].startswith("v"):
+        return (True, None)
+
+    latest = Version(release_json["tag_name"][1:])
+    return (version == latest or version > latest, latest)
 
 async def read_file(file, binary=False):
     data = bytearray() if binary else ""

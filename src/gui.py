@@ -2,6 +2,7 @@ import asyncio
 import concurrent.futures
 import sys
 import traceback
+import webbrowser
 
 from functools import partial as func_partial
 from os import process_cpu_count
@@ -788,6 +789,23 @@ def main(organizer, log_level):
             gui = GUI(organizer, log_level)
             gui.setWindowTitle(organizer.window_title)
             gui.show()
+
+            is_latest, latest_vers = await utils.run(utils.is_up_to_date, organizer.toml["version"], organizer.base_path)
+            if not is_latest:
+                do_update = await asyncWrap(
+                    QMessageBox.question(
+                        None,
+                        self.organizer.window_title,
+                        "There is a newer version of this application. Do you wish to open up " +
+                        "GitHub in order to download the new version?" +
+                        "\n\n" +
+                        f"Installed: v{organizer.toml['version']}\n" +
+                        f"Latest: v{latest_vers}"
+                    ) == QMessageBox.StandardButton.Yes
+                )
+
+                if do_update:
+                    await utils.run(webbrowser.open_new_tab, "https://github.com/ladyisatis/OnePaceOrganizer/releases/latest")
 
             await close_event.wait()
 

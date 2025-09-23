@@ -71,6 +71,17 @@ class Console:
 
     async def run(self):
         self._set_logger_sink(sys.stderr)
+        await self.organizer.load_config()
+
+        is_latest, latest_vers = await utils.run(utils.is_up_to_date, self.organizer.toml["version"], self.organizer.base_path)
+        if not is_latest:
+            await message_dialog(
+                title=self.window_title,
+                text=
+                    "Note: There is a new version of this application available, and can be downloaded from GitHub.\n\n" +
+                    f"Installed: {self.organizer.toml['version']}\n" +
+                    f"Latest: {latest_vers}"
+            ).run_async()
 
         c = Path(self.organizer.base_path, "config.json")
         if await utils.run(c.is_file):
@@ -167,7 +178,7 @@ class Console:
             text='Make sure to create a folder that has all of the One Pace video\nfiles! The next step will ask for the path to that directory.'
         ).run_async()
 
-        if self.organizer.fetch_posters and not Path(".", "data", "posters").is_dir() and not Path(".", "posters").is_dir():
+        if self.organizer.fetch_posters and not Path(".", "metadata", "posters").is_dir() and not Path(".", "posters").is_dir():
             self.organizer.fetch_posters = await yes_no_dialog(
                 title=self.window_title,
                 text="The posters folder is missing. Do you want to download the posters automatically?"
