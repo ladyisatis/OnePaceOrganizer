@@ -58,7 +58,7 @@ def main():
         parser.add_argument("--config-file", help="Path to config.json or config.yml", default=None)
         parser.add_argument("--dl-path", help="Download path (for posters, metadata, etc)", default=None)
         parser.add_argument("--log-level", help="Log level (TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL)", default="info", type=str)
-        parser.add_argument("--log-file", help="Log to file (empty to disable)", default="./log.txt", type=str)
+        parser.add_argument("--log-file", help="Log to file (empty to disable)", default="", type=str)
         parser.add_argument("--file-action", help="Action to take on unsorted file when processing. 0 for Move, 1 for Copy, 2 for Symlink, 3 for Hardlink, 4 for generate metadata only (not on Plex)", default=None)
         parser.add_argument("--folder-action", help="How to categorize episodes into season folders. 0 for with leading zeroes (Season 01-09), 1 for no leading zeroes (Season 1-9), 2 to disable", default=None)
         parser.add_argument("--threads", help="Use threads instead of processes", default=None, type=strbool)
