@@ -14,13 +14,13 @@ If there's no added metadata in the repository for an episode, like say, the One
 
 You can also re-run the program when new One Pace releases for quick renaming, and this does not require every single One Pace release ever released in order to function.
 
-**Note: this program is in BETA. Things may break and error handling could be a lot better. Contributions also welcome on that.**
+**Contributions via Pull Requests are always welcome.**
 
 ## More Info
 
 Usage (Windows): https://github.com/ladyisatis/OnePaceOrganizer/wiki/Usage-(Windows)
 
-Usage (Mac/Linux): https://github.com/ladyisatis/OnePaceOrganizer/wiki/Usage-(Mac-Linux)
+Usage (Mac/Linux): https://github.com/ladyisatis/OnePaceOrganizer/wiki/Usage-(Mac-and-Linux)
 
 Metadata and the Metadata Updater: https://github.com/ladyisatis/OnePaceOrganizer/wiki/Metadata
 
