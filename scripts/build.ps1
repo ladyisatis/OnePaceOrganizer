@@ -9,24 +9,22 @@ try {
     exit 1
 }
 
+try {
+    $uvVersion = & uv --version 2>$null
+} catch {
+    Write-Host "uv not found in PATH, please see the following page to install it:"
+    Write-Host "https://docs.astral.sh/uv/getting-started/installation/"
+    exit 1
+}
+
 if (Test-Path build) { Remove-Item build -Recurse -Force }
 if (Test-Path $BuildDir) { Remove-Item $BuildDir -Recurse -Force }
 New-Item -ItemType Directory -Path "$BuildDir" -Force | Out-Null
 
-if (-Not (Test-Path venv)) {
-    & python -m venv venv
-    & .\venv\Scripts\Activate.ps1
-    & .\venv\Scripts\python.exe -m pip install --upgrade pip setuptools
-    pip install poetry
-    poetry install --no-interaction --no-root
-    deactivate
-}
+Set-Content -Path ".\.mode" -Value "gui"
+uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-gui" --windowed --distpath "$BuildDir" --workpath "build/gui" --add-data "pyproject.toml:." --add-data ".mode:." "src/main.py"
 
-& .\venv\Scripts\Activate.ps1
-
-poetry run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-gui" --windowed --distpath "$BuildDir" --workpath "build/gui" --add-data "pyproject.toml:." "src/gui.py"
-poetry run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-cli" --console --distpath "$BuildDir" --workpath "build/cli" --add-data "pyproject.toml:." "src/main.py"
-
-deactivate
+Set-Content -Path ".\.mode" -Value "console"
+uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-cli" --console --distpath "$BuildDir" --workpath "build/console" --add-data "pyproject.toml:." --add-data ".mode:." "src/main.py"
 
 if (Test-Path build) { Remove-Item build -Recurse -Force }
