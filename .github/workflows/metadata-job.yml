@@ -63,5 +63,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           git add metadata
-          git diff --cached --quiet || (git add metadata && git commit -m "Add metadata via external sources [automated]")
+          git diff --cached --quiet || git commit -m "Add metadata via external sources [automated]"
           git push
