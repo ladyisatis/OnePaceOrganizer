@@ -225,12 +225,17 @@ class OnePaceOrganizer:
     async def plex_login(self, force_login=False):
         if force_login:
             self.plexapi_account = None
+            self.plexapi_server = None
+            self.plex_config_auth_token = ""
+            self.plex_config_server_baseurl = ""
+            self.plex_config_server_token = ""
 
-        if not self.plex_config_use_token and self.plex_config_auth_token != "" and self.plex_config_remember:
+        if self.plexapi_account is None and not self.plex_config_use_token and self.plex_config_auth_token != "" and self.plex_config_remember:
             try:
                 self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_config_auth_token)
             except:
                 self.logger.debug(traceback.format_exc())
+                self.plex_config_auth_token = ""
                 self.plexapi_account = None
 
         if self.plexapi_account is None:
@@ -805,299 +810,309 @@ class OnePaceOrganizer:
         return self.arcs[season]
 
     async def process_plex(self, files):
-        section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
-        show = await utils.run(section.getGuid, self.plex_config_show_guid)
-
-        if "title" in self.tvshow and self.tvshow["title"] != "" and show.title != self.tvshow["title"]:
-            self.logger.info(f"Set Title: {show.title} -> {self.tvshow['title']}")
-            await utils.run(show.editTitle, self.tvshow["title"])
-
-        if "originaltitle" in self.tvshow and self.tvshow["originaltitle"] != "" and show.originalTitle != self.tvshow["originaltitle"]:
-            self.logger.info(f"Set Original Title: {show.originalTitle} -> {self.tvshow['originaltitle']}")
-            await utils.run(show.editOriginalTitle, self.tvshow["originaltitle"])
-
-        if "sorttitle" in self.tvshow and self.tvshow["sorttitle"] != "" and show.titleSort != self.tvshow["sorttitle"]:
-            self.logger.info(f"Set Sort Title: {show.titleSort} -> {self.tvshow['sorttitle']}")
-            await utils.run(show.editSortTitle, self.tvshow["sorttitle"])
-
-        if "customrating" in self.tvshow and self.tvshow["customrating"] != "" and show.contentRating != self.tvshow["customrating"]:
-            self.logger.info(f"Set Rating: {show.contentRating} -> {self.tvshow['customrating']}")
-            await utils.run(show.editContentRating, self.tvshow["customrating"])
-
-        if "plot" in self.tvshow and show.summary != self.tvshow["plot"]:
-            await utils.run(show.editSummary, self.tvshow["plot"])
-            await utils.run(show.editOriginallyAvailable,
-                self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"]
-            )
-
-            poster = await utils.run(utils.find_from_list, self.base_path, [
-                ("posters", "poster.*"),
-                ("posters", "folder.*"),
-                (self.input_path, "poster.*")
-            ])
-
-            if not poster and self.fetch_posters:
-                poster = Path(self.base_path, "posters", "poster.png")
-                self.logger.info(f"Downloading: posters/{poster.name}")
-
-                dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
-                if not dl:
-                    self.logger.warning("Unable to download, skipping...")
-
-            await self.plex_art_set(poster, show, True)
-
-            background = await utils.run(utils.find_from_list, self.base_path, [
-                ("posters", "background.*"),
-                ("posters", "backdrop.*"),
-                (self.input_path, "background.*")
-            ])
-            if background is not None:
-                await self.plex_art_set(background, show, False)
-
-        index = 0
         completed = 0
         skipped = 0
-        total = len(files)
-        res = []
-        seasons = []
 
-        self.logger.success("Processing the video files...")
+        try:
+            section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
+            show = await utils.run(section.getGuid, self.plex_config_show_guid)
 
-        with self.executor_func(max_workers=self.workers) as executor:
-            tasks = []
-            loop = asyncio.get_running_loop()
+            if "title" in self.tvshow and self.tvshow["title"] != "" and show.title != self.tvshow["title"]:
+                self.logger.info(f"Set Title: {show.title} -> {self.tvshow['title']}")
+                await utils.run(show.editTitle, self.tvshow["title"])
 
-            for crc32, file in files:
-                episode_info = self.episodes[crc32]
-                self.logger.trace(f"{crc32}: {episode_info}")
+            if "originaltitle" in self.tvshow and self.tvshow["originaltitle"] != "" and show.originalTitle != self.tvshow["originaltitle"]:
+                self.logger.info(f"Set Original Title: {show.originalTitle} -> {self.tvshow['originaltitle']}")
+                await utils.run(show.editOriginalTitle, self.tvshow["originaltitle"])
 
-                if isinstance(episode_info, list):
-                    stop = True
+            if "sorttitle" in self.tvshow and self.tvshow["sorttitle"] != "" and show.titleSort != self.tvshow["sorttitle"]:
+                self.logger.info(f"Set Sort Title: {show.titleSort} -> {self.tvshow['sorttitle']}")
+                await utils.run(show.editSortTitle, self.tvshow["sorttitle"])
 
-                    for v in episode_info:
-                        if "hashes" not in v or "blake2" not in v["hashes"] or v["hashes"]["blake2"] == "":
-                            self.logger.warning(f"Skipping {file.name}: blake2s hash is required but not provided")
+            if "customrating" in self.tvshow and self.tvshow["customrating"] != "" and show.contentRating != self.tvshow["customrating"]:
+                self.logger.info(f"Set Rating: {show.contentRating} -> {self.tvshow['customrating']}")
+                await utils.run(show.editContentRating, self.tvshow["customrating"])
+
+            if "plot" in self.tvshow and show.summary != self.tvshow["plot"]:
+                await utils.run(show.editSummary, self.tvshow["plot"])
+                await utils.run(show.editOriginallyAvailable,
+                    self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"]
+                )
+
+                poster = await utils.run(utils.find_from_list, self.base_path, [
+                    ("posters", "poster.*"),
+                    ("posters", "folder.*"),
+                    (self.input_path, "poster.*")
+                ])
+
+                if not poster and self.fetch_posters:
+                    poster = Path(self.base_path, "posters", "poster.png")
+                    self.logger.info(f"Downloading: posters/{poster.name}")
+
+                    dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
+                    if not dl:
+                        self.logger.warning("Unable to download, skipping...")
+
+                await self.plex_art_set(poster, show, True)
+
+                background = await utils.run(utils.find_from_list, self.base_path, [
+                    ("posters", "background.*"),
+                    ("posters", "backdrop.*"),
+                    (self.input_path, "background.*")
+                ])
+                if background is not None:
+                    await self.plex_art_set(background, show, False)
+
+            index = 0
+            total = len(files)
+            res = []
+            seasons = []
+
+            self.logger.success("Processing the video files...")
+
+            with self.executor_func(max_workers=self.workers) as executor:
+                tasks = []
+                loop = asyncio.get_running_loop()
+
+                for crc32, file in files:
+                    episode_info = self.episodes[crc32]
+                    self.logger.trace(f"{crc32}: {episode_info}")
+
+                    if isinstance(episode_info, list):
+                        stop = True
+
+                        for v in episode_info:
+                            if "hashes" not in v or "blake2" not in v["hashes"] or v["hashes"]["blake2"] == "":
+                                self.logger.warning(f"Skipping {file.name}: blake2s hash is required but not provided")
+                                continue
+
+                            _b = v["hashes"]["blake2"]
+                            f, err, b2hash = await utils.run(utils.blake2, file)
+
+                            if err != "":
+                                self.logger.error(f"Skipping {file.name}: {err}")
+                                continue
+
+                            if _b == b2hash[:16] or _b == b2hash:
+                                stop = False
+                                episode_info = v
+                                break
+
+                        if stop:
+                            index += 1
+                            skipped += 1
+                            await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                             continue
 
-                        _b = v["hashes"]["blake2"]
-                        f, err, b2hash = await utils.run(utils.blake2, file)
+                    season = episode_info["arc"]
+                    episode = episode_info["episode"]
+                    title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"]) if "title" in episode_info and episode_info["title"] != "" else ""
 
-                        if err != "":
-                            self.logger.error(f"Skipping {file.name}: {err}")
-                            continue
-
-                        if _b == b2hash[:16] or _b == b2hash:
-                            stop = False
-                            episode_info = v
-                            break
-
-                    if stop:
+                    if title == "":
+                        self.logger.warning(f"Skipping {file.name}: metadata for {crc32} has no title, please report this issue as a GitHub issue")
                         index += 1
                         skipped += 1
                         await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                         continue
 
-                season = episode_info["arc"]
-                episode = episode_info["episode"]
-                title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"]) if "title" in episode_info and episode_info["title"] != "" else ""
+                    season_path = Path(self.output_path, "Specials" if season == 0 else f"Season {season:02d}")
+                    if season not in seasons:
+                        self.logger.info(f"Season: {season}")
+                        seasons.append(season)
 
-                if title == "":
-                    self.logger.warning(f"Skipping {file.name}: metadata for {crc32} has no title, please report this issue as a GitHub issue")
-                    index += 1
-                    skipped += 1
-                    await utils.run_func(self.progress_bar_func, int((index / total) * 100))
-                    continue
+                        if not await utils.is_dir(season_path):
+                            self.logger.debug(f"Creating directory: {season_path}")
+                            await utils.run(season_path.mkdir, exist_ok=True)
 
-                season_path = Path(self.output_path, "Specials" if season == 0 else f"Season {season:02d}")
-                if season not in seasons:
-                    self.logger.info(f"Season: {season}")
-                    seasons.append(season)
+                    dst = str(Path(season_path, f"One Pace - S{season:02d}E{episode:02d} - {title}{file.suffix}"))
+                    self.logger.debug(f"Queue: file={file}, dst={dst}, info={episode_info} [{self.file_action}]")
+                    tasks.append(loop.run_in_executor(executor, utils.move_file_worker, str(file), dst, self.file_action, episode_info))
 
-                    if not await utils.is_dir(season_path):
-                        self.logger.debug(f"Creating directory: {season_path}")
-                        await utils.run(season_path.mkdir, exist_ok=True)
+                if len(tasks) > 0:
+                    async for result in asyncio.as_completed(tasks):
+                        file, dst, err, episode_info = await result
+                        file = Path(file)
 
-                dst = str(Path(season_path, f"One Pace - S{season:02d}E{episode:02d} - {title}{file.suffix}"))
-                self.logger.debug(f"Queue: file={file}, dst={dst}, info={episode_info} [{self.file_action}]")
-                tasks.append(loop.run_in_executor(executor, utils.move_file_worker, str(file), dst, self.file_action, episode_info))
+                        if err != "":
+                            self.logger.error(f"Skipping {file.name}: {err}")
+                            skipped += 1
+                        else:
+                            self.logger.debug(f"Complete: [{crc32}] {dst} ({episode_info})")
+                            res.append((crc32, file, dst, episode_info))
+                            completed += 1
 
-            if len(tasks) > 0:
-                async for result in asyncio.as_completed(tasks):
-                    file, dst, err, episode_info = await result
-                    file = Path(file)
+                        index += 1
+                        await utils.run(self.progress_bar_func, int((index / total) * 100))
 
-                    if err != "":
-                        self.logger.error(f"Skipping {file.name}: {err}")
-                        skipped += 1
-                    else:
-                        self.logger.debug(f"Complete: [{crc32}] {dst} ({episode_info})")
-                        res.append((crc32, file, dst, episode_info))
-                        completed += 1
+            return (True, res, completed, skipped)
 
-                    index += 1
-                    await utils.run(self.progress_bar_func, int((index / total) * 100))
-
-        return (True, res, completed, skipped)
+        except Exception as e:
+            return (False, e, completed, skipped)
 
     async def process_plex_episodes(self, queue):
-        section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
-        show = await utils.run(section.getGuid, self.plex_config_show_guid)
-        seasons_completed = []
-
-        index = 0
         skipped = 0
         completed = 0
-        total = len(queue)
 
-        for index, item in enumerate(queue):
-            crc32, src, file, episode_info = item
-            self.logger.debug(f"Start: [{crc32}] {file} ({episode_info})")
+        try:
+            section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
+            show = await utils.run(section.getGuid, self.plex_config_show_guid)
+            seasons_completed = []
 
-            season = episode_info["arc"]
-            season_info = self.get_season(season)
-            episode = episode_info["episode"]
-            updated = False
+            index = 0
+            total = len(queue)
 
-            if not season in seasons_completed:
-                seasons_completed.append(season)
+            for index, item in enumerate(queue):
+                crc32, src, file, episode_info = item
+                self.logger.debug(f"Start: [{crc32}] {file} ({episode_info})")
 
-                if season_info is not None:
-                    try:
-                        self.logger.info(f"Updating: Season {season} ({season_info['title']})")
-                        plex_season = await utils.run(show.season, season=season)
+                season = episode_info["arc"]
+                season_info = self.get_season(season)
+                episode = episode_info["episode"]
+                updated = False
 
-                        season_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
-                        season_desc = season_info["description"] if "description" in season_info and season_info["description"] != "" else ""
+                if not season in seasons_completed:
+                    seasons_completed.append(season)
 
-                        if plex_season.title != season_title:
-                            self.logger.debug(f"Season {season} Title: {season_title}")
-                            await utils.run(plex_season.editTitle, season_title)
+                    if season_info is not None:
+                        try:
+                            self.logger.info(f"Updating: Season {season} ({season_info['title']})")
+                            plex_season = await utils.run(show.season, season=season)
 
-                        if season_desc != "" and plex_season.summary != season_desc:
-                            self.logger.debug(f"Season {season} Summary: {season_desc}")
-                            await utils.run(plex_season.editSummary, season_desc)
+                            season_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
+                            season_desc = season_info["description"] if "description" in season_info and season_info["description"] != "" else ""
 
-                        poster = await utils.run(utils.find_from_list, self.base_path, [
-                            (f"posters/{season}", "poster.*"),
-                            (f"posters/{season}", "folder.*"),
-                            (self.input_path, f"poster-s{season:02d}.*")
-                        ])
+                            if plex_season.title != season_title:
+                                self.logger.debug(f"Season {season} Title: {season_title}")
+                                await utils.run(plex_season.editTitle, season_title)
 
-                        if not poster and self.fetch_posters:
-                            poster = Path(self.base_path, "posters", str(season), "poster.png")
-                            try:
-                                self.logger.info(f"Downloading: posters/{season}/{poster.name}")
-                                await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
-                            except:
-                                self.logger.exception(f"Skipping downloading")
+                            if season_desc != "" and plex_season.summary != season_desc:
+                                self.logger.debug(f"Season {season} Summary: {season_desc}")
+                                await utils.run(plex_season.editSummary, season_desc)
 
-                        await self.plex_art_set(poster, plex_season, True)
+                            poster = await utils.run(utils.find_from_list, self.base_path, [
+                                (f"posters/{season}", "poster.*"),
+                                (f"posters/{season}", "folder.*"),
+                                (self.input_path, f"poster-s{season:02d}.*")
+                            ])
 
-                        background = await utils.run(utils.find_from_list, self.base_path, [
-                            (f"posters/{season}", "background.*"),
-                            (f"posters/{season}", "backdrop.*"),
-                            (self.input_path, f"background-s{season:02d}.*"),
-                        ])
-                        if background is not None:
-                            await self.plex_art_set(background, plex_season, False)
+                            if not poster and self.fetch_posters:
+                                poster = Path(self.base_path, "posters", str(season), "poster.png")
+                                try:
+                                    self.logger.info(f"Downloading: posters/{season}/{poster.name}")
+                                    await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
+                                except:
+                                    self.logger.exception(f"Skipping downloading")
 
-                    except:
-                        self.logger.exception(f"Skipping season {season}")
+                            await self.plex_art_set(poster, plex_season, True)
 
-                else:
-                    self.logger.warning(f"Skipping season {season}: Title not found, metadata might be corrupted?")
+                            background = await utils.run(utils.find_from_list, self.base_path, [
+                                (f"posters/{season}", "background.*"),
+                                (f"posters/{season}", "backdrop.*"),
+                                (self.input_path, f"background-s{season:02d}.*"),
+                            ])
+                            if background is not None:
+                                await self.plex_art_set(background, plex_season, False)
 
-            try:
-                if season_info is None:
-                    _label = f"Season {season} Episode {episode} ({episode_info['title']})"
-                else:
-                    _label = f"{season_info['title']} {episode:02d} (S{season:02d}E{episode:02d} - {episode_info['title']})"
+                        except:
+                            self.logger.exception(f"Skipping season {season}")
 
-                self.logger.info(f"Updating: {_label}")
-                plex_episode = await utils.run(show.episode, season=season, episode=episode)
+                    else:
+                        self.logger.warning(f"Skipping season {season}: Title not found, metadata might be corrupted?")
 
-                if plex_episode.title != episode_info["title"]:
-                    self.logger.debug(f"S{season}E{episode} Title: {plex_episode.title} -> {episode_info['title']}")
-                    await utils.run(plex_episode.editTitle, episode_info["title"])
-                    updated = True
+                try:
+                    if season_info is None:
+                        _label = f"Season {season} Episode {episode} ({episode_info['title']})"
+                    else:
+                        _label = f"{season_info['title']} {episode:02d} (S{season:02d}E{episode:02d} - {episode_info['title']})"
 
-                if "rating" in episode_info and plex_episode.contentRating != episode_info["rating"]:
-                    self.logger.debug(f"S{season}E{episode} Rating: {plex_episode.contentRating} -> {episode_info['rating']}")
-                    await utils.run(plex_episode.editContentRating, episode_info["rating"])
-                    updated = True
+                    self.logger.info(f"Updating: {_label}")
+                    plex_episode = await utils.run(show.episode, season=season, episode=episode)
 
-                if "sorttitle" in episode_info and plex_episode.titleSort != episode_info["sorttitle"]:
-                    self.logger.debug(f"S{season}E{episode} Sort Title: {plex_episode.titleSort} -> {episode_info['sorttitle']}")
-                    await utils.run(plex_episode.editSortTitle, episode_info["sorttitle"])
-                    updated = True
-
-                if "released" in episode_info:
-                    r = datetime.datetime.strptime(episode_info["released"], "%Y-%m-%d").date() if isinstance(episode_info["released"], str) else episode_info["released"]
-
-                    if plex_episode.originallyAvailableAt.date() != r:
-                        self.logger.debug(f"S{season}E{episode} Release Date: {plex_episode.originallyAvailableAt} -> {r}")
-                        await utils.run(plex_episode.editOriginallyAvailable, r)
+                    if plex_episode.title != episode_info["title"]:
+                        self.logger.debug(f"S{season}E{episode} Title: {plex_episode.title} -> {episode_info['title']}")
+                        await utils.run(plex_episode.editTitle, episode_info["title"])
                         updated = True
 
-                desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
-                manga_str = ""
-                anime_str = ""
+                    if "rating" in episode_info and plex_episode.contentRating != episode_info["rating"]:
+                        self.logger.debug(f"S{season}E{episode} Rating: {plex_episode.contentRating} -> {episode_info['rating']}")
+                        await utils.run(plex_episode.editContentRating, episode_info["rating"])
+                        updated = True
 
-                if episode_info["chapters"] != "":
-                    if desc_str != "":
-                        manga_str = f"\n\nChapter(s): {episode_info['chapters']}"
+                    if "sorttitle" in episode_info and plex_episode.titleSort != episode_info["sorttitle"]:
+                        self.logger.debug(f"S{season}E{episode} Sort Title: {plex_episode.titleSort} -> {episode_info['sorttitle']}")
+                        await utils.run(plex_episode.editSortTitle, episode_info["sorttitle"])
+                        updated = True
+
+                    if "released" in episode_info:
+                        r = datetime.datetime.strptime(episode_info["released"], "%Y-%m-%d").date() if isinstance(episode_info["released"], str) else episode_info["released"]
+
+                        if plex_episode.originallyAvailableAt.date() != r:
+                            self.logger.debug(f"S{season}E{episode} Release Date: {plex_episode.originallyAvailableAt} -> {r}")
+                            await utils.run(plex_episode.editOriginallyAvailable, r)
+                            updated = True
+
+                    desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
+                    manga_str = ""
+                    anime_str = ""
+
+                    if episode_info["chapters"] != "":
+                        if desc_str != "":
+                            manga_str = f"\n\nChapter(s): {episode_info['chapters']}"
+                        else:
+                            manga_str = f"Chapter(s): {episode_info['chapters']}"
+
+                    if episode_info["episodes"] != "":
+                        if desc_str != "" or manga_str != "":
+                            anime_str = f"\n\nEpisode(s): {episode_info['episodes']}"
+                        else:
+                            anime_str = f"Episode(s): {episode_info['episodes']}"
+
+                    description = f"{desc_str}{manga_str}{anime_str}"
+
+                    if plex_episode.summary != description:
+                        self.logger.debug(f"S{season}E{episode} Description Updated")
+                        await utils.run(plex_episode.editSummary, description)
+                        updated = True
+
+                    poster = await utils.run(utils.find_from_list, self.base_path, [
+                        (f"posters/{season}/{episode}", "poster.*"),
+                        (self.input_path, f"poster-s{season:02d}e{episode:02d}.*"),
+                        (self.input_path, f"{src.stem}-poster.*"),
+                        (self.input_path, f"{src.stem}-thumb.*")
+                    ])
+
+                    background = await utils.run(utils.find_from_list, self.base_path, [
+                        (f"posters/{season}/{episode}", "background.*"),
+                        (self.input_path, f"background-s{season:02d}e{episode:02d}.*"),
+                        (self.input_path, f"{src.stem}-background.*"),
+                        (self.input_path, f"{src.stem}-backdrop.*")
+                    ])
+
+                    if poster and await self.plex_art_set(poster, plex_episode, True):
+                        self.logger.debug(f"S{season}E{episode} Poster Uploaded: {poster}")
+                        updated = True
+
+                    if background and await self.plex_art_set(background, plex_episode, False):
+                        self.logger.debug(f"S{season}E{episode} Background Uploaded: {background}")
+                        updated = True
+
+                    if updated:
+                        completed += 1
                     else:
-                        manga_str = f"Chapter(s): {episode_info['chapters']}"
+                        skipped += 1
 
-                if episode_info["episodes"] != "":
-                    if desc_str != "" or manga_str != "":
-                        anime_str = f"\n\nEpisode(s): {episode_info['episodes']}"
-                    else:
-                        anime_str = f"Episode(s): {episode_info['episodes']}"
-
-                description = f"{desc_str}{manga_str}{anime_str}"
-
-                if plex_episode.summary != description:
-                    self.logger.debug(f"S{season}E{episode} Description Updated")
-                    await utils.run(plex_episode.editSummary, description)
-                    updated = True
-
-                poster = await utils.run(utils.find_from_list, self.base_path, [
-                    (f"posters/{season}/{episode}", "poster.*"),
-                    (self.input_path, f"poster-s{season:02d}e{episode:02d}.*"),
-                    (self.input_path, f"{src.stem}-poster.*"),
-                    (self.input_path, f"{src.stem}-thumb.*")
-                ])
-
-                background = await utils.run(utils.find_from_list, self.base_path, [
-                    (f"posters/{season}/{episode}", "background.*"),
-                    (self.input_path, f"background-s{season:02d}e{episode:02d}.*"),
-                    (self.input_path, f"{src.stem}-background.*"),
-                    (self.input_path, f"{src.stem}-backdrop.*")
-                ])
-
-                if poster and await self.plex_art_set(poster, plex_episode, True):
-                    self.logger.debug(f"S{season}E{episode} Poster Uploaded: {poster}")
-                    updated = True
-
-                if background and await self.plex_art_set(background, plex_episode, False):
-                    self.logger.debug(f"S{season}E{episode} Background Uploaded: {background}")
-                    updated = True
-
-                if updated:
-                    completed += 1
-                else:
+                except:
+                    self.logger.exception(f"Skipping season {season} episode {episode}")
                     skipped += 1
 
-            except:
-                self.logger.exception(f"Skipping season {season} episode {episode}")
-                skipped += 1
+                index += 1
+                await utils.run_func(self.progress_bar_func, int((index / total) * 100))
 
-            index += 1
-            await utils.run_func(self.progress_bar_func, int((index / total) * 100))
+            await utils.run_func(self.progress_bar_func, 100)
+            return (True, None, completed, skipped)
 
-        await utils.run_func(self.progress_bar_func, 100)
-        return (True, None, completed, skipped)
+        except Exception as e:
+            return (False, e, completed, skipped)
 
     async def _nfo_empty_task(self, src, dst, episode_info):
         return (src, dst, episode_info, "")
@@ -1111,7 +1126,7 @@ class OnePaceOrganizer:
                 ET.SubElement(root, str(k)).text = v.isoformat()
             elif isinstance(v, list):
                 for item in v:
-                    ET.SubElement(root, str(k)).text = str(v)
+                    ET.SubElement(root, str(k)).text = str(item)
             elif isinstance(v, bool):
                 ET.SubElement(root, str(k)).text = "true" if v else "false"
             elif k == "plot":
@@ -1533,5 +1548,9 @@ class OnePaceOrganizer:
             return (True, extra_data, completed, skipped)
 
         except Exception as e:
-            self.logger.critical(f"Exiting\n{traceback.format_exc()}")
+            self.logger.error(f"Exiting\n{traceback.format_exc()}")
+            return (False, e, 0, 0)
+
+        except RuntimeError as e:
+            self.logger.critical(f"RuntimeError\n{traceback.format_exc()}")
             return (False, e, 0, 0)
