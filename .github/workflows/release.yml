@@ -46,7 +46,7 @@ jobs:
 
       - name: Run build script
         shell: pwsh
-        run: .\scripts\build.ps1
+        run: .\misc\build.ps1
 
       - name: Prepare the .zip
         shell: pwsh
