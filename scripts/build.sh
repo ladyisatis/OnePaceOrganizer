@@ -38,7 +38,7 @@ uv run pyinstaller $COMMON_OPTS $ICON_OPT \
   --distpath "dist" \
   --workpath build/gui \
   $DATA_OPT \
-  src/main.py
+  main.py
 
 echo 'console' > .mode
 
@@ -48,6 +48,6 @@ uv run pyinstaller $COMMON_OPTS $ICON_OPT \
   --distpath "dist" \
   --workpath build/console \
   $DATA_OPT \
-  src/main.py
+  main.py
 
 rm -rf build

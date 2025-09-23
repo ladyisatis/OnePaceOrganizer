@@ -22,9 +22,9 @@ if (Test-Path $BuildDir) { Remove-Item $BuildDir -Recurse -Force }
 New-Item -ItemType Directory -Path "$BuildDir" -Force | Out-Null
 
 Set-Content -Path ".\.mode" -Value "gui"
-uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-gui" --windowed --distpath "$BuildDir" --workpath "build/gui" --add-data "pyproject.toml:." --add-data ".mode:." "src/main.py"
+uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-gui" --windowed --distpath "$BuildDir" --workpath "build/gui" --add-data "pyproject.toml:." --add-data ".mode:." "main.py"
 
 Set-Content -Path ".\.mode" -Value "console"
-uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-cli" --console --distpath "$BuildDir" --workpath "build/console" --add-data "pyproject.toml:." --add-data ".mode:." "src/main.py"
+uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-cli" --console --distpath "$BuildDir" --workpath "build/console" --add-data "pyproject.toml:." --add-data ".mode:." "main.py"
 
 if (Test-Path build) { Remove-Item build -Recurse -Force }
