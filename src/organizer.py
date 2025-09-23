@@ -87,7 +87,7 @@ class OnePaceOrganizer:
 
         self.window_title = f"One Pace Organizer v{self.toml['version']} - github.com/ladyisatis/OnePaceOrganizer"
 
-        if self.config_file is not None and not isinstance(self.config_file, Path):
+        if self.config_file is not None and self.config_file != "" and not isinstance(self.config_file, Path):
             self.config_file = Path(self.config_file)
 
         if self.config_file is None or self.config_file == "" or not await utils.is_file(self.config_file):
@@ -185,7 +185,7 @@ class OnePaceOrganizer:
         if self.config_file is not None and not isinstance(self.config_file, Path):
             self.config_file = Path(self.config_file)
 
-        if self.config_file is None:
+        if self.config_file is None or self.config_file == "":
             return False
 
         out = {
