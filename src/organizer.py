@@ -849,8 +849,13 @@ class OnePaceOrganizer:
                     poster = Path(self.base_path, "posters", "poster.png")
                     self.logger.info(f"Downloading: posters/{poster.name}")
 
-                    dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
-                    if not dl:
+                    try:
+                        dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
+                        if not dl:
+                            dl = await utils.download(f"{self.download_path}/metadata/posters/{poster.name}", poster, self.progress_bar_func)
+                            if not dl:
+                                self.logger.info("Unable to download (not found), skipping...")
+                    except:
                         self.logger.warning("Unable to download, skipping...")
 
                 await self.plex_art_set(poster, show, True)
@@ -999,9 +1004,13 @@ class OnePaceOrganizer:
                                 poster = Path(self.base_path, "posters", str(season), "poster.png")
                                 try:
                                     self.logger.info(f"Downloading: posters/{season}/{poster.name}")
-                                    await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
+                                    dl = await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
+                                    if not dl:
+                                        dl = await utils.download(f"{self.download_path}/metadata/posters/{season}/{poster.name}", poster, self.progress_bar_func)
+                                        if not dl:
+                                            self.logger.info(f"Skipping downloading (not found)")
                                 except:
-                                    self.logger.exception(f"Skipping downloading")
+                                    self.logger.warning(f"Skipping downloading")
 
                             await self.plex_art_set(poster, plex_season, True)
 
@@ -1155,7 +1164,11 @@ class OnePaceOrganizer:
                 try:
                     src = Path(self.base_path, "posters", "poster.png")
                     self.logger.info(f"Downloading: posters/{src.name}")
-                    await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
+                    dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
+                    if not dl:
+                        dl = await utils.download(f"{self.download_path}/metadata/posters/{src.name}", src, self.progress_bar_func)
+                        if not dl:
+                            self.logger.info(f"Skipping downloading (not found)")
                 except:
                     self.logger.warning(f"Skipping downloading\n{traceback.format_exc()}")
 
@@ -1305,7 +1318,11 @@ class OnePaceOrganizer:
                                     src = Path(self.base_path, "posters", str(season), "poster.png")
                                     try:
                                         self.logger.info(f"Downloading: posters/{src.name}")
-                                        await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
+                                        dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
+                                        if not dl:
+                                            dl = await utils.download(f"{self.download_path}/metadata/posters/{src.name}", src, self.progress_bar_func)
+                                            if not dl:
+                                                self.logger.info(f"Skipping downloading (not found)")
                                     except Exception as e:
                                         self.logger.warning(f"Skipping downloading: {e}")
 

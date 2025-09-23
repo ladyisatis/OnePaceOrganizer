@@ -132,39 +132,61 @@ async def is_file(file):
 async def is_dir(file):
     return await run(file.is_dir)
 
-async def glob(dir, file_pattern, rglob=False):
-    for file in await run(dir.rglob if rglob else dir.glob, file_pattern, case_sensitive=False, recurse_symlinks=True):
+async def glob(dir, file_pattern, rglob=False, loop=None):
+    if loop is None:
+        loop = asyncio.get_running_loop()
+
+    for file in await run(dir.rglob if rglob else dir.glob, file_pattern, case_sensitive=False, recurse_symlinks=True, loop=loop):
         yield file
 
-async def download(url, out, progress_bar_func):
-    await run_func(progress_bar_func, 0)
+async def download(url, out, progress_bar_func, loop=None):
+    if loop is None:
+        loop = asyncio.get_running_loop()
 
-    dir_exists = await run(out.parent.is_dir)
+    await run_func(progress_bar_func, 0, loop=loop)
+
+    dir_exists = await run(out.parent.is_dir, loop=loop)
     if not dir_exists:
-        await run(out.parent.mkdir, exist_ok=True)
+        await run(out.parent.mkdir, exist_ok=True, loop=loop)
 
-    with out.open(mode='wb') as f:
+    f = await run(out.open, mode='wb', loop=loop)
+    try:
+        resp = await run(client.stream, "GET", url, follow_redirects=True, loop=loop)
         try:
-            with client.stream("GET", url, follow_redirects=True) as resp:
-                await run(logger.debug, f"Stream response: {url} -> {out}")
+            if resp.status_code >= 400:
+                await run(resp.close, loop=loop)
+                return False
 
-                t = int(resp.headers["Content-Length"])
-                c = 0
+            await run(logger.debug, f"Stream response: {url} -> {out}")
 
-                for chunk in await run(resp.iter_bytes):
-                    if t > 0:
-                        c = c + len(chunk)
+            t = int(resp.headers["Content-Length"])
+            c = 0
 
-                    if c >= 0 and c <= 100:
-                        await run_func(progress_bar_func, c)
+            for chunk in await run(resp.iter_bytes, loop=loop):
+                if t > 0:
+                    c = c + len(chunk)
 
-                    await run(f.write, chunk)
-        except:
-            await run(logger.debug, f"Download response: {url} -> {out}")
-            resp = await run(httpx.get, url, follow_redirects=True)
-            await run(f.write, resp.content)
+                if c >= 0 and c <= 100:
+                    await run_func(progress_bar_func, c, loop=loop)
 
-    await run_func(progress_bar_func, 100)
+                await run(f.write, chunk, loop=loop)
+
+        finally:
+            await run(resp.close, loop=loop)
+
+    except:
+        await run(logger.debug, f"Download response: {url} -> {out}")
+        resp = await run(httpx.get, url, follow_redirects=True, loop=loop)
+
+        if resp.status_code >= 400:
+            return False
+
+        await run(f.write, resp.content, loop=loop)
+
+    finally:
+        await run(f.close, loop=loop)
+
+    await run_func(progress_bar_func, 100, loop=loop)
     return True
 
 def compare_file(file1, file2):
