@@ -62,20 +62,13 @@ class GUI(QMainWindow):
     def __init__(self, organizer=None, log_level="info"):
         super().__init__()
 
-        #self.log_level = log_level.upper()
-        self.log_level = "INFO"
+        self.log_level = log_level.upper()
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
         self._log_scrollbar = self.log_output.verticalScrollBar()
         self._log_signal.connect(self._log_output_append)
-
-        logger.add(
-            self._log,
-            level=self.log_level, 
-            format="{time:YYYY-MM-DD HH:mm:ss.SSS},{level: <8},{message}", 
-            colorize=False, 
-            enqueue=False
-        )
+        self._logger_id = None
+        self._set_logger(log_level)
 
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.setWindowTitle(self.organizer.window_title)
@@ -263,6 +256,50 @@ class GUI(QMainWindow):
         self.action_edit_output_tmpl.triggered.connect(self.edit_output_template)
         menu_configuration.addAction(self.action_edit_output_tmpl)
 
+        menu_log_level = menu_configuration.addMenu("Log Level")
+
+        self.action_log_level_0 = QAction("Critical", self)
+        self.action_log_level_0.setCheckable(True)
+        self.action_log_level_0.setChecked(self.log_level == "CRITICAL")
+        self.action_log_level_0.triggered.connect(func_partial(self._set_logger, "CRITICAL"))
+        menu_log_level.addAction(self.action_log_level_0)
+
+        self.action_log_level_1 = QAction("Errors", self)
+        self.action_log_level_1.setCheckable(True)
+        self.action_log_level_1.setChecked(self.log_level == "ERROR")
+        self.action_log_level_1.triggered.connect(func_partial(self._set_logger, "ERROR"))
+        menu_log_level.addAction(self.action_log_level_1)
+
+        self.action_log_level_2 = QAction("Warning", self)
+        self.action_log_level_2.setCheckable(True)
+        self.action_log_level_2.setChecked(self.log_level == "WARNING")
+        self.action_log_level_2.triggered.connect(func_partial(self._set_logger, "WARNING"))
+        menu_log_level.addAction(self.action_log_level_2)
+
+        self.action_log_level_3 = QAction("Success", self)
+        self.action_log_level_3.setCheckable(True)
+        self.action_log_level_3.setChecked(self.log_level == "SUCCESS")
+        self.action_log_level_3.triggered.connect(func_partial(self._set_logger, "SUCCESS"))
+        menu_log_level.addAction(self.action_log_level_3)
+
+        self.action_log_level_4 = QAction("Information", self)
+        self.action_log_level_4.setCheckable(True)
+        self.action_log_level_4.setChecked(self.log_level == "INFO")
+        self.action_log_level_4.triggered.connect(func_partial(self._set_logger, "INFO"))
+        menu_log_level.addAction(self.action_log_level_4)
+
+        self.action_log_level_5 = QAction("Debug", self)
+        self.action_log_level_5.setCheckable(True)
+        self.action_log_level_5.setChecked(self.log_level == "DEBUG")
+        self.action_log_level_5.triggered.connect(func_partial(self._set_logger, "DEBUG"))
+        menu_log_level.addAction(self.action_log_level_5)
+
+        self.action_log_level_6 = QAction("Trace (slow)", self)
+        self.action_log_level_6.setCheckable(True)
+        self.action_log_level_6.setChecked(self.log_level == "TRACE")
+        self.action_log_level_6.triggered.connect(func_partial(self._set_logger, "TRACE"))
+        menu_log_level.addAction(self.action_log_level_6)
+
         self.start_button = QPushButton("Start")
         self.start_button.clicked.connect(self.start)
         layout.addWidget(self.start_button)
@@ -272,13 +309,36 @@ class GUI(QMainWindow):
         widget.setLayout(layout)
 
     def _log_output_append(self, obj):
+        self.log_output.setUpdatesEnabled(False)
         self.log_output.append(obj)
         self._log_scrollbar.setValue(self._log_scrollbar.maximum())
+        self.log_output.setUpdatesEnabled(True)
 
     def _log(self, msg):
         m = msg.split(",")
         text = " ".join(m[2:]).rstrip("\n")
         self._log_signal.emit(f"[{m[0]}] [{m[1].replace(' ','')}] {text}")
+
+    def _set_logger(self, level):
+        if self._logger_id is not None:
+            logger.remove(self._logger_id)
+
+        self.log_level = level.upper()
+        self._logger_id = logger.add(
+            self._log,
+            level=self.log_level, 
+            format="{time:YYYY-MM-DD HH:mm:ss.SSS},{level: <8},{message}", 
+            colorize=False, 
+            enqueue=False
+        )
+
+        self.action_log_level_0.setChecked(self.log_level == "CRITICAL")
+        self.action_log_level_1.setChecked(self.log_level == "ERROR")
+        self.action_log_level_2.setChecked(self.log_level == "WARNING")
+        self.action_log_level_3.setChecked(self.log_level == "SUCCESS")
+        self.action_log_level_4.setChecked(self.log_level == "INFO")
+        self.action_log_level_5.setChecked(self.log_level == "DEBUG")
+        self.action_log_level_6.setChecked(self.log_level == "TRACE")
 
     def _output_label_txt(self):
         _action = "Move"

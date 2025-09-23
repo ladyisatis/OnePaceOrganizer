@@ -1,6 +1,6 @@
 [project]
 name = "OnePaceOrganizer"
-version = "1.0.0"
+version = "1.0.0a1"
 description = "One Pace Organizer for Plex and Jellyfin: Add metadata like summaries, titles and posters to your One Pace collection"
 authors = [
     {name = "Isatis",email = "git@isatis.blue"}
