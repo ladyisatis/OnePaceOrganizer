@@ -629,13 +629,11 @@ def generate_json():
 
     if episodes_changed or arcs_changed or tvshow_changed:
         now = datetime.now(timezone.utc)
-        last_update = now.isoformat()
-        last_update_ts = int(now.timestamp() * 1000)
 
         with data_yml.open(mode='w') as f:
             YamlDump(data={
-                "last_update": last_update,
-                "last_update_ts": last_update_ts,
+                "last_update": now.isoformat(),
+                "last_update_ts": now.timestamp(),
                 "base_url": f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/refs/heads/main",
                 "tvshow": tvshow,
                 "arcs": _a,
@@ -643,8 +641,8 @@ def generate_json():
             }, stream=f, allow_unicode=True, sort_keys=False)
 
         out = {
-            "last_update": last_update,
-            "last_update_ts": last_update_ts,
+            "last_update": now.isoformat(),
+            "last_update_ts": now.timestamp(),
             "base_url": f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/refs/heads/main",
             "tvshow": tvshow,
             "arcs": _a,
