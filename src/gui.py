@@ -68,7 +68,6 @@ class GUI(QMainWindow):
         self._log_scrollbar = self.log_output.verticalScrollBar()
         self._log_signal.connect(self._log_output_append)
         self._logger_id = None
-        self._set_logger(log_level)
 
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.setWindowTitle(self.organizer.window_title)
@@ -307,6 +306,8 @@ class GUI(QMainWindow):
         layout.addWidget(self.log_output, stretch=1)
         layout.addWidget(self.progress_bar)
         widget.setLayout(layout)
+
+        self._set_logger(log_level)
 
     def _log_output_append(self, obj):
         self.log_output.setUpdatesEnabled(False)

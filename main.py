@@ -11,8 +11,6 @@ from pathlib import Path
 from src.organizer import OnePaceOrganizer
 from src import utils
 
-logger.remove(0)
-
 def strbool(v):
     if isinstance(v, bool):
         return v
@@ -159,6 +157,8 @@ def main():
         console.main(opo, log_level)
 
 if __name__ == "__main__":
+    logger.remove(None)
+
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         freeze_support()
     else:
