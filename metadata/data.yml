@@ -1,6 +1,6 @@
-last_update: '2025-09-23T06:41:49.588562+00:00'
-last_update_ts: 1758609709.588562
-base_url: https://raw.githubusercontent.com/ladyisatis/onepaceorganizer/refs/heads/main
+last_update: '2025-09-24T07:46:07.380589+00:00'
+last_update_ts: 1758699967.380589
+base_url: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main
 tvshow:
   title: One Piece
   sorttitle: One Piece
@@ -1917,12 +1917,12 @@ episodes:
     hashes:
       crc32: 04C7B716
   05BE81E6:
-    season: 0
+    arc: 0
     episode: 4
     title: Wapol's Omnivorous Hurrah
     description: ''
-    manga_chapters: Covers of 236-262
-    anime_episodes: 778
+    chapters: Covers of 236-262
+    episodes: 778
     released: 2017-02-26
     hashes:
       crc32: 05BE81E6
@@ -1989,14 +1989,14 @@ episodes:
     hashes:
       crc32: 088462CB
   08B90884:
-    season: 12
+    arc: 12
     episode: 5
     title: Straight Ahead!!
     description: Sanji, pretending to be Mr. 3, convinces Crocodile he has eliminated
       Vivi and co., prompting the Unluckies to arrive and deliver a way off Little
       Garden. With a clear path straight ahead—or so it seems—the Straw Hats set sail.
-    manga_chapters: 127-129
-    anime_episodes: 77-79
+    chapters: 127-129
+    episodes: 77-79
     released: '2020-11-19'
   099FB95D:
     arc: 21
@@ -2194,7 +2194,7 @@ episodes:
     hashes:
       crc32: 0E2022E4
   0EB7F7E9:
-    season: 5
+    arc: 5
     episode: 3
     title: The Storm
     originaltitle: Storm
@@ -2203,8 +2203,8 @@ episodes:
       Leg" Zeff, and his fighting spirit is as strong as ever. Meanwhile, Gin explains
       how his men met disaster in the Grand Line when they ran afoul of a devastatingly
       strong opponent.
-    manga_chapters: 47-49
-    anime_episodes: 23-24
+    chapters: 47-49
+    episodes: 23-24
     released: 2022-07-16
     hashes:
       crc32: 0EB7F7E9
@@ -2246,15 +2246,15 @@ episodes:
     hashes:
       crc32: 0F8517DC
   10FA8741:
-    season: 35
+    arc: 35
     episode: 11
     title: Emperor Kaido vs. Luffy
     description: Infuriated by Kaido’s violence toward his allies, Luffy lands blow
       after blow on the drunken Emperor. When he activates Gear Fourth and launches
       even more powerful attacks, Kaido fights back. Law tries to rescue Luffy but
       is interrupted by Hawkins.
-    manga_chapters: 922-923
-    anime_episodes: 914-915
+    chapters: 922-923
+    episodes: 914-915
     released: '2020-03-31'
   11DA7BCB:
     arc: 31
@@ -2462,14 +2462,14 @@ episodes:
     hashes:
       crc32: 1809DA8A
   1865E7DF:
-    season: 35
+    arc: 35
     episode: 4
     title: Tsuru Returns the Favor
     description: Luffy and Zoro are stalled by Hawkins, but their fortune looks bright
       when a woman guides them to a teahouse. There, they find an herbal remedy for
       the river poison that Otama drank, while old acquaintances look on from a distance.
-    manga_chapters: '913'
-    anime_episodes: 898-899
+    chapters: '913'
+    episodes: 898-899
     released: '2019-10-18'
   194603B0:
     arc: 19
@@ -3071,15 +3071,15 @@ episodes:
     hashes:
       crc32: 31018FCB
   '316829437':
-    season: 30
+    arc: 30
     episode: 13
     title: G-5's Sacrifice and the Betrayal of the Vice Admiral!
     description: Caesar hatches a plan to forever silence his enemies, and Tashigi’s
       men make the ultimate sacrifice! Luffy races toward Caesar to deliver on his
       promise to beat and capture him, and Chopper does all he can to keep the children
       from consuming more candy.
-    manga_chapters: 679-680
-    anime_episodes: 604-606
+    chapters: 679-680
+    episodes: 604-606
     released: '2013-08-11'
   32150FF4:
     arc: 32
@@ -3415,14 +3415,14 @@ episodes:
     hashes:
       crc32: 3FC81ABD
   407B42D5:
-    season: 35
+    arc: 35
     episode: 7
     title: The Provisions Ship
     description: Luffy and co. finally find Otama hanging from the mouth of a lion
       in Holdem’s stomach. Luffy prepares to save Otama from Kaido’s lackey, and elsewhere,
       a mysterious figure confronts Basil Hawkins.
-    manga_chapters: 916-917
-    anime_episodes: 904-905
+    chapters: 916-917
+    episodes: 904-905
     released: '2019-11-22'
   410C8F0C:
     arc: 33
@@ -3449,12 +3449,12 @@ episodes:
     hashes:
       crc32: 410FD111
   415455AE:
-    season: 0
+    arc: 0
     episode: 2
     title: Straw Hat Theatre
     description: ''
-    manga_chapters: ''
-    anime_episodes: ''
+    chapters: ''
+    episodes: ''
     released: 2014-09-14
     hashes:
       crc32: 415455AE
@@ -3637,14 +3637,14 @@ episodes:
     hashes:
       crc32: 4C1997F3
   4C39B34C:
-    season: 35
+    arc: 35
     episode: 6
     title: Wano's Grand Sumo Tournament
     description: Luffy challenges Urashima, the strongest yokozuna in Wano, to a sumo
       match! However, Urashima is willing to resort to illegal moves. Meanwhile, Holdem
       tells Otama that he must punish her for a crime she committed.
-    manga_chapters: 915-916
-    anime_episodes: 902-903
+    chapters: 915-916
+    episodes: 902-903
     released: '2019-10-18'
   4CD92CFC:
     arc: 30
@@ -3699,14 +3699,14 @@ episodes:
     hashes:
       crc32: 4DDF4C07
   4E97A31D:
-    season: 35
+    arc: 35
     episode: 12
     title: Hah
     description: Luffy is sent to a great mine where prisoners must endure harsh,
       forced labor. There, he has an unexpected reunion. Meanwhile, Okiku rushes to
       the ruins of Oden Castle to confirm the safety of the Straw Hats and the others.
-    manga_chapters: '924'
-    anime_episodes: '916'
+    chapters: '924'
+    episodes: '916'
     released: '2020-04-01'
   4F16C5DC:
     arc: 31
@@ -4345,14 +4345,14 @@ episodes:
     hashes:
       crc32: 64714640
   64E446D3:
-    season: 35
+    arc: 35
     episode: 5
     title: Okobore Town
     description: Otama is kidnapped by Kaido’s gifters and taken to a flourishing
       settlement called Bakura Town where a creepy-looking headliner was expecting
       her. Luffy, Zoro, and the samurai Okiku rush to her rescue.
-    manga_chapters: 914-915
-    anime_episodes: 900-902
+    chapters: 914-915
+    episodes: 900-902
     released: '2019-10-18'
   64FB3990:
     arc: 29
@@ -4460,15 +4460,15 @@ episodes:
     hashes:
       crc32: 683EDC5C
   6858E16A:
-    season: 5
+    arc: 5
     episode: 4
     title: Pearl
     description: Mihawk departs after defeating Zoro, and Krieg continues his assault
       on the Baratie. Pearl, one of Krieg's strongest men, goes on the offensive with
       fiery attacks and multiple shields at his disposal, so Sanji reveals his unique
       fighting style.
-    manga_chapters: 53-55
-    anime_episodes: 25
+    chapters: 53-55
+    episodes: 25
     released: 2023-05-15
     hashes:
       crc32: 6858E16A
@@ -5108,14 +5108,14 @@ episodes:
     hashes:
       crc32: 79C6DC33
   7A559716:
-    season: 6
+    arc: 6
     episode: 4
     title: Bell-mère
     description: Nojiko goes into detail about Nami's childhood and their adoptive
       mother Bell-mère, a former Marine. Despite being poor and unrelated by blood,
       they had a happy life on their tangerine orchard.
-    manga_chapters: 77-78
-    anime_episodes: 34-36
+    chapters: 77-78
+    episodes: 34-36
     released: '2025-01-24'
   7A93DCC5:
     arc: 36
@@ -5273,15 +5273,15 @@ episodes:
     hashes:
       crc32: 845C0D1D
   84608F51:
-    season: 3
+    arc: 3
     episode: 7
     title: To the Sea
     description: The island is saved without any villagers ever knowing what almost
       befell their home. Kaya, grateful to the Straw Hats for what they did, gifts
       them something invaluable for sailing the high seas. Meanwhile, one more person
       joins Luffy's crew.
-    manga_chapters: 40-41
-    anime_episodes: '17'
+    chapters: 40-41
+    episodes: '17'
     released: '2025-06-29'
   8538EDC4:
     arc: 35
@@ -5372,14 +5372,14 @@ episodes:
     hashes:
       crc32: 87F0C48B
   '88019227':
-    season: 36
+    arc: 36
     episode: 13
     title: The Emperor's Crew, The Red Hair Pirates
     description: Eustass "Captain" Kid sails in, guns blazing against Elbaph while
       Shanks of the Red Hair Pirates defends his crew and friends... without an ounce
       of mercy.
-    manga_chapters: 1079
-    anime_episodes: 1112
+    chapters: 1079
+    episodes: 1112
     released: 2024-09-06
     hashes:
       crc32: 88019227
@@ -5554,15 +5554,15 @@ episodes:
     hashes:
       crc32: 9101CF0E
   919A1140:
-    season: 35
+    arc: 35
     episode: 10
     title: Shutenmaru
     description: Ashura Doji, a.k.a Shutenmaru, is one of the allies Kin’emon wants
       to search for, and he leads a raid on Okobore Town to steal the food that Luffy
       brought. This unrest prompts the drunken Kaido to fly above Okobore Town in
       his dragon form.
-    manga_chapters: 921-922
-    anime_episodes: 911-913
+    chapters: 921-922
+    episodes: 911-913
     released: '2020-03-31'
   91BE23B7:
     arc: 35
@@ -5742,14 +5742,14 @@ episodes:
     hashes:
       crc32: 9794072D
   97E4F5E3:
-    season: 36
+    arc: 36
     episode: 13
     title: The Emperor's Crew, The Red Hair Pirates
     description: Eustass "Captain" Kid sails in, guns blazing against Elbaph while
       Shanks of the Red Hair Pirates defends his crew and friends... without an ounce
       of mercy.
-    manga_chapters: 1079
-    anime_episodes: 1112
+    chapters: 1079
+    episodes: 1112
     released: 2024-09-06
     hashes:
       crc32: 97E4F5E3
@@ -5793,14 +5793,14 @@ episodes:
     hashes:
       crc32: 99260C5A
   9974A092:
-    season: 0
+    arc: 0
     episode: 98
     title: One Piece Fan Letter
     description: As the Straw Hat Pirates reunite on the Sabaody Archipelago, the
       various members of the island are drawn together like pieces of a puzzle, their
       love of certain members of the crew driving their actions and emotions.
-    manga_chapters: 'One Piece Novel: Straw Hat Stories'
-    anime_episodes: One Piece Fan Letter
+    chapters: 'One Piece Novel: Straw Hat Stories'
+    episodes: One Piece Fan Letter
     released: 2024-11-29
   99A61805:
     arc: 29
@@ -5881,14 +5881,14 @@ episodes:
     hashes:
       crc32: 9CE5B9DD
   9D785326:
-    season: 16
+    arc: 16
     episode: 10
     title: Pirate Luffy vs. Berserker Wyper
     description: Only 80 remain in the Upper Yard survival game. Zoro finds himself
       face-to-face with the Shandian Braham, Luffy takes on Wyper and his burning
       bazooka, and Nami’s group on the Merry has the deadliest encounter of all!
-    manga_chapters: 258-260
-    anime_episodes: 170-171
+    chapters: 258-260
+    episodes: 170-171
     released: '2023-12-02'
   9DEAD0F3:
     arc: 27
@@ -5941,24 +5941,24 @@ episodes:
     hashes:
       crc32: 9FA61F60
   9FC7EE52:
-    season: 14
+    arc: 14
     episode: 6
     title: Rainbase, the City of Dreams
     description: Luffy's band reaches the city of Rainbase but encounter Smoker and
       Tashigi. As they defend themselves against both the Marines and Baroque Works'
       millions, Luffy's party storms Crocodile's Rain Dinners Casino.
-    manga_chapters: 167-168
-    anime_episodes: '105'
+    chapters: 167-168
+    episodes: '105'
     released: '2021-07-06'
   A08EC3B9:
-    season: 35
+    arc: 35
     episode: 9
     title: I Love Oden
     description: Kin’emon tells Luffy and the others about how Kozuki Oden brought
       peace to Kuri and became its daimyo. However, he was set up by Kaido and Orochi.
       When Kin’emon ran to save Oden’s wife, she revealed a shocking truth.
-    manga_chapters: 919-920
-    anime_episodes: 909-911
+    chapters: 919-920
+    episodes: 909-911
     released: '2020-03-16'
   A1039182:
     arc: 5
@@ -5974,15 +5974,15 @@ episodes:
     hashes:
       crc32: A1039182
   A1DFB514:
-    season: 16
+    arc: 16
     episode: 8
     title: Vearth
     description: The Shandians’ attack on Upper Yard commences! At the Sacrificial
       Altar, the crew is finally reunited, and everyone recounts what has happened.
       Chopper looks after the injured Gan Fall, and the pirates devise a plan to steal
       the gold on the island.
-    manga_chapters: 252-254
-    anime_episodes: 165-167
+    chapters: 252-254
+    episodes: 165-167
     released: '2023-10-28'
   A3939979:
     arc: 33
@@ -6071,14 +6071,14 @@ episodes:
     hashes:
       crc32: A57211D1
   A594704B:
-    season: 3
+    arc: 3
     episode: 4
     title: The Silent Man
     description: Captain Kuro makes his appearance, and with Zoro too injured to fight,
       Luffy incapacitated, and Usopp and Nami too weak to make a stand, the situation
       is desperate. However, Kaya herself arrives, intent on bargaining with Kuro.
-    manga_chapters: 31-34
-    anime_episodes: 13-14
+    chapters: 31-34
+    episodes: 13-14
     released: '2025-02-07'
   A5F0A507:
     arc: 23
@@ -6120,15 +6120,15 @@ episodes:
     hashes:
       crc32: A6CD3EBB
   A6D860C5:
-    season: 12
+    arc: 12
     episode: 4
     title: Luffy vs. Mr. 3
     description: Luffy, Usopp, and Karoo launch headlong into rescuing their friends,
       but Miss Golden Week runs a colorful interference. Mr. 3 is forced to take matters
       into his own conniving hands, and Usopp brainstorms how he will finally free
       his friends.
-    manga_chapters: 123-126
-    anime_episodes: 75-76
+    chapters: 123-126
+    episodes: 75-76
     released: '2020-11-19'
   A6DDEC2C:
     arc: 3
@@ -6427,12 +6427,12 @@ episodes:
     hashes:
       crc32: B46EDD50
   B4925314:
-    season: 0
+    arc: 0
     episode: 10
     title: Warship Island 01 (April Fools 2025)
     description: ''
-    manga_chapters: ''
-    anime_episodes: 54
+    chapters: ''
+    episodes: 54
     released: 2025-03-31
     hashes:
       crc32: B4925314
@@ -6475,15 +6475,15 @@ episodes:
     hashes:
       crc32: B5A40AD2
   B5D2AC50:
-    season: 12
+    arc: 12
     episode: 3
     title: Foul Play
     description: Despite his internal injuries and Luffy's warnings, the prideful
       giant Dorry insists on continuing his duel with Brogy. Meanwhile, the Baroque
       Works officer agents begin to make their move on the island with the Straw Hats
       as their next targets.
-    manga_chapters: 119-122
-    anime_episodes: 73-74
+    chapters: 119-122
+    episodes: 73-74
     released: 2025-04-18
     hashes:
       crc32: B5D2AC50
@@ -6679,7 +6679,7 @@ episodes:
     hashes:
       crc32: C0B33E05
   C0B845B2:
-    season: 36
+    arc: 36
     episode: 14
     title: The Legendary Hero
     sorttitle: Legendary Hero
@@ -6687,8 +6687,8 @@ episodes:
       entices the hundreds of pirates there to hunt him down. But before they can
       seal his fate and claim the prize, a familiar Marine warship descends from the
       sky!
-    manga_chapters: 1080-1081
-    anime_episodes: 1113-1115
+    chapters: 1080-1081
+    episodes: 1113-1115
     released: 2024-10-02
     hashes:
       crc32: C0B845B2
@@ -6999,14 +6999,14 @@ episodes:
     hashes:
       crc32: CBFE01C7
   CC37D6C6:
-    season: 5
+    arc: 5
     episode: 1
     title: 'Enter: Sanji'
     description: The Straw Hats happen across Zoro's former partners, Yosaku and Johnny,
       whose dietary dilemma reminds the pirates they still need a cook on their ship.
       Thus, they set sail for the sea restaurant Baratie, hoping to snag a chef.
-    manga_chapters: 42-44
-    anime_episodes: 19-21
+    chapters: 42-44
+    episodes: 19-21
     released: 2021-11-21
     hashes:
       crc32: CC37D6C6
@@ -7062,15 +7062,15 @@ episodes:
     hashes:
       crc32: CE01A533
   CE6E899D:
-    season: 35
+    arc: 35
     episode: 53
     title: Flame Clouds
     description: In the midst of the chaos on the Performance Floor, Chopper learns
       the secret behind Queen's latest plague. Meanwhile, Big Mom reaches the roof,
       Sanji hurries in the name of love, and Zoro watches as something falls from
       the hole in the ceiling.
-    manga_chapters: 996-997
-    anime_episodes: 1009-1011
+    chapters: 996-997
+    episodes: 1009-1011
     released: ''
   CEF78887:
     arc: 20
@@ -7160,15 +7160,15 @@ episodes:
     hashes:
       crc32: D16C3A7A
   D1742A98:
-    season: 3
+    arc: 3
     episode: 7
     title: To the Sea
     description: The island is saved without any villagers ever knowing what almost
       befell their home. Kaya, grateful to the Straw Hats for what they did, gifts
       them something invaluable for sailing the high seas. Meanwhile, one more person
       joins Luffy's crew.
-    manga_chapters: 40-41
-    anime_episodes: '17'
+    chapters: 40-41
+    episodes: '17'
     released: '2017-10-21'
   D17BD2C5:
     arc: 18
@@ -7197,15 +7197,15 @@ episodes:
     hashes:
       crc32: D2E02F36
   D3899913:
-    season: 35
+    arc: 35
     episode: 8
     title: The Ruins of Oden Castle
     description: Zoro and the others dash out of Bakura Town on the treasure ship
       filled with food! Luffy catches up to them, and together, they distribute food
       and water to the people of Okobore Town. Later, Law takes them to the ruins
       of a hilltop castle.
-    manga_chapters: 918-919
-    anime_episodes: 906, 908-909
+    chapters: 918-919
+    episodes: 906, 908-909
     released: '2020-03-14'
   D511F339:
     arc: 36
@@ -7437,14 +7437,14 @@ episodes:
     hashes:
       crc32: DCF7AD65
   DD135B35:
-    season: 12
+    arc: 12
     episode: 2
     title: Dorry and Brogy
     description: Usopp, immensely impressed with the giants of Elbaph, names Brogy
       his master. To commemorate their duel, the giants imbibe two barrels of booze
       from Nami, but, unbeknownst to anyone, a saboteur has tampered with one of them!
-    manga_chapters: 117-118
-    anime_episodes: 71-72
+    chapters: 117-118
+    episodes: 71-72
     released: 2025-04-18
     hashes:
       crc32: DD135B35
@@ -7720,7 +7720,7 @@ episodes:
     hashes:
       crc32: E85B9E9D
   E90342F6:
-    season: 5
+    arc: 5
     episode: 3
     title: The Oath
     sorttitle: Oath
@@ -7728,8 +7728,8 @@ episodes:
       as the world's greatest swordsman, arrives all the way from the Grand Line to
       finish off Don Krieg. However, Zoro challenges the deadly Mihawk to a duel in
       order to achieve his dream.
-    manga_chapters: 48-52
-    anime_episodes: 23-24, 29, 135
+    chapters: 48-52
+    episodes: 23-24, 29, 135
     released: 2025-08-09
     hashes:
       crc32: E90342F6
@@ -7902,7 +7902,7 @@ episodes:
     hashes:
       crc32: EF1D7B5F
   EF447336:
-    season: 36
+    arc: 36
     episode: 14
     title: The Legendary Hero
     sorttitle: Legendary Hero
@@ -7910,8 +7910,8 @@ episodes:
       entices the hundreds of pirates there to hunt him down. But before they can
       seal his fate and claim the prize, a familiar Marine warship descends from the
       sky!
-    manga_chapters: 1080-1081
-    anime_episodes: 1113-1115
+    chapters: 1080-1081
+    episodes: 1113-1115
     released: 2024-10-02
     hashes:
       crc32: EF447336
@@ -7929,14 +7929,14 @@ episodes:
     hashes:
       crc32: D0A51040
   EFF6059A:
-    season: 0
+    arc: 0
     episode: 7
     title: Gaimon 01 (April Fools 2021)
     description: The Straw Hats venture to the fabled "Treasure Island" to discover
       riches, adventure, and... strange creatures. Oh, and everything is in Klingon
       for some reason.
-    manga_chapters: 42, 22
-    anime_episodes: 18
+    chapters: 42, 22
+    episodes: 18
     released: 2021-03-31
     hashes:
       crc32: EFF6059A
@@ -8083,15 +8083,15 @@ episodes:
     hashes:
       crc32: F23079ED
   F2D99494:
-    season: 3
+    arc: 3
     episode: 5
     title: The Pirate "Kuro of a Hundred Plans"
     description: While the fight between Luffy and Kuro continues, Jango works to
       force Kaya to bequeath her family's money to the Black Cat captain. Despite
       the Usopp Pirates' efforts to stop the hypnotist, it seems as if the transaction
       is all but inevitable.
-    manga_chapters: 35-37
-    anime_episodes: 15-16
+    chapters: 35-37
+    episodes: 15-16
     released: '2025-04-11'
   F3E829E8:
     arc: 35
@@ -8196,25 +8196,25 @@ episodes:
     hashes:
       crc32: F96F0A4A
   F9DE972C:
-    season: 3
+    arc: 3
     episode: 6
     title: For Whom the Bell Tolls
     description: Kuro's ultimate move attacks everything in the area, friend nor foe
       notwithstanding, and Luffy becomes enraged by Kuro's lack of regard for his
       crew.
-    manga_chapters: 38-39
-    anime_episodes: 16-17
+    chapters: 38-39
+    episodes: 16-17
     released: '2025-04-11'
   F9F0F488:
-    season: 35
+    arc: 35
     episode: 1
     title: Onward to Wano
     description: Luffy and the others see familiar faces in a newspaper article about
       the Reverie right as they approach Wano. However, this dangerous and foreboding
       land is as inaccessible as it is mysterious, with the sea itself acting as a
       barrier!
-    manga_chapters: 909-910
-    anime_episodes: 890-891
+    chapters: 909-910
+    episodes: 890-891
     released: '2025-04-04'
   FA2E5ADD:
     arc: 15
@@ -8319,15 +8319,15 @@ episodes:
     hashes:
       crc32: FC2376A1
   FCF3D074:
-    season: 5
+    arc: 5
     episode: 2
     title: Pirate Commodore Don Krieg
     description: Luffy is on hiatus from pirating to work as a cabin boy to pay off
       the damage done to the Baratie. While he tries to convince Sanji to join his
       crew, the pirate Gin brings the infamous Don Krieg and his starving forces to
       the sea restaurant.
-    manga_chapters: 45-47
-    anime_episodes: 21-22
+    chapters: 45-47
+    episodes: 21-22
     released: 2021-12-20
     hashes:
       crc32: FCF3D074
