@@ -12,11 +12,6 @@ PATH_SEPARATOR=":"
 #DATA_OPT="--add-data data/posters${PATH_SEPARATOR}data/posters --add-data pyproject.toml${PATH_SEPARATOR}."
 DATA_OPT="--add-data pyproject.toml${PATH_SEPARATOR}. --add-data .mode${PATH_SEPARATOR}."
 
-if ! command -v python3 &> /dev/null; then
-    echo "Python not found in PATH - please install via Homebrew (on Mac) or your favorite package manager."
-    exit 1
-fi
-
 if ! command -v uv &> /dev/null; then
     echo "uv not found in PATH - please install it via: https://docs.astral.sh/uv/getting-started/installation/"
     exit 1
@@ -36,6 +31,7 @@ uv run pyinstaller $COMMON_OPTS $ICON_OPT \
   --name OnePaceOrganizer-gui \
   --windowed \
   --distpath "dist" \
+  --exclude-module "prompt_toolkit" \
   --workpath build/gui \
   $DATA_OPT \
   main.py
@@ -46,6 +42,8 @@ uv run pyinstaller $COMMON_OPTS $ICON_OPT \
   --name OnePaceOrganizer-cli \
   --console \
   --distpath "dist" \
+  --exclude-module "qasync" \
+  --exclude-module "PySide6" \
   --workpath build/console \
   $DATA_OPT \
   main.py

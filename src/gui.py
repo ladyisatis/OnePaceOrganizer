@@ -88,14 +88,16 @@ class GUI(QMainWindow):
         self.organizer.progress_bar_func = self.progress_bar.setValue
 
         self.input = Input(layout, "Directory of unsorted One Pace .mkv/.mp4 files:", QLineEdit(), button="Browse...", connect=self.browse_input_folder)
-        self.input.prop.setText(str(self.organizer.input_path))
         self.input.prop.setPlaceholderText(str(Path.home() / "Downloads"))
+        if self.organizer.input_path != "":
+            self.input.prop.setText(str(self.organizer.input_path))
 
         self.output = Input(layout, "Move the sorted and renamed files to:", QLineEdit(), button="Browse...", connect=self.browse_output_folder)
-        self.output.prop.setText(str(self.organizer.output_path))
         self.output.prop.setPlaceholderText(str(Path("/", "path", "to", "plex_or_jellyfin", "Anime", "One Pace").resolve()))
         self.output.setVisible(self.organizer.file_action != 4)
         self._output_label_txt()
+        if self.organizer.output_path != "":
+            self.output.prop.setText(str(self.organizer.output_path))
 
         self.method = Input(layout, "I'm watching via...", QComboBox())
         self.method.prop.addItems(["Jellyfin/Emby (.nfo mode)", "Plex"])
@@ -372,8 +374,6 @@ class GUI(QMainWindow):
         if not folder or folder == "":
             return
 
-        logger.debug(f"input folder set: {folder}")
-
         if Path(folder).resolve() == Path(self.output.prop.text()).resolve() and self.organizer.file_action != 4:
             QMessageBox.information(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
             return
@@ -502,9 +502,7 @@ class GUI(QMainWindow):
         self.organizer.plex_config_username = self.plex_username.prop.text()
         self.organizer.plex_config_password = self.plex_password.prop.text()
 
-        self.organizer.logger.info(f"Logging in to Plex")
         if not await self.organizer.plex_login(True):
-            self.organizer.logger.info("Login failed")
             await self.organizer.save_config()
             self._plex_toggle_login(True)
             self._plex_toggle_enabled(True)
@@ -518,7 +516,7 @@ class GUI(QMainWindow):
             self.plex_remember_login.button.setEnabled(True)
             return
 
-        self.organizer.logger.info(f"Logged in")
+        logger.info("Logged in")
         self.plex_remember_login.button.setText("Disconnect")
         self._plex_toggle_login(False)
         self.start_button.setEnabled(False)
@@ -531,7 +529,7 @@ class GUI(QMainWindow):
         if not self.plex_server.prop.isEnabled():
             return
 
-        self.organizer.logger.info("Fetching Plex Servers")
+        logger.info("Fetching Plex Servers")
         self.plex_server.prop.setEnabled(False)
 
         self.plex_server.setVisible(True)
@@ -570,7 +568,6 @@ class GUI(QMainWindow):
 
         _id = self.plex_server.prop.currentData()
         if _id is None or _id == "":
-            self.organizer.logger.debug("Reset server")
             self.organizer.plexapi_server = None
             self.organizer.plex_config_server_id = ""
             await self.plex_get_servers()
@@ -580,9 +577,8 @@ class GUI(QMainWindow):
             self.start_button.setEnabled(False)
             return
 
-        self.organizer.logger.debug("Verifying Plex login")
+        logger.debug("Verifying Plex login")
         if not await self.organizer.plex_login():
-            self.organizer.logger.debug("Reset login")
             await self.organizer.save_config()
             self._plex_toggle_login(True)
             self._plex_toggle_enabled(True)
@@ -596,7 +592,7 @@ class GUI(QMainWindow):
             self.plex_remember_login.button.setEnabled(True)
             return
 
-        self.organizer.logger.debug("Selecting Plex server")
+        logger.debug("Selecting Plex server")
         if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id == "" and not await self.organizer.select_plex_server(_id):
             self.organizer.plexapi_server = None
             self.organizer.plex_config_server_id = ""
@@ -651,7 +647,6 @@ class GUI(QMainWindow):
             return
 
         if not await self.organizer.plex_login():
-            self.organizer.logger.debug("Reset login")
             await self.organizer.save_config()
             self._plex_toggle_login(True)
             self._plex_toggle_enabled(True)
@@ -707,7 +702,6 @@ class GUI(QMainWindow):
             return
 
         if not await self.organizer.plex_login():
-            self.organizer.logger.debug("Reset login")
             await self.organizer.save_config()
             self._plex_toggle_login(True)
             self._plex_toggle_enabled(True)
@@ -767,9 +761,9 @@ class GUI(QMainWindow):
             self.plex_remember_login.button.setEnabled(False)
             self.plex_remember_login.prop.setEnabled(False)
 
-            self.organizer.logger.info("Checking Plex connection")
+            logger.debug("Checking Plex connection")
             if not await self.organizer.plex_login():
-                self.organizer.logger.info("Plex credentials have expired - please re-login")
+                logger.info("Plex credentials have expired - please re-login")
                 await self.organizer.save_config()
                 self._plex_toggle_login(True)
                 self._plex_toggle_enabled(True)
@@ -784,7 +778,7 @@ class GUI(QMainWindow):
                 return
 
             if self.organizer.plexapi_server is None:
-                self.organizer.logger.info("Connecting to Plex server")
+                logger.info("Connecting to Plex server")
                 await self.organizer.plex_get_servers()
 
             res = await asyncio.create_task(self.organizer.start())

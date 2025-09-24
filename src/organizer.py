@@ -105,38 +105,38 @@ class OnePaceOrganizer:
         if "path_to_eps" in config:
             self.input_path = await utils.resolve(config["path_to_eps"])
 
-        if "input" in config:
+        if "input" in config and config["input"] is not None:
             self.input_path = await utils.resolve(config["input"])
 
         if "episodes" in config:
             self.output_path = await utils.resolve(config["episodes"])
 
-        if "output" in config:
+        if "output" in config and config["output"] is not None:
             self.output_path = await utils.resolve(config["output"])
 
-        if "move_after_sort" in config:
+        if "move_after_sort" in config and config["move_after_sort"] is not None:
             self.file_action = 0 if config["move_after_sort"] else 1
         
-        if "file_action" in config:
+        if "file_action" in config and config["file_action"] is not None:
             self.file_action = config["file_action"]
 
-        if "folder_action" in config:
+        if "folder_action" in config and config["folder"] is not None:
             self.folder_action = config["folder_action"]
 
-        if "fetch_posters" in config:
+        if "fetch_posters" in config and config["fetch_posters"] is not None:
             self.fetch_posters = config["fetch_posters"]
 
-        if "overwrite_nfo" in config:
+        if "overwrite_nfo" in config and config["overwrite_nfo"] is not None:
             self.overwrite_nfo = config["overwrite_nfo"]
 
-        if "filename_tmpl" in config:
+        if "filename_tmpl" in config and config["filename_tmpl"] is not None:
             self.filename_tmpl = config["filename_tmpl"]
 
         if "plex" in config:
-            if "enabled" in config["plex"]:
+            if "enabled" in config["plex"] and config["plex"]["enabled"] is not None:
                 self.plex_config_enabled = config["plex"]["enabled"]
 
-            if "url" in config["plex"]:
+            if "url" in config["plex"] and config["plex"]["url"] is not None:
                 self.plex_config_url = config["plex"]["url"]
 
             if "servers" in config["plex"] and isinstance(config["plex"]["servers"], dict):
@@ -160,33 +160,35 @@ class OnePaceOrganizer:
                         self.plex_config_show_guid = show_guid
                         break
 
-            if "use_token" in config["plex"]:
+            if "use_token" in config["plex"] and config["plex"]["use_token"] is not None:
                 self.plex_config_use_token = config["plex"]["use_token"]
 
-            if "token" in config["plex"]:
+            if "token" in config["plex"] and config["plex"]["token"] is not None:
                 self.plex_config_auth_token = config["plex"]["token"]
 
-            if "username" in config["plex"]:
+            if "username" in config["plex"] and config["plex"]["username"] is not None:
                 self.plex_config_username = config["plex"]["username"]
 
-            if "password" in config["plex"]:
+            if "password" in config["plex"] and config["plex"]["password"] is not None:
                 self.plex_config_password = config["plex"]["password"]
 
-            if "remember" in config["plex"]:
+            if "remember" in config["plex"] and config["plex"]["remember"] is not None:
                 self.plex_config_remember = config["plex"]["remember"]
 
-            if "server_baseurl" in config["plex"]:
+            if "server_baseurl" in config["plex"] and config["plex"]["server_baseurl"] is not None:
                 self.plex_config_server_baseurl = config["plex"]["server_baseurl"]
 
-            if "server_token" in config["plex"]:
+            if "server_token" in config["plex"] and config["plex"]["server_token"] is not None:
                 self.plex_config_server_token = config["plex"]["server_token"]
 
-    async def save_config(self):
-        if self.config_file is not None and not isinstance(self.config_file, Path):
-            self.config_file = Path(self.config_file)
+        return True
 
+    async def save_config(self):
         if self.config_file is None or self.config_file == "":
             return False
+
+        if self.config_file is not None and not isinstance(self.config_file, Path):
+            self.config_file = Path(self.config_file)
 
         out = {
             "input": str(self.input_path),

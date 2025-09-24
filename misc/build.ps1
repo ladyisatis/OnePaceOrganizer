@@ -2,14 +2,6 @@ $BuildDir = "dist"
 $CommonOptions = "--clean --noconfirm -F" # --icon=icon.ico
 
 try {
-    $pythonVersion = & python --version 2>$null
-} catch {
-    Write-Host "Python not found in PATH, please install via running the following command"
-    Write-Host "in Administrator Mode in PowerShell: winget install Python.Python.3.13 -e"
-    exit 1
-}
-
-try {
     $uvVersion = & uv --version 2>$null
 } catch {
     Write-Host "uv not found in PATH, please see the following page to install it:"
@@ -22,9 +14,9 @@ if (Test-Path $BuildDir) { Remove-Item $BuildDir -Recurse -Force }
 New-Item -ItemType Directory -Path "$BuildDir" -Force | Out-Null
 
 Set-Content -Path ".\.mode" -Value "gui"
-uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-gui" --windowed --distpath "$BuildDir" --workpath "build/gui" --add-data "pyproject.toml:." --add-data ".mode:." "main.py"
+uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-gui" --windowed --distpath "$BuildDir" --exclude-module "prompt_toolkit" --workpath "build/gui" --add-data "pyproject.toml:." --add-data ".mode:." "main.py"
 
 Set-Content -Path ".\.mode" -Value "console"
-uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-cli" --console --distpath "$BuildDir" --workpath "build/console" --add-data "pyproject.toml:." --add-data ".mode:." "main.py"
+uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-cli" --console --distpath "$BuildDir" --exclude-module "qasync" --exclude-module "PySide6" --workpath "build/console" --add-data "pyproject.toml:." --add-data ".mode:." "main.py"
 
 if (Test-Path build) { Remove-Item build -Recurse -Force }

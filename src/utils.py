@@ -138,8 +138,11 @@ def find_from_list(base_dir, items):
         if not isinstance(_dir, Path):
             _dir = Path(base_dir, _dir)
 
+        if not _dir.is_dir():
+            continue
+
         for res in _dir.glob(_file, case_sensitive=False, recurse_symlinks=True):
-            if res.suffix in exts:
+            if res.suffix.lower() in exts:
                 return res.resolve()
 
     return None

@@ -94,7 +94,8 @@ class Headless:
             )
 
         for line in text.split("\n"):
-            logger.info(line)
+            if line != "":
+                logger.info(line)
 
         logger.info("-")
 

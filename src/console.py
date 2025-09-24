@@ -29,7 +29,7 @@ from prompt_toolkit.widgets import (
 class Console:
     def __init__(self, organizer=None, log_level="info"):
         self.log_level = log_level.upper()
-        self.logger_id = 0
+        self.logger_id = None
         self.log_output = TextArea(
             focusable=False,
             height=Dimension(preferred=10**10)
@@ -46,7 +46,7 @@ class Console:
         if sink is None:
             sink = sys.stderr
 
-        if self.logger_id != 0:
+        if self.logger_id is not None:
             logger.remove(self.logger_id)
 
         self.logger_id = logger.add(
@@ -71,7 +71,6 @@ class Console:
 
     async def run(self):
         self._set_logger_sink(sys.stderr)
-        await self.organizer.load_config()
 
         is_latest, latest_vers = await utils.run(utils.is_up_to_date, self.organizer.toml["version"], self.organizer.base_path)
         if not is_latest:
@@ -83,8 +82,7 @@ class Console:
                     f"Latest: {latest_vers}"
             ).run_async()
 
-        c = Path(self.organizer.base_path, "config.json")
-        if await utils.run(c.is_file):
+        if await self.organizer.load_config():
             _action = "Action after Sorting: Move"
             if self.organizer.file_action == 1:
                 _action = "Action after Sorting: Copy"
@@ -188,7 +186,7 @@ class Console:
 
         while not proceed:
             if self.organizer.input_path == "":
-                self.organizer.input_path = Path(".", "in").resolve()
+                self.organizer.input_path = Path.home() / "Downloads"
 
             self.organizer.input_path = await input_dialog(
                 title=self.window_title,
