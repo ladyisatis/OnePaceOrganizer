@@ -1,4 +1,4 @@
-season: 5
+arc: 5
 episode: 3
 
 title: The Storm
@@ -9,8 +9,8 @@ description: It's revealed that Chef Zeff was once a great pirate known as "Red 
   Zeff, and his fighting spirit is as strong as ever. Meanwhile, Gin explains how
   his men met disaster in the Grand Line when they ran afoul of a devastatingly strong
   opponent.
-manga_chapters: 47-49
-anime_episodes: 23-24
+chapters: 47-49
+episodes: 23-24
 
 # rating: TV-14
 released: 2022-07-16

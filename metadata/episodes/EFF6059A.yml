@@ -1,12 +1,12 @@
-season: 0
+arc: 0
 episode: 7
 
 title: Gaimon 01 (April Fools 2021)
 # originaltitle: 
 # sorttitle: 
 description: The Straw Hats venture to the fabled "Treasure Island" to discover riches, adventure, and... strange creatures. Oh, and everything is in Klingon for some reason.
-manga_chapters: 42, 22
-anime_episodes: 18
+chapters: 42, 22
+episodes: 18
 
 # rating: TV-14
 released: 2021-03-31

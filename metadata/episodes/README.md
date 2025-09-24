@@ -5,15 +5,15 @@ This CRC32 is based off the 8-character ID-looking thing at the end of the filen
 The contents of the `.yml` file:
 
 ```
-season: 1
+arc: 1
 episode: 1
 
 title: Romance Dawn, the Dawn of an Adventure
 # originaltitle:
 # sorttitle:
 description: Influenced by the straw-hat-wearing pirate Red-Haired Shanks, an enthusiastic young boy named Monkey D. Luffy dreams of one day becoming King of the Pirates.
-manga_chapters: 1
-anime_episodes: Episode of East Blue, 312 (Intro)
+chapters: 1
+episodes: Episode of East Blue, 312 (Intro)
 
 # rating: TV-14
 released: 2025-05-03 00:42

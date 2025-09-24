@@ -1,4 +1,4 @@
-season: 5
+arc: 5
 episode: 3
 
 title: The Oath
@@ -9,8 +9,8 @@ description: As Nami steals the Going Merry, Hawk-Eye Mihawk, known far and wide
   the world's greatest swordsman, arrives all the way from the Grand Line to finish
   off Don Krieg. However, Zoro challenges the deadly Mihawk to a duel in order to
   achieve his dream.
-manga_chapters: 48-52
-anime_episodes: 23-24, 29, 135
+chapters: 48-52
+episodes: 23-24, 29, 135
 
 # rating: TV-14
 released: 2025-08-09
