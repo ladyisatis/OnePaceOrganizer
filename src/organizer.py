@@ -814,10 +814,13 @@ class OnePaceOrganizer:
     async def process_plex(self, files):
         completed = 0
         skipped = 0
+        show = None
 
         try:
             section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
             show = await utils.run(section.getGuid, self.plex_config_show_guid)
+
+            await utils.run(show.batchEdits)
 
             if "title" in self.tvshow and self.tvshow["title"] != "" and show.title != self.tvshow["title"]:
                 self.logger.info(f"Set Title: {show.title} -> {self.tvshow['title']}")
@@ -831,9 +834,23 @@ class OnePaceOrganizer:
                 self.logger.info(f"Set Sort Title: {show.titleSort} -> {self.tvshow['sorttitle']}")
                 await utils.run(show.editSortTitle, self.tvshow["sorttitle"])
 
+            if "tagline" in self.tvshow and self.tvshow["tagline"] != "" and show.tagline != self.tvshow["tagline"]:
+                self.logger.info(f"Set Tagline: {show.tagline} -> {self.tvshow['tagline']}")
+                await utils.run(show.editTagline, self.tvshow["tagline"])
+
             if "customrating" in self.tvshow and self.tvshow["customrating"] != "" and show.contentRating != self.tvshow["customrating"]:
                 self.logger.info(f"Set Rating: {show.contentRating} -> {self.tvshow['customrating']}")
                 await utils.run(show.editContentRating, self.tvshow["customrating"])
+
+            if "genre" in self.tvshow and isinstance(self.tvshow, list):
+                _genres = []
+                for genre in show.genres:
+                    _genres.append(genre.tag)
+
+                for genre in self.tvshow["genre"]:
+                    if genre not in _genres:
+                        self.logger.info(f"Add Genre: {genre}")
+                        await utils.run(show.addGenre, genre)
 
             if "plot" in self.tvshow and show.summary != self.tvshow["plot"]:
                 await utils.run(show.editSummary, self.tvshow["plot"])
@@ -951,14 +968,23 @@ class OnePaceOrganizer:
                         index += 1
                         await utils.run(self.progress_bar_func, int((index / total) * 100))
 
-            return (True, res, completed, skipped)
-
         except Exception as e:
             return (False, e, completed, skipped)
+
+        finally:
+            if show is not None:
+                try:
+                    await utils.run(show.saveEdits)
+                except Exception as e:
+                    return (False, e, completed, skipped)
+
+        return (True, res, completed, skipped)
 
     async def process_plex_episodes(self, queue):
         skipped = 0
         completed = 0
+        plex_season = None
+        plex_episode = None
 
         try:
             section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
@@ -987,6 +1013,8 @@ class OnePaceOrganizer:
 
                             season_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
                             season_desc = season_info["description"] if "description" in season_info and season_info["description"] != "" else ""
+
+                            await utils.run(plex_season.batchEdits)
 
                             if plex_season.title != season_title:
                                 self.logger.debug(f"Season {season} Title: {season_title}")
@@ -1027,6 +1055,15 @@ class OnePaceOrganizer:
                         except:
                             self.logger.exception(f"Skipping season {season}")
 
+                        finally:
+                            if plex_season is not None:
+                                try:
+                                    await utils.run(plex_season.saveEdits)
+                                except Exception as e:
+                                    self.logger.warning(f"Skipping season {season}: {e}")
+
+                                plex_season = None
+
                     else:
                         self.logger.warning(f"Skipping season {season}: Title not found, metadata might be corrupted?")
 
@@ -1038,6 +1075,8 @@ class OnePaceOrganizer:
 
                     self.logger.info(f"Updating: {_label}")
                     plex_episode = await utils.run(show.episode, season=season, episode=episode)
+
+                    await utils.run(plex_episode.batchEdits)
 
                     if plex_episode.title != episode_info["title"]:
                         self.logger.debug(f"S{season}E{episode} Title: {plex_episode.title} -> {episode_info['title']}")
@@ -1115,6 +1154,15 @@ class OnePaceOrganizer:
                 except:
                     self.logger.exception(f"Skipping season {season} episode {episode}")
                     skipped += 1
+
+                finally:
+                    if plex_episode is not None:
+                        try:
+                            await utils.run(plex_episode.saveEdits)
+                        except Exception as e:
+                            self.logger.warning(f"Skipping season {season} episode {episode}: {e}")
+
+                        plex_episode = None
 
                 index += 1
                 await utils.run_func(self.progress_bar_func, int((index / total) * 100))
