@@ -617,21 +617,22 @@ def generate_json():
 
     episodes = sort_dict(episodes)
 
-    try:
-        old = {}
-        with data_yml.open(mode='r', encoding='utf-8') as f:
-            old = YamlLoad(stream=f)
+#    try:
+#        old = {}
+#        with data_yml.open(mode='r', encoding='utf-8') as f:
+#            old = YamlLoad(stream=f)
 
-        episodes_changed = dict_changed(old["episodes"], episodes)
-        arcs_changed = dict_changed(old["arcs"], arcs)
-        tvshow_changed = dict_changed(old["tvshow"], tvshow)
-    except Exception as e:
-        logger.exception("Something went wrong")
-        episodes_changed = True
-        arcs_changed = True
-        tvshow_changed = True
+#        episodes_changed = dict_changed(old["episodes"], episodes)
+#        arcs_changed = dict_changed(old["arcs"], arcs)
+#        tvshow_changed = dict_changed(old["tvshow"], tvshow)
+#    except Exception as e:
+#        logger.exception("Something went wrong")
+#        episodes_changed = True
+#        arcs_changed = True
+#        tvshow_changed = True
+    enable_changes = True
 
-    if episodes_changed or arcs_changed or tvshow_changed:
+    if enable_changes:
         now = datetime.now(timezone.utc)
 
         with data_yml.open(mode='w') as f:
