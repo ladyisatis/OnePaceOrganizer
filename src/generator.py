@@ -596,13 +596,6 @@ def generate_json():
     with arcs_yml.open(mode='r', encoding='utf-8') as f:
         arcs = YamlLoad(stream=f)
 
-    if isinstance(arcs, list):
-        for i, arc in enumerate(arcs):
-            arcs[i] = unicode_fix_dict(arc)
-
-    elif isinstance(arcs, dict):
-        arcs = unicode_fix_dict(arcs)
-
     episodes = {}
 
     for episode_yml in episodes_dir.glob('*.yml'):
@@ -644,6 +637,12 @@ def generate_json():
                 "arcs": arcs,
                 "episodes": episodes
             }, stream=f, allow_unicode=True, sort_keys=False)
+
+        if isinstance(arcs, list):
+            for i, arc in enumerate(arcs):
+                arcs[i] = unicode_fix_dict(arc)
+        elif isinstance(arcs, dict):
+            arcs = unicode_fix_dict(arcs)
 
         out = {
             "last_update": now.isoformat(),
