@@ -36,9 +36,7 @@ jobs:
         env:
           GCLOUD_API_KEY: ${{ secrets.GCLOUD_API_KEY }}
           ONE_PACE_RSS_FEED: ${{ secrets.ONE_PACE_RSS_FEED }}
-        run: |
-          uv run src/generator.py update
-          uv run src/generator.py json
+        run: uv run src/generator.py update
 
       - name: Commit and push changes
         run: |
@@ -46,5 +44,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           git add metadata/episodes metadata/posters metadata/arcs.yml metadata/tvshow.yml
-          git diff --cached --quiet || (git add metadata && git commit -m "Add metadata via external sources [automated]")
+          git diff --cached --quiet || (uv run src/generator.py json && git add metadata && git commit -m "Add metadata via external sources [automated]")
           git push
