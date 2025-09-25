@@ -1,6 +1,6 @@
 {
-  "last_update": "2025-09-24T07:46:07.380589+00:00",
-  "last_update_ts": 1758699967.380589,
+  "last_update": "2025-09-25T12:04:12.518492+00:00",
+  "last_update_ts": 1758801852.518492,
   "base_url": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main",
   "tvshow": {
     "title": "One Piece",
@@ -23,17 +23,8 @@
     "lockdata": "false",
     "customrating": "TV-14"
   },
-  "arcs": [
-    {
-      "part": 0,
-      "saga": "Specials",
-      "title": "Specials",
-      "originaltitle": "",
-      "description": "Occasionally, the One Pace team likes to have some extra fun, so we made animated specials. See alternative storylines with twists you might not have expected.",
-      "poster": "",
-      "episodes": {}
-    },
-    {
+  "arcs": {
+    "1": {
       "part": 1,
       "saga": "East Blue",
       "title": "Romance Dawn",
@@ -59,7 +50,7 @@
         }
       }
     },
-    {
+    "2": {
       "part": 2,
       "saga": "East Blue",
       "title": "Orange Town",
@@ -81,7 +72,7 @@
         }
       }
     },
-    {
+    "3": {
       "part": 3,
       "saga": "East Blue",
       "title": "Syrup Village",
@@ -119,7 +110,7 @@
         }
       }
     },
-    {
+    "4": {
       "part": 4,
       "saga": "East Blue",
       "title": "Gaimon",
@@ -133,7 +124,7 @@
         }
       }
     },
-    {
+    "5": {
       "part": 5,
       "saga": "East Blue",
       "title": "Baratie",
@@ -175,7 +166,7 @@
         }
       }
     },
-    {
+    "6": {
       "part": 6,
       "saga": "East Blue",
       "title": "Arlong Park",
@@ -225,7 +216,7 @@
         }
       }
     },
-    {
+    "7": {
       "part": 7,
       "saga": "East Blue",
       "title": "The Adventures of Buggy's Crew",
@@ -239,7 +230,7 @@
         }
       }
     },
-    {
+    "8": {
       "part": 8,
       "saga": "East Blue",
       "title": "Loguetown",
@@ -261,7 +252,7 @@
         }
       }
     },
-    {
+    "9": {
       "part": 9,
       "saga": "Arabasta",
       "title": "Reverse Mountain",
@@ -279,7 +270,21 @@
         }
       }
     },
-    {
+    "11": {
+      "part": 11,
+      "saga": "Arabasta",
+      "title": "The Trials of Koby-Meppo",
+      "originaltitle": "",
+      "description": "Koby and Helmeppo are new cabin boys for the marines, but they become unwillingly involved in an escape attempt by Morgan. Their bravery will either earn them the respect of their superiors\u2014as well as Vice Admiral Garp\u2014or it will spell their doom.",
+      "poster": "",
+      "episodes": {
+        "01": {
+          "crc32": "4B56844F",
+          "crc32_extended": ""
+        }
+      }
+    },
+    "10": {
       "part": 10,
       "saga": "Arabasta",
       "title": "Whisky Peak",
@@ -297,21 +302,7 @@
         }
       }
     },
-    {
-      "part": 11,
-      "saga": "Arabasta",
-      "title": "The Trials of Koby-Meppo",
-      "originaltitle": "",
-      "description": "Koby and Helmeppo are new cabin boys for the marines, but they become unwillingly involved in an escape attempt by Morgan. Their bravery will either earn them the respect of their superiors\u2014as well as Vice Admiral Garp\u2014or it will spell their doom.",
-      "poster": "",
-      "episodes": {
-        "01": {
-          "crc32": "4B56844F",
-          "crc32_extended": ""
-        }
-      }
-    },
-    {
+    "12": {
       "part": 12,
       "saga": "Arabasta",
       "title": "Little Garden",
@@ -341,7 +332,7 @@
         }
       }
     },
-    {
+    "13": {
       "part": 13,
       "saga": "Arabasta",
       "title": "Drum Island",
@@ -383,7 +374,7 @@
         }
       }
     },
-    {
+    "14": {
       "part": 14,
       "saga": "Arabasta",
       "title": "Arabasta",
@@ -477,7 +468,7 @@
         }
       }
     },
-    {
+    "15": {
       "part": 15,
       "saga": "Skypiea",
       "title": "Jaya",
@@ -519,7 +510,7 @@
         }
       }
     },
-    {
+    "16": {
       "part": 16,
       "saga": "Skypiea",
       "title": "Skypiea",
@@ -629,7 +620,7 @@
         }
       }
     },
-    {
+    "17": {
       "part": 17,
       "saga": "Water Seven",
       "title": "Long Ring Long Land",
@@ -667,7 +658,7 @@
         }
       }
     },
-    {
+    "18": {
       "part": 18,
       "saga": "Water Seven",
       "title": "Water Seven",
@@ -757,7 +748,7 @@
         }
       }
     },
-    {
+    "19": {
       "part": 19,
       "saga": "Water Seven",
       "title": "Enies Lobby",
@@ -867,7 +858,7 @@
         }
       }
     },
-    {
+    "20": {
       "part": 20,
       "saga": "Water Seven",
       "title": "Post-Enies Lobby",
@@ -897,7 +888,7 @@
         }
       }
     },
-    {
+    "21": {
       "part": 21,
       "saga": "Thriller Bark",
       "title": "Thriller Bark",
@@ -995,7 +986,7 @@
         }
       }
     },
-    {
+    "22": {
       "part": 22,
       "saga": "Summit War",
       "title": "Sabaody Archipelago",
@@ -1049,7 +1040,7 @@
         }
       }
     },
-    {
+    "23": {
       "part": 23,
       "saga": "Summit War",
       "title": "Amazon Lily",
@@ -1079,7 +1070,7 @@
         }
       }
     },
-    {
+    "24": {
       "part": 24,
       "saga": "Summit War",
       "title": "Impel Down",
@@ -1129,7 +1120,7 @@
         }
       }
     },
-    {
+    "25": {
       "part": 25,
       "saga": "Summit War",
       "title": "The Adventures of the Straw Hats",
@@ -1143,7 +1134,7 @@
         }
       }
     },
-    {
+    "26": {
       "part": 26,
       "saga": "Summit War",
       "title": "Marineford",
@@ -1221,7 +1212,7 @@
         }
       }
     },
-    {
+    "27": {
       "part": 27,
       "saga": "Summit War",
       "title": "Post-War",
@@ -1263,7 +1254,7 @@
         }
       }
     },
-    {
+    "28": {
       "part": 28,
       "saga": "Fishman Island",
       "title": "Return to Sabaody",
@@ -1285,7 +1276,7 @@
         }
       }
     },
-    {
+    "29": {
       "part": 29,
       "saga": "Fishman Island",
       "title": "Fishman Island",
@@ -1391,7 +1382,7 @@
         }
       }
     },
-    {
+    "30": {
       "part": 30,
       "saga": "Dressrosa",
       "title": "Punk Hazard",
@@ -1489,7 +1480,7 @@
         }
       }
     },
-    {
+    "31": {
       "part": 31,
       "saga": "Dressrosa",
       "title": "Dressrosa",
@@ -1691,7 +1682,7 @@
         }
       }
     },
-    {
+    "32": {
       "part": 32,
       "saga": "Four Emperors",
       "title": "Zou",
@@ -1741,7 +1732,7 @@
         }
       }
     },
-    {
+    "33": {
       "part": 33,
       "saga": "Four Emperors",
       "title": "Whole Cake Island",
@@ -1907,7 +1898,7 @@
         }
       }
     },
-    {
+    "34": {
       "part": 34,
       "saga": "Four Emperors",
       "title": "Reverie",
@@ -1929,7 +1920,7 @@
         }
       }
     },
-    {
+    "35": {
       "part": 35,
       "saga": "Four Emperors",
       "title": "Wano",
@@ -2155,7 +2146,7 @@
         }
       }
     },
-    {
+    "36": {
       "part": 36,
       "saga": "Final Saga",
       "title": "Egghead",
@@ -2240,8 +2231,17 @@
           "crc32_extended": "93B80191"
         }
       }
+    },
+    "0": {
+      "part": 0,
+      "saga": "Specials",
+      "title": "Specials",
+      "originaltitle": "",
+      "description": "Occasionally, the One Pace team likes to have some extra fun, so we made animated specials. See alternative storylines with twists you might not have expected.",
+      "poster": "",
+      "episodes": {}
     }
-  ],
+  },
   "episodes": {
     "0017358A": {
       "arc": 18,
