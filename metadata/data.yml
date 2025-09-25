@@ -1,5 +1,5 @@
-last_update: '2025-09-25T12:04:12.518492+00:00'
-last_update_ts: 1758801852.518492
+last_update: '2025-09-25T13:10:33.508569+00:00'
+last_update_ts: 1758805833.508569
 base_url: https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main
 tvshow:
   title: One Piece
@@ -60,13 +60,13 @@ arcs:
     poster: metadata/posters/2/poster.png
     episodes:
       '01':
-        crc32: CBFE01C7
+        crc32: C23AC8D3
         crc32_extended: ''
       '02':
-        crc32: FAFCDE38
+        crc32: D7327225
         crc32_extended: ''
       '03':
-        crc32: 9C115EE6
+        crc32: 1809DA8A
         crc32_extended: ''
   3:
     part: 3

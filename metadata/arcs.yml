@@ -30,13 +30,13 @@
   poster: metadata/posters/2/poster.png
   episodes:
     '01':
-      crc32: CBFE01C7
+      crc32: C23AC8D3
       crc32_extended: ''
     '02':
-      crc32: FAFCDE38
+      crc32: D7327225
       crc32_extended: ''
     '03':
-      crc32: 9C115EE6
+      crc32: 1809DA8A
       crc32_extended: ''
 3:
   part: 3
