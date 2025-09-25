@@ -55,6 +55,7 @@ def update():
     arc_to_num = {}
 
     try:
+        now = datetime.now(timezone.utc)
         retry = Retry(total=999, backoff_factor=0.5)
         spreadsheet = {"sheets": []}
 
@@ -341,7 +342,7 @@ def update():
                             else:
                                 logger.warning(f"-- Skipping: arc {arc_name} not found")
 
-                        else:
+                        elif now.hour % 6 == 0:
                             r = httpx.get(item.guid.content)
 
                             for item in BeautifulSoup(r.text, "html.parser").select("li i.fa-file"):
