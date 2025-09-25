@@ -588,13 +588,20 @@ def generate_json():
     json_min_file = Path(".", "metadata", "data.min.json")
 
     tvshow = {}
-    arcs = {}
+    arcs = []
 
     with tvshow_yml.open(mode='r', encoding='utf-8') as f:
         tvshow = val_convert_string(YamlLoad(stream=f))
 
     with arcs_yml.open(mode='r', encoding='utf-8') as f:
-        arcs = sort_dict(YamlLoad(stream=f))
+        arcs = YamlLoad(stream=f)
+
+    if isinstance(arcs, list):
+        for i, arc in enumerate(arcs):
+            arcs[i] = unicode_fix_dict(arc)
+
+    elif isinstance(arcs, dict):
+        arcs = unicode_fix_dict(arcs)
 
     episodes = {}
 
@@ -619,14 +626,10 @@ def generate_json():
         arcs_changed = dict_changed(old["arcs"], arcs)
         tvshow_changed = dict_changed(old["tvshow"], tvshow)
     except Exception as e:
-        print(f"Warning: {e}")
+        logger.exception("Something went wrong")
         episodes_changed = True
         arcs_changed = True
         tvshow_changed = True
-
-    _a = []
-    for v in unicode_fix_dict(arcs).values():
-        _a.append(v)
 
     if episodes_changed or arcs_changed or tvshow_changed:
         now = datetime.now(timezone.utc)
@@ -637,7 +640,7 @@ def generate_json():
                 "last_update_ts": now.timestamp(),
                 "base_url": f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/refs/heads/main",
                 "tvshow": tvshow,
-                "arcs": _a,
+                "arcs": arcs,
                 "episodes": episodes
             }, stream=f, allow_unicode=True, sort_keys=False)
 
@@ -646,7 +649,7 @@ def generate_json():
             "last_update_ts": now.timestamp(),
             "base_url": f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/refs/heads/main",
             "tvshow": tvshow,
-            "arcs": _a,
+            "arcs": arcs,
             "episodes": unicode_fix_dict(episodes)
         }
 
