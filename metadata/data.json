@@ -1,6 +1,6 @@
 {
-  "last_update": "2025-09-25T19:03:24.736841+00:00",
-  "last_update_ts": 1758827004.736841,
+  "last_update": "2025-09-26T00:07:57.672970+00:00",
+  "last_update_ts": 1758845277.67297,
   "base_url": "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main",
   "tvshow": {
     "title": "One Piece",
@@ -59,15 +59,15 @@
       "poster": "metadata/posters/2/poster.png",
       "episodes": {
         "01": {
-          "crc32": "C23AC8D3",
+          "crc32": "CBFE01C7",
           "crc32_extended": ""
         },
         "02": {
-          "crc32": "D7327225",
+          "crc32": "FAFCDE38",
           "crc32_extended": ""
         },
         "03": {
-          "crc32": "1809DA8A",
+          "crc32": "9C115EE6",
           "crc32_extended": ""
         }
       }
