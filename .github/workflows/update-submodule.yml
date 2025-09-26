@@ -1,0 +1,37 @@
+name: Update Submodules
+
+on:
+  schedule:
+    - cron: '30 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run submodule updater
+        run: |
+          pushd ./one-pace-metadata
+          git pull
+          popd
+          cp -f one-pace-metadata/data.json metadata/data.json
+          cp -f one-pace-metadata/data.min.json metadata/data.min.json
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add metadata one-pace-metadata
+          git diff --cached --quiet || git commit -m "Update submodule [automated]"
+          git push
+
