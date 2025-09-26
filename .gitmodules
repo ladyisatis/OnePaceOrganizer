@@ -1,0 +1,3 @@
+[submodule "one-pace-metadata"]
+	path = one-pace-metadata
+	url = https://github.com/ladyisatis/one-pace-metadata
