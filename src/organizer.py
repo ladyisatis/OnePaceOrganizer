@@ -629,6 +629,8 @@ class OnePaceOrganizer:
 
         if yml_loaded == False or len(self.tvshow) == 0 or len(self.arcs) == 0 or len(self.episodes) == 0:
             try:
+                await utils.run(data_file.parent, exist_ok=True)
+
                 self.logger.success("Downloading: data.json")
                 await utils.download(f"{self.metadata_url}/data.min.json", data_file, self.progress_bar_func)
 
