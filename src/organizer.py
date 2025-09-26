@@ -120,7 +120,7 @@ class OnePaceOrganizer:
         if "file_action" in config and config["file_action"] is not None:
             self.file_action = config["file_action"]
 
-        if "folder_action" in config and config["folder"] is not None:
+        if "folder_action" in config and config["folder_action"] is not None:
             self.folder_action = config["folder_action"]
 
         if "fetch_posters" in config and config["fetch_posters"] is not None:
@@ -801,9 +801,11 @@ class OnePaceOrganizer:
         return Path(self.output_path, "Specials" if season == 0 else f"Season {season:02d}")
 
     def get_season(self, season):
-        if isinstance(season, dict):
-            if season in self.arcs:
-                return self.arcs[season]
+        self.logger.trace(f"get_season {season} (self.arcs is a {type(self.arcs)})")
+
+        if isinstance(self.arcs, dict):
+            if int(season) in self.arcs:
+                return self.arcs[int(season)]
             elif str(season) in self.arcs:
                 return self.arcs[str(season)]
 
@@ -1310,6 +1312,13 @@ class OnePaceOrganizer:
                         skipped += 1
                         await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                         continue
+
+                if "arc" not in episode_info or "episode" not in episode_info:
+                    self.logger.warning(f"Skipping {file.name}: metadata for {crc32} has no arc or part/episode number, please report this as a GitHub issue")
+                    index += 1
+                    skipped += 1
+                    await utils.run_func(self.progress_bar_func, int((index / total) * 100))
+                    continue
 
                 season = episode_info["arc"]
                 season_info = self.get_season(season)

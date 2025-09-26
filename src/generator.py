@@ -642,7 +642,8 @@ def generate_json():
             for i, arc in enumerate(arcs):
                 arcs[i] = unicode_fix_dict(arc)
         elif isinstance(arcs, dict):
-            arcs = unicode_fix_dict(arcs)
+            arcs = unicode_fix_dict(sort_dict(arcs))
+            arcs = [arc for arc in arcs.values()]
 
         out = {
             "last_update": now.isoformat(),
