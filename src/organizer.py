@@ -35,7 +35,8 @@ class OnePaceOrganizer:
 
         self.workers = int(utils.get_env("workers", 0))
         self.base_path = Path(utils.get_env("base_path", Path.cwd().resolve()))
-        self.download_path = utils.get_env("dl_path", "https://raw.githubusercontent.com/ladyisatis/onepaceorganizer/refs/heads/main")
+        self.metadata_url = utils.get("metadata_url", "https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/main")
+        self.download_path = utils.get_env("dl_path", "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main")
         self.set_executor(utils.get_env("pool_mode", "process") == "process")
 
         if self.workers == 0:
@@ -629,7 +630,7 @@ class OnePaceOrganizer:
         if yml_loaded == False or len(self.tvshow) == 0 or len(self.arcs) == 0 or len(self.episodes) == 0:
             try:
                 self.logger.success("Downloading: data.json")
-                await utils.download(f"{self.download_path}/metadata/data.min.json", data_file, self.progress_bar_func)
+                await utils.download(f"{self.metadata_url}/data.min.json", data_file, self.progress_bar_func)
 
                 data = await utils.load_json(data_file)
                 self.logger.trace(data)
@@ -873,7 +874,7 @@ class OnePaceOrganizer:
                     try:
                         dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
                         if not dl:
-                            dl = await utils.download(f"{self.download_path}/metadata/posters/{poster.name}", poster, self.progress_bar_func)
+                            dl = await utils.download(f"{self.metadata_url}/posters/{poster.name}", poster, self.progress_bar_func)
                             if not dl:
                                 self.logger.info("Unable to download (not found), skipping...")
                     except:
@@ -1038,7 +1039,7 @@ class OnePaceOrganizer:
                                     self.logger.info(f"Downloading: posters/{season}/{poster.name}")
                                     dl = await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
                                     if not dl:
-                                        dl = await utils.download(f"{self.download_path}/metadata/posters/{season}/{poster.name}", poster, self.progress_bar_func)
+                                        dl = await utils.download(f"{self.metadata_url}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
                                         if not dl:
                                             self.logger.info(f"Skipping downloading (not found)")
                                 except:
@@ -1218,7 +1219,7 @@ class OnePaceOrganizer:
                     self.logger.info(f"Downloading: posters/{src.name}")
                     dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
                     if not dl:
-                        dl = await utils.download(f"{self.download_path}/metadata/posters/{src.name}", src, self.progress_bar_func)
+                        dl = await utils.download(f"{self.metadata_url}/posters/{src.name}", src, self.progress_bar_func)
                         if not dl:
                             self.logger.info(f"Skipping downloading (not found)")
                 except:
@@ -1379,7 +1380,7 @@ class OnePaceOrganizer:
                                         self.logger.info(f"Downloading: posters/{src.name}")
                                         dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
                                         if not dl:
-                                            dl = await utils.download(f"{self.download_path}/metadata/posters/{src.name}", src, self.progress_bar_func)
+                                            dl = await utils.download(f"{self.metadata_url}/posters/{src.name}", src, self.progress_bar_func)
                                             if not dl:
                                                 self.logger.info(f"Skipping downloading (not found)")
                                     except Exception as e:

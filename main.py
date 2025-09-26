@@ -53,7 +53,8 @@ def main():
         parser.add_argument("--output-path", help="Where to put sorted .mkv/.mp4 files (and .nfo/posters if Jellyfin)", default=None)
         parser.add_argument("--cwd", help="Working directory", default=None)
         parser.add_argument("--config-file", help="Path to config.json or config.yml", default=None)
-        parser.add_argument("--dl-path", help="Download path (for posters, metadata, etc)", default=None)
+        parser.add_argument("--metadata-url", help="Metadata path", default=None)
+        parser.add_argument("--dl-path", help="Download path (for posters, etc)", default=None)
         parser.add_argument("--log-level", help="Log level (TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL)", default="info", type=str)
         parser.add_argument("--log-file", help="Log to file (empty to disable)", default="", type=str)
         parser.add_argument("--file-action", help="Action to take on unsorted file when processing. 0 for Move, 1 for Copy, 2 for Symlink, 3 for Hardlink, 4 for generate metadata only (not on Plex)", default=None)
@@ -86,6 +87,9 @@ def main():
 
         if args.config_file is not None:
             opo.config_file = args.config_file
+
+        if args.metadata_url is not None:
+            opo.metadata_url = args.metadata_url
 
         if args.dl_path is not None:
             opo.download_path = args.dl_path
