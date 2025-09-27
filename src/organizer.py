@@ -630,7 +630,7 @@ class OnePaceOrganizer:
 
         if yml_loaded == False or len(self.tvshow) == 0 or len(self.arcs) == 0 or len(self.episodes) == 0:
             try:
-                await utils.run(data_file.parent, exist_ok=True)
+                await utils.run(data_file.parent.mkdir, exist_ok=True)
 
                 self.logger.success("Downloading: data.json")
                 await utils.download(f"{self.metadata_url}/data.min.json", data_file, self.progress_bar_func)
@@ -1644,7 +1644,8 @@ class OnePaceOrganizer:
             has_data = await self.cache_episode_data()
 
             if not has_data:
-                self.logger.error("Exiting due to a lack of metadata - grab data.json and put it in the same directory.")
+                self.logger.error("Exiting due to a lack of metadata - create a new directory "+
+                    "named metadata and grab a copy of data.json to put in said directory.")
                 return (False, None, 0, 0)
 
             video_files = await self.glob_video_files()
