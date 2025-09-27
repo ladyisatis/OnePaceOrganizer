@@ -17,19 +17,15 @@ jobs:
         uses: actions/checkout@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
 
       - name: Run submodule updater
         run: |
-          git submodule update --remote
+          git submodule update --init --recursive --remote -f
           cp -f ./one-pace-metadata/data.json metadata/data.json
           cp -f ./one-pace-metadata/data.min.json metadata/data.min.json
-
-      - name: Commit and push changes
-        run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add ./metadata ./one-pace-metadata
+          git add metadata one-pace-metadata
           git diff --cached --quiet || git commit -m "Update submodule [automated]"
           git push
-
