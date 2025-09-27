@@ -47,6 +47,7 @@ class OnePaceOrganizer:
         self.folder_action = int(utils.get_env("folder_action", 0))
         self.fetch_posters = utils.get_env("fetch_posters", True)
         self.overwrite_nfo = utils.get_env("overwrite_nfo", False)
+        self.lockdata = utils.get_env("lockdata", False)
 
         self.input_path = utils.get_env("input_path")
         self.output_path = utils.get_env("output_path")
@@ -829,23 +830,23 @@ class OnePaceOrganizer:
 
             if "title" in self.tvshow and self.tvshow["title"] != "" and show.title != self.tvshow["title"]:
                 self.logger.info(f"Set Title: {show.title} -> {self.tvshow['title']}")
-                await utils.run(show.editTitle, self.tvshow["title"])
+                await utils.run(show.editTitle, self.tvshow["title"], locked=self.lockdata)
 
             if "originaltitle" in self.tvshow and self.tvshow["originaltitle"] != "" and show.originalTitle != self.tvshow["originaltitle"]:
                 self.logger.info(f"Set Original Title: {show.originalTitle} -> {self.tvshow['originaltitle']}")
-                await utils.run(show.editOriginalTitle, self.tvshow["originaltitle"])
+                await utils.run(show.editOriginalTitle, self.tvshow["originaltitle"], locked=self.lockdata)
 
             if "sorttitle" in self.tvshow and self.tvshow["sorttitle"] != "" and show.titleSort != self.tvshow["sorttitle"]:
                 self.logger.info(f"Set Sort Title: {show.titleSort} -> {self.tvshow['sorttitle']}")
-                await utils.run(show.editSortTitle, self.tvshow["sorttitle"])
+                await utils.run(show.editSortTitle, self.tvshow["sorttitle"], locked=self.lockdata)
 
             if "tagline" in self.tvshow and self.tvshow["tagline"] != "" and show.tagline != self.tvshow["tagline"]:
                 self.logger.info(f"Set Tagline: {show.tagline} -> {self.tvshow['tagline']}")
-                await utils.run(show.editTagline, self.tvshow["tagline"])
+                await utils.run(show.editTagline, self.tvshow["tagline"], locked=self.lockdata)
 
             if "customrating" in self.tvshow and self.tvshow["customrating"] != "" and show.contentRating != self.tvshow["customrating"]:
                 self.logger.info(f"Set Rating: {show.contentRating} -> {self.tvshow['customrating']}")
-                await utils.run(show.editContentRating, self.tvshow["customrating"])
+                await utils.run(show.editContentRating, self.tvshow["customrating"], locked=self.lockdata)
 
             if "genre" in self.tvshow and isinstance(self.tvshow, list):
                 _genres = []
@@ -858,7 +859,7 @@ class OnePaceOrganizer:
                         await utils.run(show.addGenre, genre)
 
             if "plot" in self.tvshow and show.summary != self.tvshow["plot"]:
-                await utils.run(show.editSummary, self.tvshow["plot"])
+                await utils.run(show.editSummary, self.tvshow["plot"], locked=self.lockdata)
                 await utils.run(show.editOriginallyAvailable,
                     self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"]
                 )
@@ -1033,11 +1034,11 @@ class OnePaceOrganizer:
 
                             if plex_season.title != season_title:
                                 self.logger.debug(f"Season {season} Title: {season_title}")
-                                await utils.run(plex_season.editTitle, season_title)
+                                await utils.run(plex_season.editTitle, season_title, locked=self.lockdata)
 
                             if season_desc != "" and plex_season.summary != season_desc:
                                 self.logger.debug(f"Season {season} Summary: {season_desc}")
-                                await utils.run(plex_season.editSummary, season_desc)
+                                await utils.run(plex_season.editSummary, season_desc, locked=self.lockdata)
 
                             poster = await utils.run(utils.find_from_list, self.base_path, [
                                 (f"posters/{season}", "poster.*"),
@@ -1105,17 +1106,17 @@ class OnePaceOrganizer:
 
                     if plex_episode.title != episode_info["title"]:
                         self.logger.debug(f"S{season}E{episode} Title: {plex_episode.title} -> {episode_info['title']}")
-                        await utils.run(plex_episode.editTitle, episode_info["title"])
+                        await utils.run(plex_episode.editTitle, episode_info["title"], locked=self.lockdata)
                         updated = True
 
                     if "rating" in episode_info and plex_episode.contentRating != episode_info["rating"]:
                         self.logger.debug(f"S{season}E{episode} Rating: {plex_episode.contentRating} -> {episode_info['rating']}")
-                        await utils.run(plex_episode.editContentRating, episode_info["rating"])
+                        await utils.run(plex_episode.editContentRating, episode_info["rating"], locked=self.lockdata)
                         updated = True
 
                     if "sorttitle" in episode_info and plex_episode.titleSort != episode_info["sorttitle"]:
                         self.logger.debug(f"S{season}E{episode} Sort Title: {plex_episode.titleSort} -> {episode_info['sorttitle']}")
-                        await utils.run(plex_episode.editSortTitle, episode_info["sorttitle"])
+                        await utils.run(plex_episode.editSortTitle, episode_info["sorttitle"], locked=self.lockdata)
                         updated = True
 
                     if "released" in episode_info:
@@ -1123,7 +1124,7 @@ class OnePaceOrganizer:
 
                         if plex_episode.originallyAvailableAt.date() != r:
                             self.logger.debug(f"S{season}E{episode} Release Date: {plex_episode.originallyAvailableAt} -> {r}")
-                            await utils.run(plex_episode.editOriginallyAvailable, r)
+                            await utils.run(plex_episode.editOriginallyAvailable, r, locked=self.lockdata)
                             updated = True
 
                     desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
@@ -1146,7 +1147,7 @@ class OnePaceOrganizer:
 
                     if plex_episode.summary != description:
                         self.logger.debug(f"S{season}E{episode} Description Updated")
-                        await utils.run(plex_episode.editSummary, description)
+                        await utils.run(plex_episode.editSummary, description, locked=self.lockdata)
                         updated = True
 
                     poster = await utils.run(utils.find_from_list, self.base_path, [
@@ -1386,7 +1387,7 @@ class OnePaceOrganizer:
                                 ET.SubElement(root, "outline").text = season_info["description"]
 
                             ET.SubElement(root, "customrating").text = season_info['rating'] if 'rating' in season_info else self.tvshow['customrating']
-                            ET.SubElement(root, "lockdata").text = "false"
+                            ET.SubElement(root, "lockdata").text = "true" if self.lockdata else "false"
 
                             src = await utils.run(utils.find_from_list, self.base_path, [
                                 (f"posters/{season}", "poster.*"),
@@ -1548,6 +1549,8 @@ class OnePaceOrganizer:
                         ET.SubElement(root, "year").text = year
                         ET.SubElement(root, "premiered").text = date
                         ET.SubElement(root, "aired").text = date
+
+                    ET.SubElement(root, "lockdata").text = "true" if self.lockdata else "false"
 
                     poster = await utils.run(utils.find_from_list, self.base_path, [
                         (f"posters/{season}/{episode}", "poster.*"),

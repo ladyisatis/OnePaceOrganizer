@@ -64,6 +64,7 @@ def main():
         parser.add_argument("--fetch-posters", help="Fetch posters if not found", default=None, type=strbool)
         parser.add_argument("--filename-tmpl", help="Filename template (see wiki page)", default=None)
         parser.add_argument("--overwrite-nfo", help="Overwrite .nfo files", default=None, type=strbool)
+        parser.add_argument("--lockdata", help="Set lockdata (Jellyfin)/locked (Plex)", default=None, type=strbool)
         parser.add_argument("--plex-enabled", help="Is Plex Enabled", default=None, type=strbool)
         parser.add_argument("--plex-url", help="Plex URL (e.g. http://127.0.0.1:32400)", default=None)
         parser.add_argument("--plex-server", help="Plex Server ID", default=None)
@@ -111,6 +112,9 @@ def main():
 
         if args.overwrite_nfo is not None:
             opo.overwrite_nfo = args.overwrite_nfo
+
+        if args.lockdata is not None:
+            opo.lockdata = args.lockdata
 
         if args.filename_tmpl is not None:
             opo.filename_tmpl = args.filename_tmpl
