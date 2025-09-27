@@ -1016,15 +1016,20 @@ class OnePaceOrganizer:
                         try:
                             self.logger.info(f"Updating: Season {season} ({season_info['title']})")
 
+                            has_said_msg = False
                             while True:
                                 try:
                                     plex_season = await utils.run(show.season, season=season)
                                     break
                                 except PlexApiNotFound as e:
                                     self.logger.debug(e)
-                                    self.logger.warning(f"Could not fetch season {season} from Plex - this usually means " +
-                                        "if it's just transferred, the Plex scanner has not gotten around to it yet. " +
-                                        "Waiting until it's ready...")
+
+                                    if not has_said_msg:
+                                        self.logger.warning(f"Could not fetch season {season} from Plex - this usually means " +
+                                            "if it's just transferred, the Plex scanner has not gotten around to it yet. " +
+                                            "Waiting until it's ready...")
+                                        has_said_msg = True
+
                                     await asyncio.sleep(10000)
 
                             season_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
@@ -1091,15 +1096,20 @@ class OnePaceOrganizer:
 
                     self.logger.info(f"Updating: {_label}")
 
+                    has_said_msg = False
                     while True:
                         try:
                             plex_episode = await utils.run(show.episode, season=season, episode=episode)
                             break
                         except PlexApiNotFound as e:
                             self.logger.debug(e)
-                            self.logger.warning(f"Could not fetch S{season:02d}E{episode:02d} from Plex - this " +
-                                "usually means if it's just transferred, the Plex scanner has not gotten around " +
-                                "to it yet. Waiting until it's ready...")
+
+                            if not has_said_msg:
+                                self.logger.warning(f"Could not fetch S{season:02d}E{episode:02d} from Plex - this " +
+                                    "usually means if it's just transferred, the Plex scanner has not gotten around " +
+                                    "to it yet. Waiting until it's ready...")
+                                has_said_msg = True
+
                             await asyncio.sleep(10000)
 
                     await utils.run(plex_episode.batchEdits)
