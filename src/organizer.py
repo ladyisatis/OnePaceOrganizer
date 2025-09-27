@@ -19,7 +19,7 @@ import yaml
 import zlib
 
 from loguru import logger
-from plexapi.exceptions import TwoFactorRequired as PlexApiTwoFactorRequired, Unauthorized as PlexApiUnauthorized
+from plexapi.exceptions import TwoFactorRequired as PlexApiTwoFactorRequired, Unauthorized as PlexApiUnauthorized, NotFound as PlexApiNotFound
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
 from pathlib import Path, UnsupportedOperation
@@ -1014,7 +1014,17 @@ class OnePaceOrganizer:
                     if season_info is not None:
                         try:
                             self.logger.info(f"Updating: Season {season} ({season_info['title']})")
-                            plex_season = await utils.run(show.season, season=season)
+
+                            while True:
+                                try:
+                                    plex_season = await utils.run(show.season, season=season)
+                                    break
+                                except PlexApiNotFound as e:
+                                    self.logger.debug(e)
+                                    self.logger.warning(f"Could not fetch season {season} from Plex - this usually means " +
+                                        "if it's just transferred, the Plex scanner has not gotten around to it yet. " +
+                                        "Waiting until it's ready...")
+                                    await asyncio.sleep(10000)
 
                             season_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
                             season_desc = season_info["description"] if "description" in season_info and season_info["description"] != "" else ""
@@ -1067,7 +1077,7 @@ class OnePaceOrganizer:
                                 except Exception as e:
                                     self.logger.warning(f"Skipping season {season}: {e}")
 
-                                plex_season = None
+                            plex_season = None
 
                     else:
                         self.logger.warning(f"Skipping season {season}: Title not found, metadata might be corrupted?")
@@ -1079,7 +1089,17 @@ class OnePaceOrganizer:
                         _label = f"{season_info['title']} {episode:02d} (S{season:02d}E{episode:02d} - {episode_info['title']})"
 
                     self.logger.info(f"Updating: {_label}")
-                    plex_episode = await utils.run(show.episode, season=season, episode=episode)
+
+                    while True:
+                        try:
+                            plex_episode = await utils.run(show.episode, season=season, episode=episode)
+                            break
+                        except PlexApiNotFound as e:
+                            self.logger.debug(e)
+                            self.logger.warning(f"Could not fetch S{season:02d}E{episode:02d} from Plex - this " +
+                                "usually means if it's just transferred, the Plex scanner has not gotten around " +
+                                "to it yet. Waiting until it's ready...")
+                            await asyncio.sleep(10000)
 
                     await utils.run(plex_episode.batchEdits)
 
@@ -1167,7 +1187,7 @@ class OnePaceOrganizer:
                         except Exception as e:
                             self.logger.warning(f"Skipping season {season} episode {episode}: {e}")
 
-                        plex_episode = None
+                    plex_episode = None
 
                 index += 1
                 await utils.run_func(self.progress_bar_func, int((index / total) * 100))
