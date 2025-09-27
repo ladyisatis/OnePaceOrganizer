@@ -35,7 +35,7 @@ class OnePaceOrganizer:
 
         self.workers = int(utils.get_env("workers", 0))
         self.base_path = Path(utils.get_env("base_path", Path.cwd().resolve()))
-        self.metadata_url = utils.get("metadata_url", "https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/main")
+        self.metadata_url = utils.get_env("metadata_url", "https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/main")
         self.download_path = utils.get_env("dl_path", "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main")
         self.set_executor(utils.get_env("pool_mode", "process") == "process")
 
