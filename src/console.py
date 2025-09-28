@@ -74,7 +74,7 @@ class Console:
 
         if self.organizer.toml is None or not self.organizer.toml.get("version", ""):
             self.organizer.toml = utils.get_toml_info(self.organizer.base_path)
-        
+
         is_latest, latest_vers = await utils.run(utils.is_up_to_date, self.organizer.toml["version"], self.organizer.base_path)
         if not is_latest:
             await message_dialog(
@@ -537,4 +537,3 @@ class Console:
 def main(organizer, log_level):
     code = asyncio.run(Console(organizer, log_level).run())
     sys.exit(code)
-
