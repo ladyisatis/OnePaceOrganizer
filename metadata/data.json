@@ -1,6 +1,6 @@
 {
-  "last_update": "2025-09-27T01:34:17.661674+00:00",
-  "last_update_ts": 1758936857.661674,
+  "last_update": "2025-09-27T23:06:58.086467+00:00",
+  "last_update_ts": 1759014418.086467,
   "base_url": "https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/main",
   "tvshow": {
     "title": "One Piece",
@@ -170,7 +170,7 @@
           "crc32_extended": ""
         },
         "08": {
-          "crc32": "D8C1FD62",
+          "crc32": "A6F61DEE",
           "crc32_extended": ""
         }
       }
@@ -2146,7 +2146,7 @@
           "crc32_extended": ""
         },
         "53": {
-          "crc32": "CE6E899D",
+          "crc32": "C99E7631",
           "crc32_extended": ""
         },
         "54": {
@@ -3210,6 +3210,18 @@
         "crc32": "24351CC0"
       }
     },
+    "2501AC5A": {
+      "arc": 35,
+      "episode": 55,
+      "title": "Straw Hat Luffy",
+      "description": "Yamato recalls learning the sad truth about Ace, but remembers what he said about his brother, Straw Hat Luffy. As Kaido and Big Mom join forces on the roof of Onigashima, they are faced with the biggest names of the Worst Generation...",
+      "chapters": "1000",
+      "episodes": "1015",
+      "released": "2025-09-27",
+      "hashes": {
+        "crc32": "2501AC5A"
+      }
+    },
     "25AFC3E5": {
       "arc": 19,
       "episode": 23,
@@ -3882,6 +3894,18 @@
       "released": "2020-09-22",
       "hashes": {
         "crc32": "4200CE0D"
+      }
+    },
+    "425F93B9": {
+      "arc": 35,
+      "episode": 55,
+      "title": "Straw Hat Luffy",
+      "description": "Yamato recalls learning the sad truth about Ace, but remembers what he said about his brother, Straw Hat Luffy. As Kaido and Big Mom join forces on the roof of Onigashima, they are faced with the biggest names of the Worst Generation...",
+      "chapters": "1000",
+      "episodes": "1015",
+      "released": "2025-09-27",
+      "hashes": {
+        "crc32": "425F93B9"
       }
     },
     "432F7EDF": {
@@ -6436,6 +6460,19 @@
       "released": "2025-05-23",
       "hashes": {
         "crc32": "A6DDEC2C"
+      }
+    },
+    "A6F61DEE": {
+      "arc": 5,
+      "episode": 8,
+      "title": "The Fourth",
+      "sorttitle": "Fourth",
+      "description": "As the dust of battle settles, the still poisoned Gin decides to go back to the Grand Line with Krieg, and Sanji makes the difficult decision to join Luffy's crew. Suddenly, Yosaku returns with news of where Nami took the Going Merry.",
+      "chapters": "67-68",
+      "episodes": "30",
+      "released": "2025-09-27",
+      "hashes": {
+        "crc32": "A6F61DEE"
       }
     },
     "A84B5499": {
