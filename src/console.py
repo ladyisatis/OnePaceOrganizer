@@ -537,3 +537,4 @@ class Console:
 def main(organizer, log_level):
     code = asyncio.run(Console(organizer, log_level).run())
     sys.exit(code)
+
