@@ -72,6 +72,9 @@ class Console:
     async def run(self):
         self._set_logger_sink(sys.stderr)
 
+        if self.organizer.toml is None or not self.organizer.toml.get("version", ""):
+            self.organizer.toml = utils.get_toml_info(self.organizer.base_path)
+        
         is_latest, latest_vers = await utils.run(utils.is_up_to_date, self.organizer.toml["version"], self.organizer.base_path)
         if not is_latest:
             await message_dialog(
