@@ -173,7 +173,7 @@ async def download(url, out, progress_bar_func, loop=None):
     if loop is None:
         loop = asyncio.get_running_loop()
 
-    await run_func(progress_bar_func, 0, loop=loop)
+    await run_func(progress_bar_func, 0)
 
     dir_exists = await run(out.parent.is_dir, loop=loop)
     if not dir_exists:
@@ -197,7 +197,7 @@ async def download(url, out, progress_bar_func, loop=None):
                     c = c + len(chunk)
 
                 if c >= 0 and c <= 100:
-                    await run_func(progress_bar_func, c, loop=loop)
+                    await run_func(progress_bar_func, c)
 
                 await run(f.write, chunk, loop=loop)
 
@@ -216,7 +216,7 @@ async def download(url, out, progress_bar_func, loop=None):
     finally:
         await run(f.close, loop=loop)
 
-    await run_func(progress_bar_func, 100, loop=loop)
+    await run_func(progress_bar_func, 100)
     return True
 
 def compare_file(file1, file2):
