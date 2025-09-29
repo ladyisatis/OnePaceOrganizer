@@ -95,8 +95,7 @@ class Console:
                 _action = "Action after Sorting: Hardlink"
             elif self.organizer.file_action == 4:
                 if self.organizer.plex_config_enabled:
-                    _action = "Action after Sorting: Copy"
-                    self.organizer.file_action = 1
+                    _action = "After Scan: Update Plex metadata only"
                 else:
                     _action = "After Scan: Generate metadata only"
 
@@ -242,8 +241,7 @@ class Console:
                 (3, "Hardlink")
             ]
 
-            if not self.organizer.plex_config_enabled:
-                values.append((4, "Generate metadata only (skip renames)"))
+            values.append((4, "Generate metadata only (skip renames)"))
 
             self.organizer.file_action = await radiolist_dialog(
                 title=self.window_title,

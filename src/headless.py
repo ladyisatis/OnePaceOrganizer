@@ -38,8 +38,7 @@ class Headless:
             _action = "Action after Sorting: Hardlink"
         elif self.organizer.file_action == 4:
             if self.organizer.plex_config_enabled:
-                _action = "Action after Sorting: Copy"
-                self.organizer.file_action = 1
+                _action = "After Scan: Update Plex metadata only"
             else:
                 _action = "After Scan: Generate metadata only"
 
@@ -116,7 +115,7 @@ class Headless:
 
         success, queue, completed, skipped = await self.organizer.start()
         if success:
-            if self.organizer.plex_config_enabled:
+            if self.organizer.plex_config_enabled and self.organizer.file_action != 4:
                 logger.success(f"Completed: {completed} completed, {skipped} skipped")
                 logger.info(f"Pausing {self.plex_wait_secs} seconds to allow file transfers")
                 await asyncio.sleep(float(self.plex_wait_secs))
