@@ -435,62 +435,110 @@ class OnePaceOrganizer:
         self.plex_config_libraries = {}
 
         try:
+            self.logger.trace("plex_get_libraries: fetching all library sections")
             sections = await utils.run(self.plexapi_server.library.sections)
-        except:
+            self.logger.trace(f"plex_get_libraries: found {len(sections)} total sections")
+        except Exception as e:
+            self.logger.error(f"plex_get_libraries: Exception occurred: {e}")
+            self.logger.error(f"plex_get_libraries: Full traceback: {traceback.format_exc()}")
             if self.message_dialog_func is None:
-                self.logger.exception("Unable to fetch Plex libraries from this server.")
+                self.logger.error("Unable to fetch Plex libraries from this server.")
             else:
                 await utils.run_func(self.message_dialog_func, "Unable to fetch Plex libraries from this server.")
 
             return False
 
         for section in sections:
+            self.logger.trace(f"plex_get_libraries: section '{section.title}' (type: {section.type}, key: {section.key})")
             if section.type == 'show':
-                selected = self.plex_config_library_key == section.key
-                self.plex_config_libraries[section.key] = {
+                section_key_str = str(section.key)
+                selected = self.plex_config_library_key == section_key_str
+                self.plex_config_libraries[section_key_str] = {
                     "title": section.title,
                     "selected": selected
                 }
+                self.logger.trace(f"plex_get_libraries: added show library '{section.title}' (key: {section_key_str}, selected: {selected})")
 
+        self.logger.trace(f"plex_get_libraries: available libraries keys: {list(self.plex_config_libraries.keys())}")
+        self.logger.trace(f"plex_get_libraries: returning {len(self.plex_config_libraries)} > 0 = {len(self.plex_config_libraries) > 0}")
         return len(self.plex_config_libraries) > 0
 
     async def plex_select_library(self, library_key):
+        self.logger.trace(f"plex_select_library: Looking for key '{library_key}' (type: {type(library_key)})")
+        self.logger.trace(f"plex_select_library: Available keys: {list(self.plex_config_libraries.keys())}")
+
+        if library_key not in self.plex_config_libraries:
+            self.logger.error(f"plex_select_library: Library key '{library_key}' not found in available libraries")
+            return False
+
         self.plex_config_library_key = library_key
 
         for k, v in self.plex_config_libraries.items():
             self.plex_config_libraries[k]["selected"] = library_key == k
 
+        self.logger.trace(f"plex_select_library: Selected library '{library_key}'")
+        return True
+
     async def plex_get_shows(self):
         if self.plexapi_server is None or self.plex_config_library_key == "":
+            self.logger.trace("plex_get_shows: server is None or library key is empty")
             return False
 
         self.plex_config_shows = {}
 
         try:
-            section = await utils.run(self.plexapi_server.library.sectionByID, self.plex_config_library_key)
+            self.logger.trace(f"plex_get_shows: getting section by ID {self.plex_config_library_key}")
+            section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
+            self.logger.trace(f"plex_get_shows: section retrieved: {section.title}")
+
+            self.logger.trace("plex_get_shows: getting all shows from section")
             shows = await utils.run(section.all)
-        except:
+            self.logger.trace(f"plex_get_shows: found {len(shows)} shows")
+        except Exception as e:
+            self.logger.error(f"plex_get_shows: Exception occurred: {e}")
+            self.logger.error(f"plex_get_shows: Full traceback: {traceback.format_exc()}")
             if self.message_dialog_func is None:
-                self.logger.exception("Unable to fetch Plex shows from this server.")
+                self.logger.error("Unable to fetch Plex shows from this server.")
             else:
                 await utils.run_func(self.message_dialog_func, "Unable to fetch Plex shows from this server.")
 
             return False
-    
+
+        if len(shows) == 0:
+            self.logger.warning(f"plex_get_shows: No shows found in library '{section.title}' (ID: {self.plex_config_library_key})")
+            return False
+
         for show in shows:
             selected = self.plex_config_show_guid == show.guid
             self.plex_config_shows[show.guid] = {
                 "title": show.title,
                 "selected": selected
             }
+            self.logger.trace(f"plex_get_shows: added show '{show.title}' with GUID '{show.guid}' (selected: {selected})")
 
+        self.logger.trace(f"plex_get_shows: returning {len(self.plex_config_shows)} > 0 = {len(self.plex_config_shows) > 0}")
         return len(self.plex_config_shows) > 0
 
     async def plex_select_show(self, guid):
+        self.logger.trace(f"plex_select_show: Looking for GUID '{guid}' (type: {type(guid)})")
+        self.logger.trace(f"plex_select_show: Available GUIDs: {list(self.plex_config_shows.keys())}")
+
+        if guid.startswith("local://"):
+            self.logger.debug(f"plex_select_show: GUID '{guid}' is a local:// GUID, skipping lookup in available shows")
+            self.plex_config_show_guid = guid
+            return True
+
+        if guid not in self.plex_config_shows:
+            self.logger.error(f"plex_select_show: Show GUID '{guid}' not found in available shows")
+            return False
+
         self.plex_config_show_guid = guid
 
         for k, v in self.plex_config_shows.items():
             self.plex_config_shows[k]["selected"] = guid == k
+
+        self.logger.trace(f"plex_select_show: Selected show '{guid}'")
+        return True
     
     async def plex_art_set(self, art_file, episode, is_poster=True):
         if not isinstance(art_file, Path):
@@ -824,7 +872,25 @@ class OnePaceOrganizer:
 
         try:
             section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
-            show = await utils.run(section.getGuid, self.plex_config_show_guid)
+
+            if self.plex_config_show_guid.startswith("local://"):
+                rating_key = self.plex_config_show_guid.replace("local://", "")
+                try:
+                    show = await utils.run(section.fetchItem, int(rating_key))
+                    self.logger.info(f"Found show by rating key: {rating_key}")
+                except Exception as e:
+                    self.logger.error(f"Failed to fetch show by rating key '{rating_key}': {e}")
+                    raise
+            else:
+                show = await utils.run(section.getGuid, self.plex_config_show_guid)
+                if show is None:
+                    show_title = self.plex_config_shows.get(self.plex_config_show_guid, {}).get("title", "One Pace")
+                    shows = await utils.run(section.search, title=show_title)
+                    if shows:
+                        show = shows[0]
+                        self.logger.info(f"Found show by title: {show_title}")
+                    else:
+                        raise Exception(f"Unable to find show with GUID '{self.plex_config_show_guid}' or title '{show_title}'")
 
             await utils.run(show.batchEdits)
 
@@ -994,8 +1060,59 @@ class OnePaceOrganizer:
 
         try:
             section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
-            show = await utils.run(section.getGuid, self.plex_config_show_guid)
+
+            self.logger.trace(f"Looking up show with GUID: {self.plex_config_show_guid}")
+            if self.plex_config_show_guid.startswith("local://"):
+                rating_key = self.plex_config_show_guid.replace("local://", "")
+                self.logger.trace(f"Attempting to fetch show by rating key: {rating_key}")
+                try:
+                    show = await utils.run(section.fetchItem, int(rating_key))
+                    self.logger.info(f"Found show by rating key: {rating_key}")
+                except Exception as e:
+                    self.logger.warning(f"Failed to fetch show by rating key '{rating_key}', trying fallback by title: {e}")
+                    # Fallback: try to find show by title
+                    show_title = self.plex_config_shows.get(self.plex_config_show_guid, {}).get("title", "One Pace")
+                    self.logger.trace(f"Searching for show by title: {show_title}")
+                    shows = await utils.run(section.search, title=show_title)
+                    if shows:
+                        show = shows[0]
+                        self.logger.info(f"Found show by title: {show_title}")
+                    else:
+                        raise Exception(f"Unable to find show with rating key '{rating_key}' or title '{show_title}'")
+            else:
+                self.logger.trace(f"Attempting to get show by GUID: {self.plex_config_show_guid}")
+                show = await utils.run(section.getGuid, self.plex_config_show_guid)
+                if show is None:
+                    self.logger.trace("getGuid returned None, trying fallback by title")
+                    show_title = self.plex_config_shows.get(self.plex_config_show_guid, {}).get("title", "One Pace")
+                    self.logger.trace(f"Searching for show by title: {show_title}")
+                    shows = await utils.run(section.search, title=show_title)
+                    if shows:
+                        show = shows[0]
+                        self.logger.info(f"Found show by title: {show_title}")
+                    else:
+                        raise Exception(f"Unable to find show with GUID '{self.plex_config_show_guid}' or title '{show_title}'")
             seasons_completed = []
+
+            # If queue is empty (metadata-only mode), get all episodes from Plex
+            if len(queue) == 0:
+                self.logger.info("Metadata-only mode: Fetching all episodes from Plex")
+                all_episodes = await utils.run(show.episodes)
+                queue = []
+                for plex_ep in all_episodes:
+                    # Try to match Plex episode with metadata
+                    season = plex_ep.parentIndex if hasattr(plex_ep, 'parentIndex') else plex_ep.seasonNumber
+                    episode = plex_ep.index
+
+                    # Find matching episode info from metadata
+                    episode_info = None
+                    for crc32, ep_data in self.episodes.items():
+                        if isinstance(ep_data, dict) and ep_data.get("arc") == season and ep_data.get("episode") == episode:
+                            episode_info = ep_data
+                            break
+
+                    if episode_info:
+                        queue.append(("metadata_only", plex_ep.file, plex_ep.locations[0] if plex_ep.locations else plex_ep.file, episode_info))
 
             index = 0
             total = len(queue)
@@ -1655,7 +1772,14 @@ class OnePaceOrganizer:
             await utils.run_func(self.progress_bar_func, 0)
 
             if self.plex_config_enabled:
-                return await self.process_plex(video_files)
+                if self.file_action == 4 and len(video_files) == 0:
+                    # Metadata-only mode for Plex - process existing episodes
+                    self.logger.info("Plex metadata-only mode: Updating existing episodes in Plex")
+                    # Create a dummy queue to trigger metadata updates
+                    dummy_queue = []
+                    return await self.process_plex_episodes(dummy_queue)
+                else:
+                    return await self.process_plex(video_files)
 
             completed, skipped = await self.process_nfo(video_files)
             return (True, extra_data, completed, skipped)
