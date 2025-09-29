@@ -73,6 +73,8 @@ def main():
         parser.add_argument("--plex-use-token", help="Use Authorization Token instead of Username and Password", default=None, type=strbool)
         parser.add_argument("--plex-code", help="Plex 2-Factor Auth Code (headless mode only)", default=None)
         parser.add_argument("--plex-remember", help="Remember Plex Credentials", default=None, type=strbool)
+        parser.add_argument("--plex-retry-times", help="How many times Organizer should retry to fetch a Plex season/episode", default=None)
+        parser.add_argument("--plex-retry-secs", help="How many seconds Organizer should retry to fetch a Plex season/episode", default=None)
         parser.add_argument("--plex-wait-secs", help="Number of seconds to wait for file transfers (headless mode only)", default=300, type=int)
 
         args = parser.parse_args()
@@ -136,6 +138,12 @@ def main():
 
         if args.plex_use_token is not None:
             opo.plex_config_use_token = args.plex_use_token
+
+        if args.plex_retry_times is not None:
+            opo.plex_retry_times = int(args.plex_retry_times)
+
+        if args.plex_retry_secs is not None:
+            opo.plex_retry_secs = int(args.plex_retry_secs)
 
         if args.plex_remember is not None:
             opo.plex_config_remember = args.plex_remember

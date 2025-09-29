@@ -75,6 +75,8 @@ class OnePaceOrganizer:
         self.plex_config_server_baseurl = utils.get_env("plex_server_baseurl", "")
         self.plex_config_server_token = utils.get_env("plex_server_token", "")
         self.plex_code = utils.get_env("plex_code", "")
+        self.plex_retry_secs = util.get_env("plex_retry_secs", 30)
+        self.plex_retry_times = util.get_env("plex_retry_times", 3)
 
         self.progress_bar_func = None
         self.message_dialog_func = None
@@ -1179,6 +1181,14 @@ class OnePaceOrganizer:
 
             index = 0
             total = len(queue)
+            max_retries = int(self.plex_retry_times)
+            retry_secs = int(self.plex_retry_secs)
+
+            if max_retries < 1:
+                max_retries = 1
+
+            if retry_secs < 1:
+                retry_secs = 1
 
             for index, item in enumerate(queue):
                 crc32, src, file, episode_info = item
@@ -1196,8 +1206,6 @@ class OnePaceOrganizer:
                         try:
                             self.logger.info(f"Updating: Season {season} ({season_info['title']})")
 
-                            has_said_msg = False
-                            max_retries = 3
                             retry_count = 0
                             while retry_count < max_retries:
                                 try:
@@ -1207,57 +1215,59 @@ class OnePaceOrganizer:
                                     self.logger.debug(e)
                                     retry_count += 1
 
-                                    if not has_said_msg:
+                                    if retry_count == 1:
                                         self.logger.warning(f"Could not fetch season {season} from Plex - this usually means " +
                                             "if it's just transferred, the Plex scanner has not gotten around to it yet. " +
-                                            f"Waiting 30 seconds... (attempt {retry_count}/{max_retries})")
-                                        has_said_msg = True
+                                            f"Waiting {retry_secs} second(s)... (attempt {retry_count}/{max_retries})")
+                                    else:
+                                        self.logger.debug(f"Season {season}: Attempt {retry_count}/{max_retries}")
 
-                                    await asyncio.sleep(30)
+                                    await asyncio.sleep(retry_secs)
                             else:
-                                self.logger.error(f"Failed to fetch season {season} from Plex after {max_retries} attempts. Skipping season.")
-                                continue
+                                self.logger.error(f"Failed to fetch season {season} from Plex after {max_retries} attempt(s). Skipping season.")
+                                plex_season = None
 
-                            season_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
-                            season_desc = season_info["description"] if "description" in season_info and season_info["description"] != "" else ""
+                            if plex_season is not None:
+                                season_title = season_info["title"] if season == 0 else f"{season}. {season_info['title']}"
+                                season_desc = season_info["description"] if "description" in season_info and season_info["description"] != "" else ""
 
-                            await utils.run(plex_season.batchEdits)
+                                await utils.run(plex_season.batchEdits)
 
-                            if plex_season.title != season_title:
-                                self.logger.debug(f"Season {season} Title: {season_title}")
-                                await utils.run(plex_season.editTitle, season_title, locked=self.lockdata)
+                                if plex_season.title != season_title:
+                                    self.logger.debug(f"Season {season} Title: {season_title}")
+                                    await utils.run(plex_season.editTitle, season_title, locked=self.lockdata)
 
-                            if season_desc != "" and plex_season.summary != season_desc:
-                                self.logger.debug(f"Season {season} Summary: {season_desc}")
-                                await utils.run(plex_season.editSummary, season_desc, locked=self.lockdata)
+                                if season_desc != "" and plex_season.summary != season_desc:
+                                    self.logger.debug(f"Season {season} Summary: {season_desc}")
+                                    await utils.run(plex_season.editSummary, season_desc, locked=self.lockdata)
 
-                            poster = await utils.run(utils.find_from_list, self.base_path, [
-                                (f"posters/{season}", "poster.*"),
-                                (f"posters/{season}", "folder.*"),
-                                (self.input_path, f"poster-s{season:02d}.*")
-                            ])
+                                poster = await utils.run(utils.find_from_list, self.base_path, [
+                                    (f"posters/{season}", "poster.*"),
+                                    (f"posters/{season}", "folder.*"),
+                                    (self.input_path, f"poster-s{season:02d}.*")
+                                ])
 
-                            if not poster and self.fetch_posters:
-                                poster = Path(self.base_path, "posters", str(season), "poster.png")
-                                try:
-                                    self.logger.info(f"Downloading: posters/{season}/{poster.name}")
-                                    dl = await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
-                                    if not dl:
-                                        dl = await utils.download(f"{self.metadata_url}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
+                                if not poster and self.fetch_posters:
+                                    poster = Path(self.base_path, "posters", str(season), "poster.png")
+                                    try:
+                                        self.logger.info(f"Downloading: posters/{season}/{poster.name}")
+                                        dl = await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
                                         if not dl:
-                                            self.logger.info(f"Skipping downloading (not found)")
-                                except:
-                                    self.logger.warning(f"Skipping downloading")
+                                            dl = await utils.download(f"{self.metadata_url}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
+                                            if not dl:
+                                                self.logger.info(f"Skipping downloading (not found)")
+                                    except:
+                                        self.logger.warning(f"Skipping downloading")
 
-                            await self.plex_art_set(poster, plex_season, True)
+                                await self.plex_art_set(poster, plex_season, True)
 
-                            background = await utils.run(utils.find_from_list, self.base_path, [
-                                (f"posters/{season}", "background.*"),
-                                (f"posters/{season}", "backdrop.*"),
-                                (self.input_path, f"background-s{season:02d}.*"),
-                            ])
-                            if background is not None:
-                                await self.plex_art_set(background, plex_season, False)
+                                background = await utils.run(utils.find_from_list, self.base_path, [
+                                    (f"posters/{season}", "background.*"),
+                                    (f"posters/{season}", "backdrop.*"),
+                                    (self.input_path, f"background-s{season:02d}.*"),
+                                ])
+                                if background is not None:
+                                    await self.plex_art_set(background, plex_season, False)
 
                         except:
                             self.logger.exception(f"Skipping season {season}")
@@ -1285,8 +1295,6 @@ class OnePaceOrganizer:
                     if crc32 == "metadata_only":
                         plex_episode = src
                     else:
-                        has_said_msg = False
-                        max_retries = 3
                         retry_count = 0
                         while retry_count < max_retries:
                             try:
@@ -1296,111 +1304,113 @@ class OnePaceOrganizer:
                                 self.logger.debug(e)
                                 retry_count += 1
 
-                                if not has_said_msg:
+                                if retry_count == 1:
                                     self.logger.warning(f"Could not fetch S{season:02d}E{episode:02d} from Plex - this " +
                                         "usually means if it's just transferred, the Plex scanner has not gotten around " +
-                                        "to it yet. Waiting 30 seconds... (attempt {retry_count}/{max_retries})")
-                                    has_said_msg = True
+                                        "to it yet. Waiting {retry_secs} second(s)... (attempt {retry_count}/{max_retries})")
+                                else:
+                                    self.logger.debug(f"S{season:02d}E{episode:02d}: Attempt {retry_count}/{max_retries}")
 
-                                await asyncio.sleep(30)
+                                await asyncio.sleep(retry_secs)
                         else:
-                            self.logger.error(f"Failed to fetch S{season:02d}E{episode:02d} from Plex after {max_retries} attempts. Skipping episode.")
+                            self.logger.error(f"Failed to fetch S{season:02d}E{episode:02d} from Plex after {max_retries} attempt(s). Skipping episode.")
                             skipped += 1
-                            continue
+                            plex_episode = None
 
-                    await utils.run(plex_episode.batchEdits)
+                    if plex_episode is not None:
+                        await utils.run(plex_episode.batchEdits)
 
-                    if plex_episode.title != episode_info["title"]:
-                        self.logger.debug(f"S{season}E{episode} Title: {plex_episode.title} -> {episode_info['title']}")
-                        await utils.run(plex_episode.editTitle, episode_info["title"], locked=self.lockdata)
-                        updated = True
-
-                    if "rating" in episode_info and plex_episode.contentRating != episode_info["rating"]:
-                        self.logger.debug(f"S{season}E{episode} Rating: {plex_episode.contentRating} -> {episode_info['rating']}")
-                        await utils.run(plex_episode.editContentRating, episode_info["rating"], locked=self.lockdata)
-                        updated = True
-
-                    if "sorttitle" in episode_info and plex_episode.titleSort != episode_info["sorttitle"]:
-                        self.logger.debug(f"S{season}E{episode} Sort Title: {plex_episode.titleSort} -> {episode_info['sorttitle']}")
-                        await utils.run(plex_episode.editSortTitle, episode_info["sorttitle"], locked=self.lockdata)
-                        updated = True
-
-                    if "released" in episode_info:
-                        r = datetime.datetime.strptime(episode_info["released"], "%Y-%m-%d").date() if isinstance(episode_info["released"], str) else episode_info["released"]
-
-                        needs_update = False
-                        if plex_episode.originallyAvailableAt is None:
-                            needs_update = True
-                        else:
-                            if plex_episode.originallyAvailableAt.date() != r:
-                                needs_update = True
-
-                        if needs_update:
-                            self.logger.debug(f"S{season}E{episode} Release Date: {plex_episode.originallyAvailableAt} -> {r}")
-                            await utils.run(plex_episode.editOriginallyAvailable, r, locked=self.lockdata)
+                        if plex_episode.title != episode_info["title"]:
+                            self.logger.debug(f"S{season}E{episode} Title: {plex_episode.title} -> {episode_info['title']}")
+                            await utils.run(plex_episode.editTitle, episode_info["title"], locked=self.lockdata)
                             updated = True
 
-                    desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
-                    manga_str = ""
-                    anime_str = ""
+                        if "rating" in episode_info and plex_episode.contentRating != episode_info["rating"]:
+                            self.logger.debug(f"S{season}E{episode} Rating: {plex_episode.contentRating} -> {episode_info['rating']}")
+                            await utils.run(plex_episode.editContentRating, episode_info["rating"], locked=self.lockdata)
+                            updated = True
 
-                    if episode_info["chapters"] != "":
-                        if desc_str != "":
-                            manga_str = f"\n\nChapter(s): {episode_info['chapters']}"
+                        if "sorttitle" in episode_info and plex_episode.titleSort != episode_info["sorttitle"]:
+                            self.logger.debug(f"S{season}E{episode} Sort Title: {plex_episode.titleSort} -> {episode_info['sorttitle']}")
+                            await utils.run(plex_episode.editSortTitle, episode_info["sorttitle"], locked=self.lockdata)
+                            updated = True
+
+                        if "released" in episode_info:
+                            r = datetime.datetime.strptime(episode_info["released"], "%Y-%m-%d").date() if isinstance(episode_info["released"], str) else episode_info["released"]
+
+                            needs_update = False
+                            if plex_episode.originallyAvailableAt is None:
+                                needs_update = True
+                            else:
+                                if plex_episode.originallyAvailableAt.date() != r:
+                                    needs_update = True
+
+                            if needs_update:
+                                self.logger.debug(f"S{season}E{episode} Release Date: {plex_episode.originallyAvailableAt} -> {r}")
+                                await utils.run(plex_episode.editOriginallyAvailable, r, locked=self.lockdata)
+                                updated = True
+
+                        desc_str = episode_info["description"] if "description" in episode_info and episode_info["description"] != "" else ""
+                        manga_str = ""
+                        anime_str = ""
+
+                        if episode_info["chapters"] != "":
+                            if desc_str != "":
+                                manga_str = f"\n\nChapter(s): {episode_info['chapters']}"
+                            else:
+                                manga_str = f"Chapter(s): {episode_info['chapters']}"
+
+                        if episode_info["episodes"] != "":
+                            if desc_str != "" or manga_str != "":
+                                anime_str = f"\n\nEpisode(s): {episode_info['episodes']}"
+                            else:
+                                anime_str = f"Episode(s): {episode_info['episodes']}"
+
+                        description = f"{desc_str}{manga_str}{anime_str}"
+
+                        if plex_episode.summary != description:
+                            self.logger.debug(f"S{season}E{episode} Description Updated")
+                            await utils.run(plex_episode.editSummary, description, locked=self.lockdata)
+                            updated = True
+
+                        poster_search_paths = [
+                            (f"posters/{season}/{episode}", "poster.*"),
+                            (self.input_path, f"poster-s{season:02d}e{episode:02d}.*")
+                        ]
+
+                        if hasattr(src, 'stem'):
+                            poster_search_paths.extend([
+                                (self.input_path, f"{src.stem}-poster.*"),
+                                (self.input_path, f"{src.stem}-thumb.*")
+                            ])
+
+                        poster = await utils.run(utils.find_from_list, self.base_path, poster_search_paths)
+
+                        background_search_paths = [
+                            (f"posters/{season}/{episode}", "background.*"),
+                            (self.input_path, f"background-s{season:02d}e{episode:02d}.*")
+                        ]
+
+                        if hasattr(src, 'stem'):
+                            background_search_paths.extend([
+                                (self.input_path, f"{src.stem}-background.*"),
+                                (self.input_path, f"{src.stem}-backdrop.*")
+                            ])
+
+                        background = await utils.run(utils.find_from_list, self.base_path, background_search_paths)
+
+                        if poster and await self.plex_art_set(poster, plex_episode, True):
+                            self.logger.debug(f"S{season}E{episode} Poster Uploaded: {poster}")
+                            updated = True
+
+                        if background and await self.plex_art_set(background, plex_episode, False):
+                            self.logger.debug(f"S{season}E{episode} Background Uploaded: {background}")
+                            updated = True
+
+                        if updated:
+                            completed += 1
                         else:
-                            manga_str = f"Chapter(s): {episode_info['chapters']}"
-
-                    if episode_info["episodes"] != "":
-                        if desc_str != "" or manga_str != "":
-                            anime_str = f"\n\nEpisode(s): {episode_info['episodes']}"
-                        else:
-                            anime_str = f"Episode(s): {episode_info['episodes']}"
-
-                    description = f"{desc_str}{manga_str}{anime_str}"
-
-                    if plex_episode.summary != description:
-                        self.logger.debug(f"S{season}E{episode} Description Updated")
-                        await utils.run(plex_episode.editSummary, description, locked=self.lockdata)
-                        updated = True
-
-                    poster_search_paths = [
-                        (f"posters/{season}/{episode}", "poster.*"),
-                        (self.input_path, f"poster-s{season:02d}e{episode:02d}.*")
-                    ]
-
-                    if hasattr(src, 'stem'):
-                        poster_search_paths.extend([
-                            (self.input_path, f"{src.stem}-poster.*"),
-                            (self.input_path, f"{src.stem}-thumb.*")
-                        ])
-
-                    poster = await utils.run(utils.find_from_list, self.base_path, poster_search_paths)
-
-                    background_search_paths = [
-                        (f"posters/{season}/{episode}", "background.*"),
-                        (self.input_path, f"background-s{season:02d}e{episode:02d}.*")
-                    ]
-
-                    if hasattr(src, 'stem'):
-                        background_search_paths.extend([
-                            (self.input_path, f"{src.stem}-background.*"),
-                            (self.input_path, f"{src.stem}-backdrop.*")
-                        ])
-
-                    background = await utils.run(utils.find_from_list, self.base_path, background_search_paths)
-
-                    if poster and await self.plex_art_set(poster, plex_episode, True):
-                        self.logger.debug(f"S{season}E{episode} Poster Uploaded: {poster}")
-                        updated = True
-
-                    if background and await self.plex_art_set(background, plex_episode, False):
-                        self.logger.debug(f"S{season}E{episode} Background Uploaded: {background}")
-                        updated = True
-
-                    if updated:
-                        completed += 1
-                    else:
-                        skipped += 1
+                            skipped += 1
 
                 except:
                     self.logger.exception(f"Skipping season {season} episode {episode}")
