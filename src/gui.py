@@ -263,6 +263,16 @@ class GUI(QMainWindow):
         self.action_lockdata.triggered.connect(self.set_lockdata)
         menu_configuration.addAction(self.action_lockdata)
 
+        self.action_edit_plex_retry_times = QAction("Edit Maximum Retries", self)
+        self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
+        self.action_edit_plex_retry_times.triggered.connect(self.edit_plex_retry_times)
+        menu_configuration.addAction(self.action_edit_plex_retry_times)
+
+        self.action_edit_plex_retry_secs = QAction("Edit Seconds Between Retries", self)
+        self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
+        self.action_edit_plex_retry_secs.triggered.connect(self.edit_plex_retry_secs)
+        menu_configuration.addAction(self.action_edit_plex_retry_secs)
+
         menu_log_level = menu_configuration.addMenu("Log Level")
 
         self.action_log_level_0 = QAction("Critical", self)
@@ -448,6 +458,8 @@ class GUI(QMainWindow):
         self.action_after_sort_metadata.setVisible(not self.organizer.plex_config_enabled)
         self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
         self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
+        self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
+        self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
 
         if self.organizer.plex_config_enabled and self.organizer.file_action == 4:
             self.set_action(0)
@@ -755,6 +767,18 @@ class GUI(QMainWindow):
         _fn = self._input_dialog(f"Enter the template for the filename:{_sp}", self.organizer.filename_tmpl)
         if _fn is not None and _fn != "":
             self.organizer.filename_tmpl = _fn
+
+    def edit_plex_retry_times(self):
+        _sp = " " * 100
+        _fn = self._input_dialog(f"Enter maximum number of retries:{_sp}", str(self.organizer.plex_retry_times))
+        if _fn is not None and _fn != "":
+            self.organizer.plex_retry_times = int(_fn)
+
+    def edit_plex_retry_times(self):
+        _sp = " " * 100
+        _fn = self._input_dialog(f"Enter seconds to wait before retries:{_sp}", str(self.organizer.plex_retry_secs))
+        if _fn is not None and _fn != "":
+            self.organizer.plex_retry_secs = int(_fn)
 
     @asyncSlot()
     async def start(self):
