@@ -257,6 +257,12 @@ class GUI(QMainWindow):
         self.action_edit_output_tmpl.triggered.connect(self.edit_output_template)
         menu_configuration.addAction(self.action_edit_output_tmpl)
 
+        self.action_lockdata = QAction("Lock Fields after Edits", self)
+        self.action_lockdata.setCheckable(True)
+        self.action_lockdata.setChecked(self.organizer.lockdata)
+        self.action_lockdata.triggered.connect(self.set_lockdata)
+        menu_configuration.addAction(self.action_lockdata)
+
         menu_log_level = menu_configuration.addMenu("Log Level")
 
         self.action_log_level_0 = QAction("Critical", self)
@@ -445,6 +451,10 @@ class GUI(QMainWindow):
 
         if self.organizer.plex_config_enabled and self.organizer.file_action == 4:
             self.set_action(0)
+
+    def set_lockdata(self):
+        self.organizer.lockdata = not self.organizer.lockdata
+        self.action_lockdata.setChecked(self.organizer.lockdata)
 
     def switch_plex_method(self, text):
         self.organizer.plex_config_use_token = text == "Authentication Token"
