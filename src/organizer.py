@@ -75,8 +75,8 @@ class OnePaceOrganizer:
         self.plex_config_server_baseurl = utils.get_env("plex_server_baseurl", "")
         self.plex_config_server_token = utils.get_env("plex_server_token", "")
         self.plex_code = utils.get_env("plex_code", "")
-        self.plex_retry_secs = util.get_env("plex_retry_secs", 30)
-        self.plex_retry_times = util.get_env("plex_retry_times", 3)
+        self.plex_retry_secs = utils.get_env("plex_retry_secs", 30)
+        self.plex_retry_times = utils.get_env("plex_retry_times", 3)
 
         self.progress_bar_func = None
         self.message_dialog_func = None
