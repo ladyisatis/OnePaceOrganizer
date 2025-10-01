@@ -45,7 +45,7 @@ class Headless:
         text = (
             f"Path to One Pace Files: {self.organizer.input_path}\n"
             f"Where to Place After Renaming: {self.organizer.output_path}\n"
-            f"Action after Sorting: {_action}\n"
+            f"{_action}\n"
         )
 
         if self.organizer.plex_config_enabled:
@@ -100,7 +100,7 @@ class Headless:
 
         if self.organizer.plex_config_enabled:
             tasks = [
-                func_partial(self.organizer.plex_login, True),
+                func_partial(self.organizer.plex_login),
                 func_partial(self.organizer.plex_get_servers),
                 func_partial(self.organizer.plex_select_server, self.organizer.plex_config_server_id),
                 func_partial(self.organizer.plex_get_libraries),
