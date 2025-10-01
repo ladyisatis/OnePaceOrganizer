@@ -1630,7 +1630,7 @@ class OnePaceOrganizer:
                                         if not dl:
                                             dl = await utils.download(f"{self.metadata_url}/posters/{season}/{src.name}", src, self.progress_bar_func)
                                             if not dl:
-                                                self.logger.info(f"Skipping downloading (not found)")
+                                                self.logger.info("Skipping downloading (not found)")
                                     except Exception as e:
                                         self.logger.warning(f"Skipping downloading: {e}")
 
