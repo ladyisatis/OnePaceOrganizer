@@ -774,7 +774,7 @@ class GUI(QMainWindow):
         if _fn is not None and _fn != "":
             self.organizer.plex_retry_times = int(_fn)
 
-    def edit_plex_retry_times(self):
+    def edit_plex_retry_secs(self):
         _sp = " " * 100
         _fn = self._input_dialog(f"Enter seconds to wait before retries:{_sp}", str(self.organizer.plex_retry_secs))
         if _fn is not None and _fn != "":
