@@ -19,16 +19,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Python
-        uses: actions/setup-python@main
-        with:
-          python-version: '>=3.13'
-          freethreaded: true
-
       - name: Install uv
         uses: astral-sh/setup-uv@main
         with:
           enable-cache: true
+
+      - name: Install Python
+        shell: pwsh
+        run: uv python install
 
       - name: Install dependencies
         run: uv sync --locked --all-extras --dev
