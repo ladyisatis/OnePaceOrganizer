@@ -1626,9 +1626,9 @@ class OnePaceOrganizer:
                                     src = Path(self.base_path, "posters", str(season), "poster.png")
                                     try:
                                         self.logger.info(f"Downloading: posters/{src.name}")
-                                        dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
+                                        dl = await utils.download(f"{self.download_path}/posters/{season}/{src.name}", src, self.progress_bar_func)
                                         if not dl:
-                                            dl = await utils.download(f"{self.metadata_url}/posters/{src.name}", src, self.progress_bar_func)
+                                            dl = await utils.download(f"{self.metadata_url}/posters/{season}/{src.name}", src, self.progress_bar_func)
                                             if not dl:
                                                 self.logger.info(f"Skipping downloading (not found)")
                                     except Exception as e:
