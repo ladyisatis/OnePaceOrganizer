@@ -550,14 +550,20 @@ class OnePaceOrganizer:
             arts = await utils.run(episode.posters if is_poster else episode.arts)
 
             for art in arts:
-                if (art.provider == None or art.provider == "local") and art.selected:
+                if (art.provider is None or art.provider == "local") and art.selected:
                     return False
 
             self.logger.info(f"Uploading {'poster' if is_poster else 'background'}: {art_file}")
             await utils.run(episode.uploadPoster if is_poster else episode.uploadArt, filepath=str(art_file))
 
+            try:
+                await utils.run(episode.saveEdits)
+                await utils.run(episode.batchEdits)
+            except:
+                pass
+
             arts = await utils.run(episode.posters if is_poster else episode.arts)
-            if len(arts) > 1:
+            if len(arts) > 0:
                 await utils.run(episode.setPoster if is_poster else episode.setArt, arts[len(arts)-1])
 
             return True
@@ -879,37 +885,34 @@ class OnePaceOrganizer:
                 rating_key = self.plex_config_show_guid.replace("local://", "")
                 try:
                     item = await utils.run(section.fetchItem, int(rating_key))
-                    self.logger.info(f"Found item by rating key: {rating_key} (type: {type(item)})")
+                    self.logger.debug(f"Found item by rating key: {rating_key} (type: {type(item)})")
 
                     # Handle case where we get an Episode instead of a Show
                     if hasattr(item, 'type'):
                         if item.type == 'show':
                             show = item
-                            self.logger.info(f"Item is a show: {show.title}")
+                            self.logger.debug(f"Item is a show: {show.title}")
                         elif item.type == 'episode':
-                            self.logger.info(f"Item is an episode, getting show from episode: {item.title}")
+                            self.logger.debug(f"Item is an episode, getting show from episode: {item.title}")
                             show = await utils.run(item.show)
-                            self.logger.info(f"Retrieved show: {show.title}")
+                            self.logger.debug(f"Retrieved show: {show.title}")
                         else:
-                            raise Exception(f"Item with rating key '{rating_key}' is not a show or episode (type: {item.type})")
+                            self.logger.error(f"Item with rating key '{rating_key}' is not a show or episode (type: {item.type})")
+                            return (False, None, completed, skipped)
                     else:
                         # Fallback: assume it's a show if type attribute is missing
                         show = item
-                        self.logger.info(f"Assuming item is a show: {show.title}")
+                        self.logger.debug(f"Assuming item is a show: {show.title}")
 
                 except Exception as e:
                     self.logger.error(f"Failed to fetch show by rating key '{rating_key}': {e}")
-                    raise
+                    return (False, e, completed, skipped)
+
             else:
                 show = await utils.run(section.getGuid, self.plex_config_show_guid)
                 if show is None:
-                    show_title = self.plex_config_shows.get(self.plex_config_show_guid, {}).get("title", "One Pace")
-                    shows = await utils.run(section.search, title=show_title)
-                    if shows:
-                        show = shows[0]
-                        self.logger.info(f"Found show by title: {show_title}")
-                    else:
-                        raise Exception(f"Unable to find show with GUID '{self.plex_config_show_guid}' or title '{show_title}'")
+                    self.logger.error(f"Unable to find show with GUID '{self.plex_config_show_guid}'")
+                    return (False, None, completed, skipped)
 
             await utils.run(show.batchEdits)
 
@@ -1084,52 +1087,41 @@ class OnePaceOrganizer:
             if self.plex_config_show_guid.startswith("local://"):
                 rating_key = self.plex_config_show_guid.replace("local://", "")
                 self.logger.trace(f"Attempting to fetch show by rating key: {rating_key}")
+
                 try:
                     item = await utils.run(section.fetchItem, int(rating_key))
-                    self.logger.info(f"Found item by rating key: {rating_key} (type: {type(item)})")
+                    self.logger.debug(f"Found item by rating key: {rating_key} (type: {type(item)})")
 
                     # Handle case where we get an Episode instead of a Show
                     if hasattr(item, 'type'):
                         if item.type == 'show':
                             show = item
-                            self.logger.info(f"Item is a show: {show.title}")
+                            self.logger.debug(f"Item is a show: {show.title}")
                         elif item.type == 'episode':
-                            self.logger.info(f"Item is an episode, getting show from episode: {item.title}")
+                            self.logger.debug(f"Item is an episode, getting show from episode: {item.title}")
                             show = await utils.run(item.show)
-                            self.logger.info(f"Retrieved show: {show.title}")
+                            self.logger.debug(f"Retrieved show: {show.title}")
                         else:
-                            raise Exception(f"Item with rating key '{rating_key}' is not a show or episode (type: {item.type})")
+                            self.logger.error(f"Item with rating key '{rating_key}' is not a show or episode (type: {item.type})")
+                            return (False, None, completed, skipped)
                     else:
                         # Fallback: assume it's a show if type attribute is missing
                         show = item
-                        self.logger.info(f"Assuming item is a show: {show.title}")
+                        self.logger.debug(f"Assuming item is a show: {show.title}")
 
                 except Exception as e:
-                    self.logger.warning(f"Failed to fetch show by rating key '{rating_key}', trying fallback by title: {e}")
-                    show_title = self.plex_config_shows.get(self.plex_config_show_guid, {}).get("title", "One Pace")
-                    self.logger.trace(f"Searching for show by title: {show_title}")
-                    shows = await utils.run(section.search, title=show_title)
-                    if shows:
-                        show = shows[0]
-                        self.logger.info(f"Found show by title: {show_title}")
-                    else:
-                        raise Exception(f"Unable to find show with rating key '{rating_key}' or title '{show_title}'")
+                    self.logger.error(f"Failed to fetch show by rating key '{rating_key}': {e}")
+                    return (False, e, completed, skipped)
+
             else:
                 self.logger.trace(f"Attempting to get show by GUID: {self.plex_config_show_guid}")
                 show = await utils.run(section.getGuid, self.plex_config_show_guid)
                 if show is None:
-                    self.logger.trace("getGuid returned None, trying fallback by title")
-                    show_title = self.plex_config_shows.get(self.plex_config_show_guid, {}).get("title", "One Pace")
-                    self.logger.trace(f"Searching for show by title: {show_title}")
-                    shows = await utils.run(section.search, title=show_title)
-                    if shows:
-                        show = shows[0]
-                        self.logger.info(f"Found show by title: {show_title}")
-                    else:
-                        raise Exception(f"Unable to find show with GUID '{self.plex_config_show_guid}' or title '{show_title}'")
+                    self.logger.error(f"Unable to find show with GUID '{self.plex_config_show_guid}'")
+                    return (False, None, completed, skipped)
 
                 if hasattr(show, 'type') and show.type == 'episode':
-                    self.logger.info(f"Retrieved episode instead of show, getting show from episode: {show.title}")
+                    self.logger.debug(f"Retrieved episode instead of show, getting show from episode: {show.title}")
                     show = await utils.run(show.show)
 
             self.logger.debug(f"Final show object type: {type(show)}")
@@ -1151,8 +1143,6 @@ class OnePaceOrganizer:
                         all_episodes = await utils.run(show.episodes)
                     elif hasattr(show, 'all'):
                         all_episodes = await utils.run(show.all)
-                    elif hasattr(section, 'searchEpisodes'):
-                        all_episodes = await utils.run(section.searchEpisodes, title="One Pace")
                     else:
                         all_items = await utils.run(section.all)
                         all_episodes = [item for item in all_items if hasattr(item, 'type') and item.type == 'episode']
