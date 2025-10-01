@@ -815,6 +815,9 @@ class GUI(QMainWindow):
                 logger.info("Connecting to Plex server")
                 await self.organizer.plex_get_servers()
 
+                if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id is not None and self.organizer.plex_config_server_id != "":
+                    await self.organizer.plex_select_server(self.organizer.plex_config_server_id)
+
             res = await asyncio.create_task(self.organizer.start())
             if isinstance(res, tuple):
                 success, queue, completed, skipped = res
