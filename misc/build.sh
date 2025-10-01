@@ -30,6 +30,7 @@ echo 'gui' > .mode
 uv run pyinstaller $COMMON_OPTS $ICON_OPT \
   --name OnePaceOrganizer-gui \
   --windowed \
+  --hidden-import=ssl --hidden-import=_ssl \
   --distpath "dist" \
   --exclude-module "prompt_toolkit" \
   --workpath build/gui \
@@ -41,6 +42,7 @@ echo 'console' > .mode
 uv run pyinstaller $COMMON_OPTS $ICON_OPT \
   --name OnePaceOrganizer-cli \
   --console \
+  --hidden-import=ssl --hidden-import=_ssl \
   --distpath "dist" \
   --exclude-module "qasync" \
   --exclude-module "PySide6" \
