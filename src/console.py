@@ -53,7 +53,7 @@ class Console:
             sink=sink,
             level=self.log_level,
             format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {message}",
-            enqueue=True
+            enqueue=False
         )
 
     def _message_dialog(self, text=""):
@@ -62,15 +62,16 @@ class Console:
             text=text
         ).run()
 
-    def _input_dialog(self, text, default=""):
-        return input_dialog(
+    async def _input_dialog(self, text, default=""):
+        return await input_dialog(
             title=self.window_title,
             text=text,
             default=default
-        ).run()
+        ).run_async()
 
     async def run(self):
-        self._set_logger_sink(sys.stderr)
+        if hasattr(sys, "stderr"):
+            self._set_logger_sink(sys.stderr)
 
         if self.organizer.toml is None or not self.organizer.toml.get("version", ""):
             self.organizer.toml = utils.get_toml_info(self.organizer.base_path)
@@ -102,7 +103,7 @@ class Console:
             text = (
                 f"Path to One Pace Files: {self.organizer.input_path}\n"
                 f"Where to Place After Renaming: {self.organizer.output_path}\n"
-                f"Action after Sorting: {_action}\n"
+                f"{_action}\n"
             )
 
             if self.organizer.plex_config_enabled:
@@ -275,7 +276,7 @@ class Console:
 
         return await self.start_process()
 
-    async def run_plex_wizard():
+    async def run_plex_wizard(self):
         authenticated = False
 
         self.organizer.plex_config_url = await input_dialog(
@@ -291,6 +292,11 @@ class Console:
             no_text="User/Pass"
         ).run_async()
 
+        self.organizer.plex_config_remember = await yes_no_dialog(
+            title=self.window_title,
+            text="Do you want to remember your Plex credentials?"
+        ).run_async()
+
         while not authenticated:
             if self.organizer.plex_config_use_token:
                 self.organizer.plex_config_auth_token = await input_dialog(
@@ -303,31 +309,27 @@ class Console:
                 if self.organizer.plex_config_auth_token is None:
                     return False
 
-                self.organizer.plex_config_username = str(await input_dialog(
+            else:
+                self.organizer.plex_config_username = await input_dialog(
                     title=self.window_title,
                     text='Plex Account Username:',
                     default=self.organizer.plex_config_username
-                ).run_async())
+                ).run_async()
 
                 if self.organizer.plex_config_username is None:
                     return False
 
-                self.organizer.plex_config_password = str(await input_dialog(
+                self.organizer.plex_config_password = await input_dialog(
                     title=self.window_title,
                     text='Plex Account Password:',
-                    default=self.plex_config_password,
+                    default=self.organizer.plex_config_password,
                     password=True
-                ).run_async())
+                ).run_async()
 
                 if self.organizer.plex_config_password is None:
                     return False
 
-            self.organizer.plex_config_remember = await yes_no_dialog(
-                title=self.window_title,
-                text="Do you want to remember your Plex credentials?"
-            ).run_async()
-
-            authorized = await self.organizer.plex_login(True)
+            authenticated = await self.organizer.plex_login(True)
 
         if not await self.organizer.plex_get_servers():
             yn = await yes_no_dialog(
@@ -448,48 +450,68 @@ class Console:
         return self.dialog
 
     def pb_progress(self, val):
-        val = int(val)
-        if val < 0 or val > 100:
-            return
+        if self.dialog.future is not None and not self.dialog.future.done():
+            val = int(val)
+            if val < 0 or val > 100:
+                return
 
-        self.progress_bar.percentage = val
-        self.dialog.invalidate()
-
-    def pb_label(self, text):
-        level, text = text.split("|")
-
-        if level.startswith("SUCCESS"):
-            self.dialog_label.text = text
+            self.progress_bar.percentage = val
             self.dialog.invalidate()
 
-    def pb_button_text(self, text):
-        self.button.text = text
-        self.dialog.invalidate()
+    def pb_label(self, text):
+        if self.dialog.future is not None and not self.dialog.future.done():
+            text = text.split("|")
 
-    def pb_log_output(self, val):
-        self.log_output.buffer.insert_text(val)
-        self.dialog.invalidate()
+            if len(text) == 1 or text[0].startswith("SUCCESS"):
+                self.dialog_label.text = text[0] if len(text) == 1 else text[1]
+                self.dialog.invalidate()
+
+    def pb_button_text(self, text):
+        if self.dialog.future is not None and not self.dialog.future.done():
+            self.button.text = text
+            self.dialog.invalidate()
+
+    def pb_log_output(self, val, loop=None):
+        if self.dialog.future is not None and not self.dialog.future.done():
+            try:
+                if loop is not None:
+                    loop.call_soon_threadsafe(self.log_output.buffer.insert_text, val)
+                else:
+                    self.log_output.buffer.insert_text(val)
+            except:
+                self.log_output.buffer.insert_text(val)
+            finally:
+                self.dialog.invalidate()
 
     async def pb_exit(self):
-        async with self.pb_lock:
-            if self.pb_task:
-                await self.pb_task
-
-            if self.dialog.future is not None:
+        if self.dialog.future is not None and not self.dialog.future.done():
+            async with self.pb_lock:
                 await utils.run(self.dialog.exit, result=True)
+
+                if self.pb_task:
+                    await self.pb_task
 
     async def start_process(self):
         async with self.pb_lock:
             self.pb_task = asyncio.create_task(self.progress_dialog().run_async())
 
-        self._set_logger_sink(self.pb_log_output)
+        self._set_logger_sink(func_partial(self.pb_log_output, loop=asyncio.get_running_loop()))
         logger.add(sink=self.pb_label, level='SUCCESS', format='{level}|{message}', colorize=False)
         self.organizer.progress_bar_func = self.pb_progress
 
-        self.process_task = asyncio.create_task(self.organizer.start())
-
         try:
-            if self.organizer.plex_config_enabled and self.dialog.future is not None:
+            if self.organizer.plexapi_account is None:
+                await self.organizer.plex_login()
+
+            if self.organizer.plexapi_server is None:
+                await self.organizer.plex_get_servers()
+
+                if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id is not None and self.organizer.plex_config_server_id != "":
+                    await self.organizer.plex_select_server(self.organizer.plex_config_server_id)
+
+            self.process_task = asyncio.create_task(self.organizer.start())
+
+            if self.organizer.plex_config_enabled:
                 success, queue, completed, skipped = await self.process_task
 
                 if len(queue) > 0:
@@ -502,7 +524,7 @@ class Console:
                         text=(
                                 f"All of the One Pace files have been created in:\n"
                                 f"{str(self.organizer.output_path)}\n\n"
-                                f"Please move the\"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
+                                f"Please move the \"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
                                 "and make sure that it appears in Plex. Seasons and episodes will temporarily "
                                 "have incorrect information, and the next step will correct them.\n\n"
                                 "Click OK once this has been done and you can see the One Pace video files in Plex."
@@ -512,22 +534,29 @@ class Console:
                     async with self.pb_lock:
                         self.pb_task = asyncio.create_task(self.progress_dialog().run_async())
 
-                    self.process_task = asyncio.create_task(self.organizer.process_plex_episodes(res))
+                    self.process_task = asyncio.create_task(self.organizer.process_plex_episodes(queue))
 
             success, queue, completed, skipped = await self.process_task
-            await utils.run(self.pb_log_output, f"Completed: {completed} processed, {skipped} skipped")
+            await utils.run(self.pb_label, f"Completed: {completed} processed, {skipped} skipped")
+            await utils.run(self.pb_button_text, "Exit")
 
             async with self.pb_lock:
                 if self.pb_task:
                     await self.pb_task
 
-                if self.dialog.future is not None:
+                if self.dialog.future is not None and not self.dialog.future.done():
                     await utils.run(self.dialog.exit, result=True)
 
         except asyncio.CancelledError:
-            if self.dialog.future is not None:
+            if self.dialog.future is not None and not self.dialog.future.done():
                 await utils.run(self.pb_label, "Cancelled")
                 await utils.run(self.pb_button_text, "Exit")
+
+                async with self.pb_lock:
+                    if self.pb_task:
+                        await self.pb_task
+
+                    await utils.run(self.dialog.exit, result=True)
 
         finally:
             await self.organizer.save_config()
