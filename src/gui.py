@@ -806,39 +806,45 @@ class GUI(QMainWindow):
         self.action_season_1.setChecked(season == 1)
         self.action_season_2.setChecked(season == 2)
 
-    def edit_output_template(self):
+    @asyncSlot()
+    async def edit_output_template(self):
         _sp = " " * 100
-        _fn = self._input_dialog(f"Enter the template for the filename:{_sp}", self.organizer.filename_tmpl)
+        _fn = await self._input_dialog(f"Enter the template for the filename:{_sp}", self.organizer.filename_tmpl)
         if _fn is not None and _fn != "":
             self.organizer.filename_tmpl = _fn
 
-    def edit_plex_retry_times(self):
+    @asyncSlot()
+    async def edit_plex_retry_times(self):
         _sp = " " * 100
-        _fn = self._input_dialog(f"Enter maximum number of retries:{_sp}", str(self.organizer.plex_retry_times))
+        _fn = await self._input_dialog(f"Enter maximum number of retries:{_sp}", str(self.organizer.plex_retry_times))
         if _fn is not None and _fn != "":
             self.organizer.plex_retry_times = int(_fn)
 
-    def edit_plex_retry_secs(self):
+    @asyncSlot()
+    async def edit_plex_retry_secs(self):
         _sp = " " * 100
-        _fn = self._input_dialog(f"Enter seconds to wait before retries:{_sp}", str(self.organizer.plex_retry_secs))
+        _fn = await self._input_dialog(f"Enter seconds to wait before retries:{_sp}", str(self.organizer.plex_retry_secs))
         if _fn is not None and _fn != "":
             self.organizer.plex_retry_secs = int(_fn)
 
-    def edit_workers(self):
+    @asyncSlot()
+    async def edit_workers(self):
         _sp = " " * 100
-        _fn = self._input_dialog(f"Enter number of workers for threads/processes: (0 = Auto){_sp}", str(self.organizer.workers))
+        _fn = await self._input_dialog(f"Enter number of workers for threads/processes: (0 = Auto){_sp}", str(self.organizer.workers))
         if _fn is not None and _fn != "":
             self.organizer.workers = int(_fn)
 
-    def edit_metadata_url(self):
+    @asyncSlot()
+    async def edit_metadata_url(self):
         _sp = " " * 100
-        _fn = self._input_dialog(f"Enter metadata URL:{_sp}", self.organizer.metadata_url)
+        _fn = await self._input_dialog(f"Enter metadata URL:{_sp}", self.organizer.metadata_url)
         if _fn is not None and _fn != "":
             self.organizer.metadata_url = _fn
 
-    def edit_download_path(self):
+    @asyncSlot()
+    async def edit_download_path(self):
         _sp = " " * 100
-        _fn = self._input_dialog(f"Enter download path:{_sp}", self.organizer.download_path)
+        _fn = await self._input_dialog(f"Enter download path:{_sp}", self.organizer.download_path)
         if _fn is not None and _fn != "":
             self.organizer.download_path = _fn
 
