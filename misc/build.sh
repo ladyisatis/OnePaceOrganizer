@@ -98,7 +98,6 @@ if [ ! -d "metadata" ]; then
       -exec rm -rf {} +;
 fi
 
-[ ! -f "posters.zip" ] && zip -r posters.zip posters
 [ ! -d "temp_zip" ] && mkdir -p temp_zip
 [ ! -d "temp_zip/metadata" ] && cp -r metadata temp_zip/metadata
 [ ! -d "temp_zip/posters" ] && cp -r posters temp_zip/posters
@@ -129,6 +128,8 @@ elif [ "$BUILD_OS" == "macos" ]; then
   mv dist/OnePaceOrganizer-cli OnePaceOrganizer-cli-macos-arm64
 
 else
+  [ ! -f "posters.zip" ] && zip -r posters.zip posters
+
   cp dist/OnePaceOrganizer-gui temp_zip/OnePaceOrganizer-gui-linux-x64
   cp dist/OnePaceOrganizer-cli temp_zip/OnePaceOrganizer-cli-linux-x64
 
