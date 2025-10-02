@@ -192,7 +192,7 @@ class GUI(QMainWindow):
         menu = self.menuBar()
         menu_file = menu.addMenu("&File")
         menu_configuration = menu.addMenu("&Configuration")
-        menu_about = menu.addMenu("&Help")
+        menu_help = menu.addMenu("&Help")
 
         action_exit = QAction("Exit", self)
         action_exit.triggered.connect(self.exit)
