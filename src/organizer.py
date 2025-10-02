@@ -106,16 +106,10 @@ class OnePaceOrganizer:
 
         self.logger.trace(config)
 
-        if "path_to_eps" in config:
-            self.input_path = await utils.resolve(config["path_to_eps"])
-
-        if "input" in config and config["input"] is not None:
+        if "input" in config and config["input"] is not None and config["input"] != "":
             self.input_path = await utils.resolve(config["input"])
 
-        if "episodes" in config:
-            self.output_path = await utils.resolve(config["episodes"])
-
-        if "output" in config and config["output"] is not None:
+        if "output" in config and config["output"] is not None and config["output"] != "":
             self.output_path = await utils.resolve(config["output"])
 
         if "move_after_sort" in config and config["move_after_sort"] is not None:
@@ -140,7 +134,7 @@ class OnePaceOrganizer:
             if "enabled" in config["plex"] and config["plex"]["enabled"] is not None:
                 self.plex_config_enabled = config["plex"]["enabled"]
 
-            if "url" in config["plex"] and config["plex"]["url"] is not None:
+            if "url" in config["plex"] and config["plex"]["url"] is not None and config["plex"]["url"] != "":
                 self.plex_config_url = config["plex"]["url"]
 
             if "servers" in config["plex"] and isinstance(config["plex"]["servers"], dict):
@@ -167,22 +161,22 @@ class OnePaceOrganizer:
             if "use_token" in config["plex"] and config["plex"]["use_token"] is not None:
                 self.plex_config_use_token = config["plex"]["use_token"]
 
-            if "token" in config["plex"] and config["plex"]["token"] is not None:
+            if "token" in config["plex"] and config["plex"]["token"] is not None and config["plex"]["token"] != "":
                 self.plex_config_auth_token = config["plex"]["token"]
 
-            if "username" in config["plex"] and config["plex"]["username"] is not None:
+            if "username" in config["plex"] and config["plex"]["username"] is not None and config["plex"]["username"] != "":
                 self.plex_config_username = config["plex"]["username"]
 
-            if "password" in config["plex"] and config["plex"]["password"] is not None:
+            if "password" in config["plex"] and config["plex"]["password"] is not None and config["plex"]["password"] != "":
                 self.plex_config_password = config["plex"]["password"]
 
             if "remember" in config["plex"] and config["plex"]["remember"] is not None:
                 self.plex_config_remember = config["plex"]["remember"]
 
-            if "server_baseurl" in config["plex"] and config["plex"]["server_baseurl"] is not None:
+            if "server_baseurl" in config["plex"] and config["plex"]["server_baseurl"] is not None and config["plex"]["server_baseurl"] != "":
                 self.plex_config_server_baseurl = config["plex"]["server_baseurl"]
 
-            if "server_token" in config["plex"] and config["plex"]["server_token"] is not None:
+            if "server_token" in config["plex"] and config["plex"]["server_token"] is not None and config["plex"]["server_token"] != "":
                 self.plex_config_server_token = config["plex"]["server_token"]
 
         return True
