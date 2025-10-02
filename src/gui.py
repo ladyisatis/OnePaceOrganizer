@@ -830,9 +830,11 @@ class GUI(QMainWindow):
     @asyncSlot()
     async def edit_workers(self):
         _sp = " " * 100
-        _fn = await self._input_dialog(f"Enter number of workers for threads/processes: (0 = Auto){_sp}", str(self.organizer.workers))
+        _workers = "0" if self.organizer.workers is None else str(self.organizer.workers)
+        _fn = await self._input_dialog(f"Enter number of workers for threads/processes: (0 = Auto){_sp}", _workers)
         if _fn is not None and _fn != "":
-            self.organizer.workers = int(_fn)
+            _fn = int(_fn)
+            self.organizer.workers = None if _fn < 1 else _fn
 
     @asyncSlot()
     async def edit_metadata_url(self):
