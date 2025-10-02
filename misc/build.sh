@@ -35,13 +35,15 @@ if [[ -z "${ICON_FILE}" ]]; then
   fi
 fi
 
+echo "Icon file: $ICON_FILE"
+
 echo 'gui' > .mode
 
 uv run pyinstaller --clean --noconfirm -F \
   --name OnePaceOrganizer-gui \
-  --icon "$ICON_FILE" \
+  --icon="$ICON_FILE" \
   --windowed \
-  --hidden-import=ssl --hidden-import=_ssl \
+  --hidden-import=ssl --hidden-import=_ssl --hidden-import=httpx \
   --distpath "dist" \
   --exclude-module "prompt_toolkit" \
   --workpath build/gui \
@@ -54,9 +56,9 @@ echo 'console' > .mode
 
 uv run pyinstaller --clean --noconfirm -F \
   --name OnePaceOrganizer-cli \
-  --icon "$ICON_FILE" \
+  --icon="$ICON_FILE" \
   --console \
-  --hidden-import=ssl --hidden-import=_ssl \
+  --hidden-import=ssl --hidden-import=_ssl --hidden-import=httpx \
   --distpath "dist" \
   --exclude-module "qasync" \
   --exclude-module "PySide6" \
