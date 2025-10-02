@@ -600,10 +600,7 @@ class OnePaceOrganizer:
             data_folder = Path(self.base_path, "metadata")
             episodes_folder = Path(data_folder, "episodes")
 
-            if not await utils.is_dir(episodes_folder):
-                return False
-
-            self.logger.info(f"{episodes_folder} detected, loading metadata from folder")
+            self.logger.info(f"Loading local metadata from {data_folder}")
 
             episode_files = []
             async for file in utils.glob(episodes_folder, "*.yml", rglob=True):
@@ -645,7 +642,7 @@ class OnePaceOrganizer:
 
         except:
             await utils.run_func(self.progress_bar_func, 0)
-            self.logger.warning(f"Skipping using metadata/episodes for metadata\n{traceback.format_exc()}")
+            self.logger.warning(f"Skipping using local metadata\n{traceback.format_exc()}")
             return False
 
         return True
@@ -655,30 +652,39 @@ class OnePaceOrganizer:
         data = {}
 
         if await utils.is_file(data_file):
-            self.logger.success("Checking episode metadata file (data.json)...")
+            self.logger.info("Checking episode metadata file (data.json)...")
 
-            data = await utils.load_json(data_file)
-            self.logger.trace(data)
+            try:
+                data = await utils.load_json(data_file)
+                self.logger.trace(data)
 
-            if "last_update" in data and data["last_update"] != "":
-                now = datetime.datetime.now(tz=datetime.UTC)
-                data_file_stat = await utils.stat(data_file)
-                last_update_remote = datetime.datetime.fromisoformat(data["last_update"])
-                last_update_local = datetime.datetime.fromtimestamp(data_file_stat.st_mtime, tz=datetime.UTC)
+                if "last_update" in data and data["last_update"] != "":
+                    now = datetime.datetime.now(tz=datetime.UTC)
+                    data_file_stat = await utils.stat(data_file)
+                    last_update_remote = datetime.datetime.fromisoformat(data["last_update"])
+                    last_update_local = datetime.datetime.fromtimestamp(data_file_stat.st_mtime, tz=datetime.UTC)
 
-                if now - last_update_remote < datetime.timedelta(hours=12):
-                    self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.arcs = data["arcs"] if "arcs" in data else []
-                    self.episodes = data["episodes"] if "episodes" in data else {}
+                    if now - last_update_remote < datetime.timedelta(hours=24):
+                        self.tvshow = data["tvshow"] if "tvshow" in data else {}
+                        self.arcs = data["arcs"] if "arcs" in data else []
+                        self.episodes = data["episodes"] if "episodes" in data else {}
 
-                elif now - last_update_local < datetime.timedelta(hours=1):
-                    self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.arcs = data["arcs"] if "arcs" in data else []
-                    self.episodes = data["episodes"] if "episodes" in data else {}
+                    elif now - last_update_local < datetime.timedelta(hours=1):
+                        self.tvshow = data["tvshow"] if "tvshow" in data else {}
+                        self.arcs = data["arcs"] if "arcs" in data else []
+                        self.episodes = data["episodes"] if "episodes" in data else {}
 
-        yml_loaded = await self.cache_yml()
+            except:
+                self.logger.warning(f"Danger: {data_file} might be corrupted!\n{traceback.format_exc()}")
 
-        if yml_loaded == False or len(self.tvshow) == 0 or len(self.arcs) == 0 or len(self.episodes) == 0:
+        if await utils.is_dir(self.base_path, "metadata") and (
+            await utils.is_dir(self.base_path, "metadata", "episodes") or
+            await utils.is_file(self.base_path, "metadata", "tvshow.yml") or
+            await utils.is_file(self.base_path, "metadata", "arcs.yml")
+        ):
+            await self.cache_yml()
+
+        if len(self.tvshow) == 0 or len(self.arcs) == 0 or len(self.episodes) == 0:
             try:
                 await utils.run(data_file.parent.mkdir, exist_ok=True)
 
