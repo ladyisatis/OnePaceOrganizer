@@ -35,13 +35,14 @@ if [[ -z "${ICON_FILE}" ]]; then
   fi
 fi
 
-echo "Icon file: $ICON_FILE"
+OS_ARCH="$(uname -m)"
 
 echo 'gui' > .mode
 
 uv run pyinstaller --clean --noconfirm -F \
-  --name OnePaceOrganizer-gui \
+  --name="OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" \
   --icon="$ICON_FILE" \
+  --debug \
   --windowed \
   --hidden-import=ssl --hidden-import=_ssl --hidden-import=httpx \
   --distpath "dist" \
@@ -55,8 +56,9 @@ uv run pyinstaller --clean --noconfirm -F \
 echo 'console' > .mode
 
 uv run pyinstaller --clean --noconfirm -F \
-  --name OnePaceOrganizer-cli \
+  --name="OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" \
   --icon="$ICON_FILE" \
+  --debug \
   --console \
   --hidden-import=ssl --hidden-import=_ssl --hidden-import=httpx \
   --distpath "dist" \
@@ -105,40 +107,34 @@ fi
 [ ! -d "temp_zip/posters" ] && cp -r posters temp_zip/posters
 
 if [ "$BUILD_OS" == "windows" ]; then
-  cp dist/OnePaceOrganizer-cli.exe temp_zip/
-  cp dist/OnePaceOrganizer-gui.exe temp_zip/
+  cp "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}.exe" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}.exe" temp_zip/
 
-  pwsh -Command "Compress-Archive -Path 'temp_zip\\*' -DestinationPath 'OnePaceOrganizer-win-x64.zip'"
+  pwsh -Command "Compress-Archive -Path 'temp_zip\\*' -DestinationPath 'OnePaceOrganizer-${BUILD_OS}-${OS_ARCH}.zip'"
   rm -rf temp_zip
 
-  mv dist/OnePaceOrganizer-cli.exe OnePaceOrganizer-cli-win-x64.exe
-  mv dist/OnePaceOrganizer-gui.exe OnePaceOrganizer-gui-win-x64.exe
+  mv "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}.exe" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}.exe" .
 
 elif [ "$BUILD_OS" == "macos" ]; then
   mkdir -p dist/OnePaceOrganizer.app/Contents/MacOS
-  cp dist/OnePaceOrganizer-gui dist/OnePaceOrganizer.app/Contents/MacOS/OnePaceOrganizer
+  cp "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" dist/OnePaceOrganizer.app/Contents/MacOS/OnePaceOrganizer
 
-  cp dist/OnePaceOrganizer-gui temp_zip/OnePaceOrganizer-gui-macos-arm64
-  cp dist/OnePaceOrganizer-cli temp_zip/OnePaceOrganizer-cli-macos-arm64
+  cp "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" temp_zip/
   cp -r dist/OnePaceOrganizer.app temp_zip/
 
-  pushd temp_zip && zip -r ../OnePaceOrganizer-macos-arm64.zip . && popd
+  pushd temp_zip && zip -r "../OnePaceOrganizer-${BUILD_OS}-${OS_ARCH}.zip" . && popd
   rm -rf temp_zip
 
-  mv dist/OnePaceOrganizer.app OnePaceOrganizer-gui-macos-arm64.app
-  mv dist/OnePaceOrganizer-gui OnePaceOrganizer-gui-macos-arm64
-  mv dist/OnePaceOrganizer-cli OnePaceOrganizer-cli-macos-arm64
+  mv dist/OnePaceOrganizer.app "OnePaceOrganizer-${BUILD_OS}-${OS_ARCH}.app"
+  mv "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" .
 
 else
   [ ! -f "posters.zip" ] && zip -r posters.zip posters
 
-  cp dist/OnePaceOrganizer-gui temp_zip/OnePaceOrganizer-gui-linux-x64
-  cp dist/OnePaceOrganizer-cli temp_zip/OnePaceOrganizer-cli-linux-x64
+  cp "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" temp_zip/
 
-  pushd temp_zip && zip -r ../OnePaceOrganizer-linux-x64.zip . && popd
+  pushd temp_zip && zip -r "../OnePaceOrganizer-${BUILD_OS}-${OS_ARCH}.zip" . && popd
   rm -rf temp_zip
 
-  mv dist/OnePaceOrganizer-cli OnePaceOrganizer-cli-linux-x64
-  mv dist/OnePaceOrganizer-gui OnePaceOrganizer-gui-linux-x64
+  mv "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" .
 
 fi
