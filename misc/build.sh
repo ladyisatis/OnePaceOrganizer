@@ -107,7 +107,7 @@ if [ "$BUILD_OS" == "windows" ]; then
   cp dist/OnePaceOrganizer-cli.exe temp_zip/
   cp dist/OnePaceOrganizer-gui.exe temp_zip/
 
-  pushd temp_zip && zip -r ../OnePaceOrganizer-win-x64.zip . && popd
+  pwsh -Command "Compress-Archive -Path 'temp_zip\\*' -DestinationPath 'OnePaceOrganizer-win-x64.zip'"
   rm -rf temp_zip
 
   mv dist/OnePaceOrganizer-cli.exe OnePaceOrganizer-cli-win-x64.exe
