@@ -677,10 +677,10 @@ class OnePaceOrganizer:
             except:
                 self.logger.warning(f"Danger: {data_file} might be corrupted!\n{traceback.format_exc()}")
 
-        if await utils.is_dir(self.base_path, "metadata") and (
-            await utils.is_dir(self.base_path, "metadata", "episodes") or
-            await utils.is_file(self.base_path, "metadata", "tvshow.yml") or
-            await utils.is_file(self.base_path, "metadata", "arcs.yml")
+        if await utils.is_dir(Path(self.base_path, "metadata")) and (
+            await utils.is_dir(Path(self.base_path, "metadata", "episodes")) or
+            await utils.is_file(Path(self.base_path, "metadata", "tvshow.yml")) or
+            await utils.is_file(Path(self.base_path, "metadata", "arcs.yml"))
         ):
             await self.cache_yml()
 
