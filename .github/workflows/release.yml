@@ -8,7 +8,12 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: windows-latest
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     env:
       UV_CACHE_DIR: /tmp/.uv-cache
@@ -32,50 +37,45 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --all-extras --dev
 
-      - name: Run build script
-        shell: pwsh
-        run: .\misc\build.ps1
-
-      - name: Prepare the .zip
-        shell: pwsh
+      - name: Run build script (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash
         run: |
-          Invoke-WebRequest -Uri "https://github.com/ladyisatis/one-pace-metadata/archive/refs/heads/main.zip" -OutFile "metadata.zip"
-          Expand-Archive -Path "metadata.zip" -DestinationPath "."
-          Remove-Item "metadata.zip"
+          export BUILD_OS="windows"
+          export ICON_FILE="./misc/icon.ico"
+          ./misc/build.sh
 
-          Rename-Item "one-pace-metadata-main" "metadata"
+      - name: Run build script (macOS)
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          export BUILD_OS="macos"
+          export ICON_FILE="./misc/icon.icns"
+          ./misc/build.sh
 
-          Get-ChildItem -Path "metadata" -File | Where-Object {
-              $_.Name -notin @("data.json", "arcs.yml", "tvshow.yml")
-          } | Remove-Item -Force
-
-          Get-ChildItem -Path "metadata" -Directory | Where-Object {
-              $_.Name -notin @("episodes", "posters")
-          } | Remove-Item -Recurse -Force
-
-          Compress-Archive -Path posters -DestinationPath posters.zip
-
-          New-Item -ItemType Directory -Path temp_zip
-          Copy-Item dist\OnePaceOrganizer-cli.exe -Destination temp_zip
-          Copy-Item dist\OnePaceOrganizer-gui.exe -Destination temp_zip
-
-          Copy-Item -Recurse metadata -Destination temp_zip\metadata
-          Copy-Item -Recurse posters -Destination temp_zip\posters
-
-          Compress-Archive -Path temp_zip\* -DestinationPath OnePaceOrganizer-win-x64.zip
-
-          Remove-Item -Recurse -Force temp_zip
-          Rename-Item dist\OnePaceOrganizer-cli.exe OnePaceOrganizer-cli-win-x64.exe
-          Rename-Item dist\OnePaceOrganizer-gui.exe OnePaceOrganizer-gui-win-x64.exe
+      - name: Run build script (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          export BUILD_OS="linux"
+          export ICON_FILE="./misc/icon.png"
+          ./misc/build.sh
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: |
-            dist/OnePaceOrganizer-cli-win-x64.exe
-            dist/OnePaceOrganizer-gui-win-x64.exe
-            posters.zip
+            OnePaceOrganizer-cli-win-x64.exe
+            OnePaceOrganizer-cli-macos-arm64
+            OnePaceOrganizer-cli-linux-x64
+            OnePaceOrganizer-gui-win-x64.exe
+            OnePaceOrganizer-gui-macos-arm64.app
+            OnePaceOrganizer-gui-macos-arm64
+            OnePaceOrganizer-gui-linux-x64
             OnePaceOrganizer-win-x64.zip
+            OnePaceOrganizer-macos-arm64.zip
+            OnePaceOrganizer-linux-x64.zip
+            posters.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

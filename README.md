@@ -16,7 +16,7 @@ You can also re-run the program when new One Pace releases for quick renaming, a
 
 ## Pixeldrain
 
-Episodes from Pixeldrain are unsupported as there's too many to create CRC32 metadata files for, and no automatic way to tell which video files from Pixeldrain correspond to which episode. You're welcome to download the `episodes` folder from the [metadata repository](https://github.com/ladyisatis/one-pace-metadata) and put it inside the `metadata` folder, search for the corresponding [episode file](https://github.com/ladyisatis/one-pace-metadata/tree/main/episodes) and copy its contents [using the instructions here](https://github.com/ladyisatis/one-pace-metadata?tab=readme-ov-file#yaml-episodesyml-arcsyml-tvshowyml), however that may take a lot of time compared to just grabbing the video files the non-Pixeldrain way.
+Episodes from Pixeldrain that are separated into "English Subtitles" and "English Dub" are unsupported as there's too many to create CRC32 metadata files for, and no automatic way to tell which video files from Pixeldrain correspond to which episode. You're welcome to download the `episodes` folder from the [metadata repository](https://github.com/ladyisatis/one-pace-metadata) and put it inside the `metadata` folder, search for the corresponding [episode file](https://github.com/ladyisatis/one-pace-metadata/tree/main/episodes) and copy its contents [using the instructions here](https://github.com/ladyisatis/one-pace-metadata?tab=readme-ov-file#yaml-episodesyml-arcsyml-tvshowyml), however that may take a lot of time compared to just grabbing the video files the non-Pixeldrain way.
 
 ## Contributing
 
@@ -29,6 +29,7 @@ Contributions via Pull Requests are always welcome if I miss a bug or want anoth
 - [SpykerNZ/one-pace-for-plex](https://github.com/SpykerNZ/one-pace-for-plex) for NFO setup
   - and unofficial posters in the *posters* directory (which were also done by [/u/piratezekk](https://www.reddit.com/user/piratezekk))
 - [matteron/one-pace-plex-api](https://github.com/matteron/one-pace-plex-api) for the code that updates the Plex API
+- [IconArchive](https://www.iconarchive.com/show/one-piece-jolly-roger-icons-by-crountch/Luffys-flag-icon.html) for application icon
 - The [One Pace Team](https://onepace.net/) itself for:
   - Official posters in *metadata/posters*
   - One Pace Episode Guide spreadsheet managing, which amalgamates into *metadata/data.json*
