@@ -192,6 +192,7 @@ class GUI(QMainWindow):
         menu = self.menuBar()
         menu_file = menu.addMenu("&File")
         menu_configuration = menu.addMenu("&Configuration")
+        menu_about = menu.addMenu("&Help")
 
         action_exit = QAction("Exit", self)
         action_exit.triggered.connect(self.exit)
@@ -224,7 +225,6 @@ class GUI(QMainWindow):
         action_after_sort.addAction(self.action_after_sort_hardlink)
 
         self.action_after_sort_metadata = QAction("Sort and update metadata only", self)
-        self.action_after_sort_metadata.setVisible(not self.organizer.plex_config_enabled)
         self.action_after_sort_metadata.setCheckable(True)
         self.action_after_sort_metadata.setChecked(self.organizer.file_action == 4)
         self.action_after_sort_metadata.triggered.connect(func_partial(self.set_action, 4))
@@ -257,23 +257,56 @@ class GUI(QMainWindow):
         self.action_edit_output_tmpl.triggered.connect(self.edit_output_template)
         menu_configuration.addAction(self.action_edit_output_tmpl)
 
+        self.action_overwrite_nfo = QAction("Overwrite .nfo Files", self)
+        self.action_overwrite_nfo.setCheckable(True)
+        self.action_overwrite_nfo.setChecked(self.organizer.overwrite_nfo)
+        self.action_overwrite_nfo.setVisible(not self.organizer.plex_config_enabled)
+        self.action_overwrite_nfo.triggered.connect(self.set_overwrite_nfo)
+        menu_configuration.addAction(self.action_overwrite_nfo)
+
+        menu_configuration.addSeparator()
+
+        menu_advanced = menu_configuration.addMenu("Advanced")
+
         self.action_lockdata = QAction("Lock Fields after Edits", self)
         self.action_lockdata.setCheckable(True)
         self.action_lockdata.setChecked(self.organizer.lockdata)
         self.action_lockdata.triggered.connect(self.set_lockdata)
-        menu_configuration.addAction(self.action_lockdata)
+        menu_advanced.addAction(self.action_lockdata)
 
-        self.action_edit_plex_retry_times = QAction("Edit Maximum Retries", self)
+        self.action_fetch_posters = QAction("Fetch Posters if Missing", self)
+        self.action_fetch_posters.setCheckable(True)
+        self.action_fetch_posters.setChecked(self.organizer.fetch_posters)
+        self.action_fetch_posters.triggered.connect(self.set_fetch_posters)
+        menu_advanced.addAction(self.action_fetch_posters)
+
+        menu_advanced.addSeparator()
+
+        self.action_edit_plex_retry_times = QAction("(Plex) Edit Maximum Retries", self)
         self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
         self.action_edit_plex_retry_times.triggered.connect(self.edit_plex_retry_times)
-        menu_configuration.addAction(self.action_edit_plex_retry_times)
+        menu_advanced.addAction(self.action_edit_plex_retry_times)
 
-        self.action_edit_plex_retry_secs = QAction("Edit Seconds Between Retries", self)
+        self.action_edit_plex_retry_secs = QAction("(Plex) Edit Seconds Between Retries", self)
         self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
         self.action_edit_plex_retry_secs.triggered.connect(self.edit_plex_retry_secs)
-        menu_configuration.addAction(self.action_edit_plex_retry_secs)
+        menu_advanced.addAction(self.action_edit_plex_retry_secs)
 
-        menu_log_level = menu_configuration.addMenu("Log Level")
+        action_edit_workers = QAction("Edit Number of Workers", self)
+        action_edit_workers.triggered.connect(self.edit_workers)
+        menu_advanced.addAction(action_edit_workers)
+
+        action_edit_metadata_url = QAction("Edit Metadata URL", self)
+        action_edit_metadata_url.triggered.connect(self.edit_metadata_url)
+        menu_advanced.addAction(action_edit_metadata_url)
+
+        action_edit_download_path = QAction("Edit Download Path", self)
+        action_edit_download_path.triggered.connect(self.edit_download_path)
+        menu_advanced.addAction(action_edit_download_path)
+
+        menu_advanced.addSeparator()
+
+        menu_log_level = menu_advanced.addMenu("Log Level")
 
         self.action_log_level_0 = QAction("Critical", self)
         self.action_log_level_0.setCheckable(True)
@@ -316,6 +349,19 @@ class GUI(QMainWindow):
         self.action_log_level_6.setChecked(self.log_level == "TRACE")
         self.action_log_level_6.triggered.connect(func_partial(self._set_logger, "TRACE"))
         menu_log_level.addAction(self.action_log_level_6)
+
+        action_report_issue = QAction("Report Issue", self)
+        action_report_issue.triggered.connect(lambda: webbrowser.open_new_tab("https://github.com/ladyisatis/OnePaceOrganizer/issues"))
+        menu_help.addAction(action_report_issue)
+
+        action_wiki = QAction("Wiki", self)
+        action_wiki.triggered.connect(lambda: webbrowser.open_new_tab("https://github.com/ladyisatis/OnePaceOrganizer/wiki"))
+        menu_help.addAction(action_wiki)
+
+        action_about = QAction("About", self)
+        action_about.triggered.connect(lambda: webbrowser.open_new_tab("https://github.com/ladyisatis/OnePaceOrganizer?tab=readme-ov-file#one-pace-organizer"))
+        menu_help.addSeparator()
+        menu_help.addAction(action_about)
 
         self.start_button = QPushButton("Start")
         self.start_button.clicked.connect(self.start)
@@ -455,14 +501,11 @@ class GUI(QMainWindow):
         self._update_start_btn()
 
         self.plex_group.setVisible(self.organizer.plex_config_enabled)
-        self.action_after_sort_metadata.setVisible(not self.organizer.plex_config_enabled)
         self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
         self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
         self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
         self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
-
-        if self.organizer.plex_config_enabled and self.organizer.file_action == 4:
-            self.set_action(0)
+        self.action_overwrite_nfo.setVisible(not self.organizer.plex_config_enabled)
 
     def set_lockdata(self):
         self.organizer.lockdata = not self.organizer.lockdata
@@ -525,6 +568,7 @@ class GUI(QMainWindow):
         self.organizer.plex_config_password = self.plex_password.prop.text()
 
         if not await self.organizer.plex_login(True):
+            logger.info("Could not log in, please try again")
             await self.organizer.save_config()
             self._plex_toggle_login(True)
             self._plex_toggle_enabled(True)
@@ -779,6 +823,32 @@ class GUI(QMainWindow):
         _fn = self._input_dialog(f"Enter seconds to wait before retries:{_sp}", str(self.organizer.plex_retry_secs))
         if _fn is not None and _fn != "":
             self.organizer.plex_retry_secs = int(_fn)
+
+    def edit_workers(self):
+        _sp = " " * 100
+        _fn = self._input_dialog(f"Enter number of workers for threads/processes: (0 = Auto){_sp}", str(self.organizer.workers))
+        if _fn is not None and _fn != "":
+            self.organizer.workers = int(_fn)
+
+    def edit_metadata_url(self):
+        _sp = " " * 100
+        _fn = self._input_dialog(f"Enter metadata URL:{_sp}", self.organizer.metadata_url)
+        if _fn is not None and _fn != "":
+            self.organizer.metadata_url = _fn
+
+    def edit_download_path(self):
+        _sp = " " * 100
+        _fn = self._input_dialog(f"Enter download path:{_sp}", self.organizer.download_path)
+        if _fn is not None and _fn != "":
+            self.organizer.download_path = _fn
+
+    def set_fetch_posters(self):
+        self.organizer.fetch_posters = not self.organizer.fetch_posters
+        self.action_fetch_posters.setChecked(self.organizer.fetch_posters)
+
+    def set_overwrite_nfo(self):
+        self.organizer.overwrite_nfo = not self.organizer.overwrite_nfo
+        self.action_overwrite_nfo.setChecked(self.organizer.overwrite_nfo)
 
     @asyncSlot()
     async def start(self):
