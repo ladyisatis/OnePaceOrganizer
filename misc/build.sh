@@ -42,7 +42,7 @@ echo 'gui' > .mode
 uv run pyinstaller --clean --noconfirm -F \
   --name="OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" \
   --icon="$ICON_FILE" \
-  --debug \
+  --debug=all \
   --windowed \
   --hidden-import=ssl --hidden-import=_ssl --hidden-import=httpx \
   --distpath "dist" \
@@ -58,7 +58,7 @@ echo 'console' > .mode
 uv run pyinstaller --clean --noconfirm -F \
   --name="OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" \
   --icon="$ICON_FILE" \
-  --debug \
+  --debug=all \
   --console \
   --hidden-import=ssl --hidden-import=_ssl --hidden-import=httpx \
   --distpath "dist" \
