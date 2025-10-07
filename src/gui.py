@@ -89,7 +89,7 @@ class GUI(QMainWindow):
 
         self.input = Input(layout, "Directory of unsorted One Pace .mkv/.mp4 files:", QLineEdit(), button="Browse...", connect=self.browse_input_folder)
         self.input.prop.setPlaceholderText(str(Path.home() / "Downloads"))
-        self.input.setVisible(not self.organizer.plex_config_enabled and self.organizer.file_action != 4)
+        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
         if self.organizer.input_path != "":
             self.input.prop.setText(str(self.organizer.input_path))
 
@@ -416,7 +416,7 @@ class GUI(QMainWindow):
 
         self.output.label.setText(f"{_action} the sorted and renamed files to:")
         self.output.setVisible(self.organizer.file_action != 4)
-        self.input.setVisible(not self.organizer.plex_config_enabled and self.organizer.file_action != 4)
+        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
 
     async def _input_dialog(self, text, default=""):
         res, ok = await asyncWrap(
@@ -501,10 +501,12 @@ class GUI(QMainWindow):
         self.plex_group.setVisible(self.organizer.plex_config_enabled)
         self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
         self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
-        self.action_edit_plex_url.setVisible(self.organizer_plex_config_enabled)
+        self.action_edit_plex_url.setVisible(self.organizer.plex_config_enabled)
         self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
         self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
         self.action_overwrite_nfo.setVisible(not self.organizer.plex_config_enabled)
+        self.output.setVisible(self.organizer.file_action != 4)
+        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
 
     def set_lockdata(self):
         self.organizer.lockdata = not self.organizer.lockdata
@@ -516,6 +518,8 @@ class GUI(QMainWindow):
         self.plex_token.setVisible(self.organizer.plex_config_use_token)
         self.plex_username.setVisible(not self.organizer.plex_config_use_token)
         self.plex_password.setVisible(not self.organizer.plex_config_use_token)
+        self.output.setVisible(self.organizer.file_action != 4)
+        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
 
     def _plex_toggle_enabled(self, enable_all: bool):
         self.plex_method.prop.setEnabled(enable_all)
