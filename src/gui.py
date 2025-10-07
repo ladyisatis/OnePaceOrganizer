@@ -71,7 +71,7 @@ class GUI(QMainWindow):
 
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.setWindowTitle(self.organizer.window_title)
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(800, 800)
 
         self.organizer.message_dialog_func = self._message_dialog
         self.organizer.input_dialog_func = self._input_dialog
@@ -89,6 +89,7 @@ class GUI(QMainWindow):
 
         self.input = Input(layout, "Directory of unsorted One Pace .mkv/.mp4 files:", QLineEdit(), button="Browse...", connect=self.browse_input_folder)
         self.input.prop.setPlaceholderText(str(Path.home() / "Downloads"))
+        self.input.setVisible(not self.organizer.plex_config_enabled and self.organizer.file_action != 4)
         if self.organizer.input_path != "":
             self.input.prop.setText(str(self.organizer.input_path))
 
@@ -107,12 +108,6 @@ class GUI(QMainWindow):
         self.plex_group = QGroupBox("Plex")
         self.plex_group_layout = QVBoxLayout()
         _plex_remembered_login = not self.organizer.plex_config_use_token and self.organizer.plex_config_auth_token != "" and self.organizer.plex_config_remember
-
-        self.plex_url = Input(self.plex_group_layout, "Plex URL:", QLineEdit(), width=self.plex_width)
-        self.plex_url.prop.setText(self.organizer.plex_config_url)
-        self.plex_url.prop.setPlaceholderText("http://127.0.0.1:32400")
-        self.plex_url.prop.textEdited.connect(self.edit_plex_url)
-        self.plex_url.setVisible(not _plex_remembered_login)
 
         self.plex_method = Input(self.plex_group_layout, "Login Method:", QComboBox(), width=self.plex_width)
         self.plex_method.prop.addItems(["Username and Password", "Authentication Token"])
@@ -198,7 +193,7 @@ class GUI(QMainWindow):
         action_exit.triggered.connect(self.exit)
         menu_file.addAction(action_exit)
 
-        action_after_sort = menu_configuration.addMenu("Action after Sorting/Renaming")
+        action_after_sort = menu_configuration.addMenu("Action after Scanning")
 
         self.action_after_sort_move = QAction("Move (recommended)", self)
         self.action_after_sort_move.setCheckable(True)
@@ -224,7 +219,7 @@ class GUI(QMainWindow):
         self.action_after_sort_hardlink.triggered.connect(func_partial(self.set_action, 3))
         action_after_sort.addAction(self.action_after_sort_hardlink)
 
-        self.action_after_sort_metadata = QAction("Sort and update metadata only", self)
+        self.action_after_sort_metadata = QAction("Update metadata only", self)
         self.action_after_sort_metadata.setCheckable(True)
         self.action_after_sort_metadata.setChecked(self.organizer.file_action == 4)
         self.action_after_sort_metadata.triggered.connect(func_partial(self.set_action, 4))
@@ -256,6 +251,11 @@ class GUI(QMainWindow):
         self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
         self.action_edit_output_tmpl.triggered.connect(self.edit_output_template)
         menu_configuration.addAction(self.action_edit_output_tmpl)
+
+        self.action_edit_plex_url = QAction("Edit Plex Server URL", self)
+        self.action_edit_plex_url.setVisible(self.organizer.plex_config_enabled)
+        self.action_edit_plex_url.triggered.connect(self.edit_plex_url)
+        menu_configuration.addAction(self.action_edit_plex_url)
 
         self.action_overwrite_nfo = QAction("Overwrite .nfo Files", self)
         self.action_overwrite_nfo.setCheckable(True)
@@ -416,6 +416,7 @@ class GUI(QMainWindow):
 
         self.output.label.setText(f"{_action} the sorted and renamed files to:")
         self.output.setVisible(self.organizer.file_action != 4)
+        self.input.setVisible(not self.organizer.plex_config_enabled and self.organizer.file_action != 4)
 
     async def _input_dialog(self, text, default=""):
         res, ok = await asyncWrap(
@@ -483,9 +484,6 @@ class GUI(QMainWindow):
         self.organizer.output_path = Path(folder).resolve()
         self.output.prop.setText(str(self.organizer.output_path))
 
-    def edit_plex_url(self, text):
-        self.organizer.plex_config_url = text
-
     def _update_start_btn(self):
         self.start_button.setEnabled(
             not self.organizer.plex_config_enabled or (
@@ -503,6 +501,7 @@ class GUI(QMainWindow):
         self.plex_group.setVisible(self.organizer.plex_config_enabled)
         self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
         self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
+        self.action_edit_plex_url.setVisible(self.organizer_plex_config_enabled)
         self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
         self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
         self.action_overwrite_nfo.setVisible(not self.organizer.plex_config_enabled)
@@ -528,10 +527,8 @@ class GUI(QMainWindow):
         self.plex_server.prop.setEnabled(enable_all)
         self.plex_library.prop.setEnabled(enable_all)
         self.plex_show.prop.setEnabled(enable_all)
-        self.plex_url.prop.setEnabled(enable_all)
 
     def _plex_toggle_login(self, is_visible: bool):
-        self.plex_url.setVisible(is_visible)
         self.plex_method.setVisible(is_visible)
         if self.organizer.plex_config_use_token:
             self.plex_token.setVisible(is_visible)
@@ -826,6 +823,17 @@ class GUI(QMainWindow):
         _fn = await self._input_dialog(f"Enter seconds to wait before retries:{_sp}", str(self.organizer.plex_retry_secs))
         if _fn is not None and _fn != "":
             self.organizer.plex_retry_secs = int(_fn)
+
+    @asyncSlot()
+    async def edit_plex_url(self):
+        _sp = " " * 100
+        _fn = await self._input_dialog(f"Enter Plex URL to directly connect to: (leave blank to go via Plex's servers instead){_sp}", self.organizer.plex_config_url)
+        if _fn is not None:
+            if "://app.plex.tv/" in _fn or "://plex.tv/" in _fn:
+                await self._message_dialog("Plex URL is invalid as it should be a direct URL to the instance. " +
+                    "(You should probably leave this blank to go through Plex's servers automatically.)")
+            else:
+                self.organizer.plex_config_url = _fn
 
     @asyncSlot()
     async def edit_workers(self):

@@ -56,7 +56,7 @@ class OnePaceOrganizer:
         self.plexapi_account: MyPlexAccount = None
         self.plexapi_server: PlexServer = None
         self.plex_config_enabled = utils.get_env("plex_enabled", False)
-        self.plex_config_url = utils.get_env("plex_url", "http://127.0.0.1:32400")
+        self.plex_config_url = utils.get_env("plex_url", "")
 
         self.plex_config_servers = {}
         self.plex_config_server_id = utils.get_env("plex_server")
@@ -72,8 +72,6 @@ class OnePaceOrganizer:
         self.plex_config_username = utils.get_env("plex_username")
         self.plex_config_password = utils.get_env("plex_password")
         self.plex_config_remember = utils.get_env("plex_remember", False)
-        self.plex_config_server_baseurl = utils.get_env("plex_server_baseurl", "")
-        self.plex_config_server_token = utils.get_env("plex_server_token", "")
         self.plex_code = utils.get_env("plex_code", "")
         self.plex_retry_secs = utils.get_env("plex_retry_secs", 30)
         self.plex_retry_times = utils.get_env("plex_retry_times", 3)
@@ -173,12 +171,6 @@ class OnePaceOrganizer:
             if "remember" in config["plex"] and config["plex"]["remember"] is not None:
                 self.plex_config_remember = config["plex"]["remember"]
 
-            if "server_baseurl" in config["plex"] and config["plex"]["server_baseurl"] is not None and config["plex"]["server_baseurl"] != "":
-                self.plex_config_server_baseurl = config["plex"]["server_baseurl"]
-
-            if "server_token" in config["plex"] and config["plex"]["server_token"] is not None and config["plex"]["server_token"] != "":
-                self.plex_config_server_token = config["plex"]["server_token"]
-
         return True
 
     async def save_config(self):
@@ -200,8 +192,6 @@ class OnePaceOrganizer:
                 "enabled": self.plex_config_enabled,
                 "url": self.plex_config_url,
                 "servers": self.plex_config_servers,
-                "server_baseurl": self.plex_config_server_baseurl,
-                "server_token": self.plex_config_server_token,
                 "libraries": self.plex_config_libraries,
                 "shows": self.plex_config_shows,
                 "use_token": self.plex_config_use_token,
@@ -227,25 +217,30 @@ class OnePaceOrganizer:
             self.plexapi_account = None
             self.plexapi_server = None
             self.plex_config_auth_token = ""
-            self.plex_config_server_baseurl = ""
-            self.plex_config_server_token = ""
 
-        if self.plexapi_account is None and not self.plex_config_use_token and self.plex_config_auth_token != "" and self.plex_config_remember:
+        if self.plexapi_account is None and self.plexapi_server is None and not self.plex_config_use_token and self.plex_config_auth_token != "" and self.plex_config_remember:
             try:
-                self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_config_auth_token)
+                if self.plex_config_url == "":
+                    self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_config_auth_token)
+                else:
+                    self.plexapi_server = await utils.run(PlexServer, baseurl=self.plex_config_url, token=self.plex_config_auth_token)
             except:
                 self.logger.debug(traceback.format_exc())
                 self.plex_config_auth_token = ""
                 self.plexapi_account = None
+                self.plexapi_server = None
 
-        if self.plexapi_account is None:
+        if self.plexapi_account is None and self.plexapi_server is None:
             self.plex_config_servers = {}
             self.plex_config_libraries = {}
             self.plex_config_shows = {}
 
             if self.plex_config_use_token:
                 try:
-                    self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_config_auth_token)
+                    if self.plex_config_url == "":
+                        self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_config_auth_token)
+                    else:
+                        self.plexapi_server = await utils.run(PlexServer, baseurl=self.plex_config_url, token=self.plex_config_auth_token)
 
                 except PlexApiUnauthorized:
                     if self.message_dialog_func is not None:
@@ -322,28 +317,44 @@ class OnePaceOrganizer:
                 self.plex_config_username = ""
                 self.plex_config_password = ""
 
-        return self.plexapi_account is not None and self.plexapi_account.authenticationToken != ""
+        return (self.plexapi_account is not None and self.plexapi_account.authenticationToken != "") or self.plexapi_server is not None
 
     async def plex_get_servers(self):
-        if self.plex_config_remember and self.plex_config_server_baseurl != "" and self.plex_config_server_token != "":
+        self.plex_config_servers = {}
+
+        if self.plexapi_server is None and self.plex_config_url != "" and (self.plexapi_account is not None or self.plex_config_auth_token != ""):
             try:
-                self.plexapi_server = await utils.run(PlexServer, baseurl=self.plex_config_server_baseurl, token=self.plex_config_server_token)
+                self.plexapi_server = await utils.run(
+                    PlexServer,
+                    baseurl=self.plex_config_url,
+                    token=self.plex_config_auth_token if self.plexapi_account is None else self.plexapi_account.authenticationToken
+                )
+
+                self.plex_config_servers[self.plexapi_server.machineIdentifier] = {
+                    "name": self.plexapi_server.friendlyName,
+                    "selected": True
+                }
+
+                self.plex_config_server_id = self.plexapi_server.machineIdentifier
+
+                return True
             except:
-                self.plexapi_server = None
-                self.plex_config_server_token = ""
-                self.plex_config_server_baseurl = ""
-        else:
-            self.plexapi_server = None
+                self.logger.debug(traceback.format_exc())
+                if self.plexapi_account is not None:
+                    self.logger.warning(f"Unable to use direct connection to {self.plex_config_url}, trying fallback...")
+                else:
+                    self.logger.error(f"Unable to use direct connection to {self.plex_config_url}.")
+                    return False
 
         if self.plexapi_account is None:
-            return self.plexapi_server is not None
-
-        self.plex_config_servers = {}
+            self.logger.error("Not logged in to Plex.")
+            return False
 
         try:
             resources = await utils.run(self.plexapi_account.resources)
         except:
-            self.logger.exception("Unable to find Plex servers")
+            self.logger.debug(traceback.format_exc())
+            self.logger.error("Unable to find any Plex servers.")
             return False
 
         if len(resources) == 0:
@@ -393,16 +404,27 @@ class OnePaceOrganizer:
                         self.logger.exception(f"Unable to connect to Plex server '{resource.name}'")
                         return False
 
-        if self.plex_config_remember and self.plex_config_server_token == "":
-            self.plex_config_server_baseurl = self.plexapi_server._baseurl
-            self.plex_config_server_token = self.plexapi_server._token
-
         return self.plexapi_server is not None
 
     async def plex_select_server(self, server_id):
         if server_id == "" or server_id is None:
             self.logger.error("Plex server is blank")
             return False
+
+        if self.plex_config_url != "":
+            try:
+                self.plexapi_server = await utils.run(
+                    PlexServer,
+                    baseurl=self.plex_config_url,
+                    token=self.plex_config_auth_token if self.plexapi_account is None else self.plexapi_account.authenticationToken
+                )
+
+                self.plex_config_server_id = server_id
+
+                return self.plexapi_server.machineIdentifier == server_id
+            except:
+                self.logger.debug(traceback.format_exc())
+                self.logger.warning(f"Unable to use direct connection to {self.plex_config_url}, trying fallback...")
 
         resources = await utils.run(self.plexapi_account.resources)
 
@@ -1074,7 +1096,7 @@ class OnePaceOrganizer:
 
         return (True, res, completed, skipped)
 
-    async def process_plex_episodes(self, queue):
+    async def process_plex_episodes(self, queue, metadata_only=False):
         skipped = 0
         completed = 0
         plex_season = None
@@ -1132,7 +1154,7 @@ class OnePaceOrganizer:
 
             seasons_completed = []
 
-            if len(queue) == 0:
+            if metadata_only:
                 self.logger.info("Metadata-only mode: Fetching all episodes from Plex")
                 try:
                     self.logger.debug(f"Show object type: {type(show)}")
@@ -1148,19 +1170,31 @@ class OnePaceOrganizer:
                         all_episodes = [item for item in all_items if hasattr(item, 'type') and item.type == 'episode']
 
                     self.logger.info(f"Found {len(all_episodes)} episodes in Plex")
-                    queue = []
+
+                    arc_eps = {}
+                    for crc32, ep_data in self.episodes.items():
+                        _arc = ep_data.get("arc")
+                        _episode = ep_data.get("episode")
+
+                        if _arc not in arc_eps:
+                            arc_eps[_arc] = {}
+
+                        if _episode not in arc_eps[_arc]:
+                            arc_eps[_arc][_episode] = crc32
+
                     for plex_ep in all_episodes:
                         season = plex_ep.parentIndex if hasattr(plex_ep, 'parentIndex') else plex_ep.seasonNumber
                         episode = plex_ep.index
 
-                        episode_info = None
-                        for crc32, ep_data in self.episodes.items():
-                            if isinstance(ep_data, dict) and ep_data.get("arc") == season and ep_data.get("episode") == episode:
-                                episode_info = ep_data
+                        if season in arc_eps and episode in arc_eps[season]:
+                            crc32 = arc_eps[season][episode]
+                            ep_data = self.episodes[crc32]
+
+                            if isinstance(ep_data, dict):
+                                queue.append((crc32, plex_ep, None, ep_data))
+                                arc_eps.append(key)
                                 break
 
-                        if episode_info:
-                            queue.append(("metadata_only", plex_ep, None, episode_info))
                         else:
                             self.logger.debug(f"No metadata found for S{season}E{episode}")
 
@@ -1282,7 +1316,7 @@ class OnePaceOrganizer:
 
                     self.logger.info(f"Updating: {_label}")
 
-                    if crc32 == "metadata_only":
+                    if metadata_only:
                         plex_episode = src
                     else:
                         retry_count = 0
@@ -1872,8 +1906,7 @@ class OnePaceOrganizer:
             if self.plex_config_enabled:
                 if self.file_action == 4:
                     self.logger.info("Plex metadata-only mode: Updating existing episodes in Plex")
-                    dummy_queue = []
-                    return await self.process_plex_episodes(dummy_queue)
+                    return await self.process_plex_episodes([], True)
                 else:
                     return await self.process_plex(video_files)
 

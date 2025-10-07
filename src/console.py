@@ -281,7 +281,7 @@ class Console:
 
         self.organizer.plex_config_url = await input_dialog(
             title=self.window_title,
-            text='URL to your Plex instance:',
+            text="URL to your Plex instance: (leave blank if you want to connect via Plex's servers instead)",
             default=self.organizer.plex_config_url
         ).run_async()
 
