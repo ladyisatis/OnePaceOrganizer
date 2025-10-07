@@ -485,7 +485,7 @@ class OnePaceOrganizer:
         self.logger.trace(f"plex_select_library: Looking for key '{library_key}' (type: {type(library_key)})")
         self.logger.trace(f"plex_select_library: Available keys: {list(self.plex_config_libraries.keys())}")
 
-        if library_key not in self.plex_config_libraries:
+        if str(library_key) not in self.plex_config_libraries:
             self.logger.error(f"plex_select_library: Library key '{library_key}' not found in available libraries")
             return False
 
@@ -498,8 +498,13 @@ class OnePaceOrganizer:
         return True
 
     async def plex_get_shows(self):
-        if self.plexapi_server is None or self.plex_config_library_key == "":
-            self.logger.trace("plex_get_shows: server is None or library key is empty")
+        if self.plexapi_server is None:
+            connected = await self.plex_select_server(self.plex_config_server_id)
+            if not connected:
+                return False
+
+        if not isinstance(self.plex_config_library_key, int) and self.plex_config_library_key == "":
+            self.logger.trace("plex_get_shows: library key is empty")
             return False
 
         self.plex_config_shows = {}
