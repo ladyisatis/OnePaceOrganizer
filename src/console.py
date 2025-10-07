@@ -500,14 +500,15 @@ class Console:
         self.organizer.progress_bar_func = self.pb_progress
 
         try:
-            if self.organizer.plexapi_account is None:
-                await self.organizer.plex_login()
+            if self.organizer.plex_config_enabled:
+                if self.organizer.plexapi_account is None:
+                    await self.organizer.plex_login()
 
-            if self.organizer.plexapi_server is None:
-                await self.organizer.plex_get_servers()
+                if self.organizer.plexapi_server is None:
+                    await self.organizer.plex_get_servers()
 
-                if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id is not None and self.organizer.plex_config_server_id != "":
-                    await self.organizer.plex_select_server(self.organizer.plex_config_server_id)
+                    if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id is not None and self.organizer.plex_config_server_id != "":
+                        await self.organizer.plex_select_server(self.organizer.plex_config_server_id)
 
             self.process_task = asyncio.create_task(self.organizer.start())
 
