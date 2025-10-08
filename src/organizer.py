@@ -202,6 +202,14 @@ class OnePaceOrganizer:
             }
         }
 
+        if not self.plex_config_remember:
+            out["plex"]["servers"] = {}
+            out["plex"]["libraries"] = {}
+            out["plex"]["shows"] = {}
+            out["plex"]["token"] = ""
+            out["plex"]["username"] = ""
+            out["plex"]["password"] = ""
+
         if self.config_file.suffix == ".yml" or self.config_file.suffix == ".yaml":
             await utils.write_file(self.config_file, await utils.run(yaml.safe_dump, out))
             return
@@ -243,11 +251,11 @@ class OnePaceOrganizer:
                         self.plexapi_server = await utils.run(PlexServer, baseurl=self.plex_config_url, token=self.plex_config_auth_token)
 
                 except PlexApiUnauthorized:
+                    self.logger.debug(traceback.format_exc())
                     if self.message_dialog_func is not None:
-                        self.logger.debug(traceback.format_exc())
                         await utils.run_func(self.message_dialog_func, "Invalid Plex account token, please try again.")
                     else:
-                        self.logger.exception("Invalid Plex account token, please try again.")
+                        self.logger.error("Invalid Plex account token, please try again.")
 
                     return False
 
@@ -358,6 +366,8 @@ class OnePaceOrganizer:
             return False
 
         if len(resources) == 0:
+            self.plex_config_server_id = ""
+
             if self.message_dialog_func is None:
                 self.logger.error("Unable to find any Plex servers on this account.")
             else:
@@ -379,8 +389,8 @@ class OnePaceOrganizer:
                 self.plexapi_server = await utils.run(resources[0].connect)
                 self.logger.info("Connected")
 
-            except:
-                self.logger.exception(f"Unable to connect to Plex server '{resources[0].name}'")
+            except Exception as e:
+                self.logger.error(f"Unable to connect to Plex server '{resources[0].name}': {e}")
                 return False
 
         else:
@@ -400,8 +410,8 @@ class OnePaceOrganizer:
                         self.plexapi_server = await utils.run(resource.connect)
                         self.logger.info("Connected")
 
-                    except:
-                        self.logger.exception(f"Unable to connect to Plex server '{resource.name}'")
+                    except Exception as e:
+                        self.logger.error(f"Unable to connect to Plex server '{resource.name}': {e}")
                         return False
 
         return self.plexapi_server is not None
@@ -411,7 +421,7 @@ class OnePaceOrganizer:
             self.logger.error("Plex server is blank")
             return False
 
-        if self.plex_config_url != "":
+        if self.plex_config_url != "" and (self.plex_config_auth_token != "" or self.plexapi_account is not None):
             try:
                 self.plexapi_server = await utils.run(
                     PlexServer,
@@ -424,7 +434,7 @@ class OnePaceOrganizer:
                 return self.plexapi_server.machineIdentifier == server_id
             except:
                 self.logger.debug(traceback.format_exc())
-                self.logger.warning(f"Unable to use direct connection to {self.plex_config_url}, trying fallback...")
+                self.logger.warning(f"Unable to use direct connection to {self.plex_config_url}. Trying fallback...")
 
         resources = await utils.run(self.plexapi_account.resources)
 
@@ -438,8 +448,10 @@ class OnePaceOrganizer:
                         self.plex_config_servers[id]["selected"] = self.plex_config_server_id == resource.clientIdentifier
 
                     break
-            except:
-                self.logger.exception(f"Unable to connect to Plex server '{resource.name}'")
+
+            except Exception as e:
+                self.logger.debug(traceback.format_exc())
+                self.logger.error(f"Unable to connect to Plex server '{resource.name}' ({e})")
                 return False
 
         return True

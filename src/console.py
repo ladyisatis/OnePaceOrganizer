@@ -515,7 +515,7 @@ class Console:
             if self.organizer.plex_config_enabled:
                 success, queue, completed, skipped = await self.process_task
 
-                if len(queue) > 0:
+                if  isinstance(queue, list) and len(queue) > 0:
                     await utils.run(self.pb_log_output, f"Completed: {completed} processed, {skipped} skipped")
                     await utils.run(self.pb_log_output, "--------------")
                     await self.pb_exit()

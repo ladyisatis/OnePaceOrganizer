@@ -107,7 +107,7 @@ class GUI(QMainWindow):
 
         self.plex_group = QGroupBox("Plex")
         self.plex_group_layout = QVBoxLayout()
-        _plex_remembered_login = not self.organizer.plex_config_use_token and self.organizer.plex_config_auth_token != "" and self.organizer.plex_config_remember
+        _plex_remembered_login = self.organizer.plex_config_auth_token != "" and self.organizer.plex_config_remember
 
         self.plex_method = Input(self.plex_group_layout, "Login Method:", QComboBox(), width=self.plex_width)
         self.plex_method.prop.addItems(["Username and Password", "Authentication Token"])
@@ -139,14 +139,15 @@ class GUI(QMainWindow):
         )
         self.plex_remember_login.prop.setChecked(self.organizer.plex_config_remember)
 
-        self.plex_server = Input(self.plex_group_layout, "Plex Server:", QComboBox(), width=self.plex_width)
+        self.plex_server = Input(self.plex_group_layout, "Server:", QComboBox(), width=self.plex_width)
         self.plex_server.prop.addItem("", userData=None)
 
         i = 1
         for server_id, item in self.organizer.plex_config_servers.items():
             self.plex_server.prop.addItem(item["name"], userData=server_id)
-            if server_id == self.organizer.plex_config_server_id:
+            if item["selected"]:
                 self.plex_server.prop.setCurrentIndex(i)
+                self.organizer.plex_config_server_id = server_id
             i += 1
 
         self.plex_server.prop.activated.connect(self.select_plex_server)
@@ -158,12 +159,13 @@ class GUI(QMainWindow):
         i = 1
         for library_key, item in self.organizer.plex_config_libraries.items():
             self.plex_library.prop.addItem(item["title"], userData=library_key)
-            if library_key == self.organizer.plex_config_library_key:
+            if item["selected"]:
                 self.plex_library.prop.setCurrentIndex(i)
+                self.organizer.plex_config_library_key = library_key
             i += 1
 
         self.plex_library.prop.activated.connect(self.select_plex_library)
-        self.plex_library.setVisible(_plex_remembered_login and self.organizer.plex_config_server_id != "" and len(self.organizer.plex_config_libraries) > 0)
+        self.plex_library.setVisible(_plex_remembered_login and len(self.organizer.plex_config_servers) > 0 and len(self.organizer.plex_config_libraries) > 0)
 
         self.plex_show = Input(self.plex_group_layout, "Show:", QComboBox(), width=self.plex_width)
         self.plex_show.prop.addItem("", userData=None)
@@ -171,12 +173,13 @@ class GUI(QMainWindow):
         i = 1
         for show_guid, item in self.organizer.plex_config_shows.items():
             self.plex_show.prop.addItem(item["title"], userData=show_guid)
-            if show_guid == self.organizer.plex_config_show_guid:
+            if item["selected"]:
                 self.plex_show.prop.setCurrentIndex(i)
+                self.organizer.plex_config_show_guid = show_guid
             i += 1
 
         self.plex_show.prop.activated.connect(self.select_plex_show)
-        self.plex_show.setVisible(_plex_remembered_login and self.organizer.plex_config_library_key != "" and len(self.organizer.plex_config_shows) > 0)
+        self.plex_show.setVisible(_plex_remembered_login and len(self.organizer.plex_config_servers) > 0 and len(self.organizer.plex_config_libraries) > 0 and len(self.organizer.plex_config_shows) > 0)
 
         self.plex_group.setLayout(self.plex_group_layout)
         layout.addWidget(self.plex_group)
@@ -922,24 +925,26 @@ class GUI(QMainWindow):
                     self.start_button.setEnabled(True)
                     return
 
-                if len(queue) > 0:
-                    QMessageBox.information(None, self.organizer.window_title,
-                        (
-                            f"All of the One Pace files have been created in:\n"
-                            f"{str(self.organizer.output_path)}\n\n"
-                            f"Please move the\"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
-                            "and make sure that it appears in Plex. Seasons and episodes will temporarily "
-                            "have incorrect information, and the next step will correct them.\n\n"
-                            "Click OK once this has been done and you can see the One Pace video files in Plex."
+                if isinstance(queue, list):
+                    if len(queue) > 0:
+                        QMessageBox.information(None, self.organizer.window_title,
+                            (
+                                f"All of the One Pace files have been created in:\n"
+                                f"{str(self.organizer.output_path)}\n\n"
+                                f"Please move the\"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
+                                "and make sure that it appears in Plex. Seasons and episodes will temporarily "
+                                "have incorrect information, and the next step will correct them.\n\n"
+                                "Click OK once this has been done and you can see the One Pace video files in Plex."
+                            )
                         )
-                    )
 
-                    res = asyncio.create_task(self.organizer.process_plex_episodes(queue))
-                    success, queue, completed, skipped = await res
-                    self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
-                else:
-                    self.log_output.append(self.spacer)
-                    self.log_output.append("Nothing to do")
+                        res = asyncio.create_task(self.organizer.process_plex_episodes(queue))
+                        success, queue, completed, skipped = await res
+                        self.log_output.append(self.spacer)
+                        self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
+                    else:
+                        self.log_output.append(self.spacer)
+                        self.log_output.append("Nothing to do")
 
             self.plex_server.prop.setEnabled(True)
             self.plex_library.prop.setEnabled(True)
