@@ -1,5 +1,6 @@
 import asyncio
 import concurrent.futures
+import platform
 import sys
 import traceback
 import webbrowser
@@ -733,7 +734,7 @@ class GUI(QMainWindow):
             self.plex_remember_login.button.setEnabled(True)
             return
 
-        await self.organizer.plex_select_library(_id)
+        await self.organizer.plex_select_library(int(_id))
         self.plex_server.setVisible(True)
         self.plex_library.setVisible(True)
         self.plex_show.setVisible(True)

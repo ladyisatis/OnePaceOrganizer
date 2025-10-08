@@ -522,9 +522,12 @@ class OnePaceOrganizer:
 
     async def plex_get_shows(self):
         if self.plexapi_server is None:
+            logger.info("Reconnecting to Plex server...")
             connected = await self.plex_select_server(self.plex_config_server_id)
             if not connected:
                 return False
+            else:
+                logger.info("Reconnected")
 
         if not isinstance(self.plex_config_library_key, int) and self.plex_config_library_key == "":
             self.logger.trace("plex_get_shows: library key is empty")
@@ -566,6 +569,14 @@ class OnePaceOrganizer:
         return len(self.plex_config_shows) > 0
 
     async def plex_select_show(self, guid):
+        if self.plexapi_server is None:
+            logger.info("Reconnecting to Plex server...")
+            connected = await self.plex_select_server(self.plex_config_server_id)
+            if not connected:
+                return False
+            else:
+                logger.info("Reconnected")
+
         self.logger.trace(f"plex_select_show: Looking for GUID '{guid}' (type: {type(guid)})")
         self.logger.trace(f"plex_select_show: Available GUIDs: {list(self.plex_config_shows.keys())}")
 

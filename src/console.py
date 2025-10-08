@@ -362,7 +362,7 @@ class Console:
         if server_id is None:
             return False
 
-        if not await self.organizer.plex_select_server(server_id) or not await self.organizer.plex_get_libraries():
+        if not await self.organizer.plex_select_server(int(server_id)) or not await self.organizer.plex_get_libraries():
             return False
 
         values = []
