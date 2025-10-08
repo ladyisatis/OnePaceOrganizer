@@ -161,7 +161,10 @@ class GUI(QMainWindow):
             self.plex_library.prop.addItem(item["title"], userData=library_key)
             if item["selected"]:
                 self.plex_library.prop.setCurrentIndex(i)
-                self.organizer.plex_config_library_key = library_key
+                if "key" in item:
+                    self.organizer.plex_config_library_key = item["key"]
+                else:
+                    self.organizer.plex_config_library_key = library_key
             i += 1
 
         self.plex_library.prop.activated.connect(self.select_plex_library)
@@ -730,7 +733,7 @@ class GUI(QMainWindow):
             self.plex_remember_login.button.setEnabled(True)
             return
 
-        await self.organizer.plex_select_library(int(_id))
+        await self.organizer.plex_select_library(_id)
         self.plex_server.setVisible(True)
         self.plex_library.setVisible(True)
         self.plex_show.setVisible(True)

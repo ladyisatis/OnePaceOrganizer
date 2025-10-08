@@ -371,7 +371,7 @@ class Console:
         for id, library in self.organizer.plex_config_libraries.items():
             values.append((id, library["title"]))
 
-            if self.organizer.plex_config_library_key == id or library["selected"]:
+            if ("key" in library and self.organizer.plex_config_library_key == library["key"]) or self.organizer.plex_config_library_key == id or library["selected"]:
                 default = id
 
         library_key = await radiolist_dialog(
@@ -383,6 +383,9 @@ class Console:
 
         if library_key is None:
             return False
+
+        if "key" in self.organizer.plex_config_libraries[library_key]:
+            library_key = self.organizer.plex_config_libraries[library_key]["key"]
 
         await self.organizer.plex_select_library(library_key)
 
@@ -515,7 +518,7 @@ class Console:
             if self.organizer.plex_config_enabled:
                 success, queue, completed, skipped = await self.process_task
 
-                if  isinstance(queue, list) and len(queue) > 0:
+                if isinstance(queue, list) and len(queue) > 0:
                     await utils.run(self.pb_log_output, f"Completed: {completed} processed, {skipped} skipped")
                     await utils.run(self.pb_log_output, "--------------")
                     await self.pb_exit()

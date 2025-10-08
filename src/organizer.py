@@ -146,7 +146,10 @@ class OnePaceOrganizer:
                 self.plex_config_libraries = config["plex"]["libraries"]
                 for library_key, item in self.plex_config_libraries.items():
                     if item["selected"]:
-                        self.plex_config_library_key = library_key
+                        if "key" in item:
+                            self.plex_config_library_key = item["key"]
+                        else:
+                            self.plex_config_library_key = library_key
                         break
 
             if "shows" in config["plex"] and isinstance(config["plex"]["shows"], dict):
@@ -484,6 +487,7 @@ class OnePaceOrganizer:
                 section_key_str = str(section.key)
                 selected = self.plex_config_library_key == section_key_str
                 self.plex_config_libraries[section_key_str] = {
+                    "key": section.key,
                     "title": section.title,
                     "selected": selected
                 }
@@ -501,10 +505,17 @@ class OnePaceOrganizer:
             self.logger.error(f"plex_select_library: Library key '{library_key}' not found in available libraries")
             return False
 
-        self.plex_config_library_key = library_key
+        self.plex_config_library_key = ""
 
         for k, v in self.plex_config_libraries.items():
-            self.plex_config_libraries[k]["selected"] = library_key == k
+            if "key" in v:
+                self.plex_config_libraries[k]["selected"] = library_key == v["key"]
+                if self.plex_config_libraries[k]["selected"]:
+                    self.plex_config_library_key = v["key"]
+            else:
+                self.plex_config_libraries[k]["selected"] = library_key == k
+                if self.plex_config_libraries[k]["selected"]:
+                    self.plex_config_library_key = k
 
         self.logger.trace(f"plex_select_library: Selected library '{library_key}'")
         return True
