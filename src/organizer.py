@@ -1197,8 +1197,6 @@ class OnePaceOrganizer:
 
                             if isinstance(ep_data, dict):
                                 queue.append((crc32, plex_ep, None, ep_data))
-                                arc_eps.append(key)
-                                break
 
                         else:
                             self.logger.debug(f"No metadata found for S{season}E{episode}")
