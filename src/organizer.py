@@ -485,7 +485,7 @@ class OnePaceOrganizer:
             self.logger.trace(f"plex_get_libraries: section '{section.title}' (type: {section.type}, key: {section.key})")
             if section.type == 'show':
                 section_key_str = str(section.key)
-                selected = self.plex_config_library_key == section_key_str
+                selected = self.plex_config_library_key == section.key or self.plex_config_library_key == section_key_str
                 self.plex_config_libraries[section_key_str] = {
                     "key": section.key,
                     "title": section.title,
