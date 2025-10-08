@@ -50,6 +50,7 @@ uv run pyinstaller --clean --noconfirm -F \
   --workpath build/gui \
   --add-data "pyproject.toml:." \
   --add-data ".mode:." \
+  --add-data "$ICON_FILE:." \
   $EXTRA_OPTS \
   main.py
 
@@ -67,6 +68,7 @@ uv run pyinstaller --clean --noconfirm -F \
   --workpath build/console \
   --add-data "pyproject.toml:." \
   --add-data ".mode:." \
+  --add-data "$ICON_FILE:." \
   $EXTRA_OPTS \
   main.py
 

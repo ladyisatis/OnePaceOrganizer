@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
     QLineEdit, QFileDialog, QCheckBox, QComboBox, QTextEdit, QProgressBar,
     QGroupBox, QMessageBox, QInputDialog, QMainWindow
 )
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QIcon
 from PySide6.QtCore import Qt, Signal
 
 class Input:
@@ -73,6 +73,20 @@ class GUI(QMainWindow):
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.setWindowTitle(self.organizer.window_title)
         self.setMinimumSize(800, 800)
+
+        try:
+            current_os = platform.system()
+            base_path = Path(sys._MEIPASS if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') else 'misc')
+
+            if current_os == "Windows" and Path(base_path, "icon.ico").is_file():
+                self.setWindowIcon(QIcon(str(Path(base_path, "icon.ico").resolve())))
+            elif current_os == "Darwin" and Path(base_path, "icon.icns").is_file():
+                self.setWindowIcon(QIcon(str(Path(base_path, "icon.icns").resolve())))
+            elif Path(base_path, "icon.png").is_file():
+                self.setWindowIcon(QIcon(str(Path(base_path, "icon.png").resolve())))
+
+        except:
+            print(f"Skipping setting app icon:\n{traceback.format_exc()}")
 
         self.organizer.message_dialog_func = self._message_dialog
         self.organizer.input_dialog_func = self._input_dialog

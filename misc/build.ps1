@@ -12,10 +12,10 @@ if (Test-Path metadata) { Remove-Item metadata -Recurse -Force }
 New-Item -ItemType Directory -Path "dist" -Force | Out-Null
 
 Set-Content -Path ".\.mode" -Value "gui"
-uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-gui" --icon "$env:ICON_FILE" --windowed --distpath "dist" --hidden-import=ssl --hidden-import=_ssl --exclude-module "prompt_toolkit" --workpath "build/gui" --add-data "pyproject.toml:." --add-data ".mode:." $env:EXTRA_OPTS "main.py"
+uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-gui" --icon "$env:ICON_FILE" --windowed --distpath "dist" --hidden-import=ssl --hidden-import=_ssl --exclude-module "prompt_toolkit" --workpath "build/gui" --add-data "pyproject.toml:." --add-data ".mode:." --add-data "$env:ICON_FILE:." $env:EXTRA_OPTS "main.py"
 
 Set-Content -Path ".\.mode" -Value "console"
-uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-cli" --icon "$env:ICON_FILE" --console --distpath "dist" --hidden-import=ssl --hidden-import=_ssl --exclude-module "qasync" --exclude-module "PySide6" --workpath "build/console" --add-data "pyproject.toml:." --add-data ".mode:." $env:EXTRA_OPTS "main.py"
+uv run pyinstaller --clean --noconfirm -F --name "OnePaceOrganizer-cli" --icon "$env:ICON_FILE" --console --distpath "dist" --hidden-import=ssl --hidden-import=_ssl --exclude-module "qasync" --exclude-module "PySide6" --workpath "build/console" --add-data "pyproject.toml:." --add-data ".mode:." --add-data "$env:ICON_FILE:." $env:EXTRA_OPTS "main.py"
 
 if (Test-Path build) { Remove-Item build -Recurse -Force }
 
