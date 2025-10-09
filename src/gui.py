@@ -102,7 +102,9 @@ class GUI(QMainWindow):
         self.progress_bar.setValue(0)
         self.organizer.progress_bar_func = self.progress_bar.setValue
 
-        self.input = Input(layout, "Directory of unsorted One Pace .mkv/.mp4 files:", QLineEdit(), button="Browse...", connect=self.browse_input_folder)
+        self.input_nometadata_str = "Directory of unsorted One Pace .mkv/.mp4 files:"
+        self.input_metadata_str = "Directory of your One Pace collection:"
+        self.input = Input(layout, self.input_nometadata_str, QLineEdit(), button="Browse...", connect=self.browse_input_folder)
         self.input.prop.setPlaceholderText(str(Path.home() / "Downloads"))
         self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
         if self.organizer.input_path != "":
@@ -437,6 +439,7 @@ class GUI(QMainWindow):
 
         self.output.label.setText(f"{_action} the sorted and renamed files to:")
         self.output.setVisible(self.organizer.file_action != 4)
+        self.input.label.setText(self.input_metadata_str if self.organizer.file_action == 4 else self.input_nometadata_str)
         self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
 
     async def _input_dialog(self, text, default=""):
@@ -527,6 +530,7 @@ class GUI(QMainWindow):
         self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
         self.action_overwrite_nfo.setVisible(not self.organizer.plex_config_enabled)
         self.output.setVisible(self.organizer.file_action != 4)
+        self.input.label.setText(self.input_metadata_str if self.organizer.file_action == 4 else self.input_nometadata_str)
         self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
 
     def set_lockdata(self):
