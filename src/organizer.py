@@ -81,6 +81,7 @@ class OnePaceOrganizer:
         self.input_dialog_func = None
         self.worker_task = None
         self.toml = None
+        self.extra_fields = {}
         self.logger = logger
 
     async def load_config(self):
@@ -110,9 +111,6 @@ class OnePaceOrganizer:
         if "output" in config and config["output"] is not None and config["output"] != "":
             self.output_path = await utils.resolve(config["output"])
 
-        if "move_after_sort" in config and config["move_after_sort"] is not None:
-            self.file_action = 0 if config["move_after_sort"] else 1
-        
         if "file_action" in config and config["file_action"] is not None:
             self.file_action = config["file_action"]
 
@@ -127,6 +125,9 @@ class OnePaceOrganizer:
 
         if "filename_tmpl" in config and config["filename_tmpl"] is not None:
             self.filename_tmpl = config["filename_tmpl"]
+
+        if "extra_fields" in config and isinstance(config["extra_fields"], dict):
+            self.extra_fields = config["extra_fields"]
 
         if "plex" in config:
             if "enabled" in config["plex"] and config["plex"]["enabled"] is not None:
@@ -191,6 +192,7 @@ class OnePaceOrganizer:
             "fetch_posters": self.fetch_posters,
             "overwrite_nfo": self.overwrite_nfo,
             "filename_tmpl": self.filename_tmpl,
+            "extra_fields": self.extra_fields,
             "plex": {
                 "enabled": self.plex_config_enabled,
                 "url": self.plex_config_url,
