@@ -287,21 +287,21 @@ class GUI(QMainWindow):
         self.action_overwrite_nfo.triggered.connect(self.set_overwrite_nfo)
         menu_configuration.addAction(self.action_overwrite_nfo)
 
-        menu_configuration.addSeparator()
-
-        menu_advanced = menu_configuration.addMenu("Advanced")
-
         self.action_lockdata = QAction("Lock Fields after Edits", self)
         self.action_lockdata.setCheckable(True)
         self.action_lockdata.setChecked(self.organizer.lockdata)
         self.action_lockdata.triggered.connect(self.set_lockdata)
-        menu_advanced.addAction(self.action_lockdata)
+        menu_configuration.addAction(self.action_lockdata)
 
         self.action_fetch_posters = QAction("Fetch Posters if Missing", self)
         self.action_fetch_posters.setCheckable(True)
         self.action_fetch_posters.setChecked(self.organizer.fetch_posters)
         self.action_fetch_posters.triggered.connect(self.set_fetch_posters)
-        menu_advanced.addAction(self.action_fetch_posters)
+        menu_configuration.addAction(self.action_fetch_posters)
+
+        menu_configuration.addSeparator()
+
+        menu_advanced = menu_configuration.addMenu("Advanced")
 
         menu_advanced.addSeparator()
 
