@@ -72,7 +72,20 @@ class GUI(QMainWindow):
 
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.setWindowTitle(self.organizer.window_title)
-        self.setMinimumSize(800, 800)
+        self.setMinimumSize(800, 600)
+
+        _has_gui_x = "gui_x" in self.organizer.extra_fields and isinstance(self.organizer.extra_fields["gui_x"], int)
+        _has_gui_y = "gui_y" in self.organizer.extra_fields and isinstance(self.organizer.extra_fields["gui_y"], int)
+        _has_gui_width = "gui_width" in self.organizer.extra_fields and isinstance(self.organizer.extra_fields["gui_width"], int)
+        _has_gui_height = "gui_height" in self.organizer.extra_fields and isinstance(self.organizer.extra_fields["gui_height"], int)
+
+        if _has_gui_x and _has_gui_y and _has_gui_width and _has_gui_height:
+            self.setGeometry(
+                self.organizer.extra_fields["gui_x"],
+                self.organizer.extra_fields["gui_y"],
+                self.organizer.extra_fields["gui_width"],
+                self.organizer.extra_fields["gui_height"]
+            )
 
         try:
             current_os = platform.system()
@@ -455,6 +468,18 @@ class GUI(QMainWindow):
         return await asyncWrap(
             lambda: QMessageBox.information(None, self.organizer.window_title, text) 
         ) == QMessageBox.StandardButtons.Ok
+
+    def moveEvent(self, event):
+        _pos = event.pos()
+        self.organizer.extra_fields["gui_x"] = _pos.x()
+        self.organizer.extra_fields["gui_y"] = _pos.y()
+        super().moveEvent(event)
+
+    def resizeEvent(self, event):
+        _size = event.size()
+        self.organizer.extra_fields["gui_width"] = _size.width()
+        self.organizer.extra_fields["gui_height"] = _size.height()
+        super().resizeEvent(event)
 
     def browse_input_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Input Folder")
