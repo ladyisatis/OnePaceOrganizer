@@ -906,7 +906,7 @@ class OnePaceOrganizer:
                     self.logger.warning(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed [2]")
 
             else:
-                self.logger.warning(f"Skipping {info[0].name}: Episode metadata missing, make sure you have the latest version of this release")
+                self.logger.warning(f"Skipping {info[1].name}: Episode metadata missing, make sure you have the latest version of this One Pace release")
 
             await utils.run_func(self.progress_bar_func, int(((index + 1) / filelist_total) * 100))
 
