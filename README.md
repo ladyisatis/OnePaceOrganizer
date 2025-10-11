@@ -12,7 +12,7 @@ By the end, on your Plex or Jellyfin setup, you should have:
 
 You can also re-run the program when new One Pace releases for quick renaming, and this does not require every single One Pace release ever released in order to function. If there's no added metadata in the repository for an episode, like say, the One Pace team just released an episode 2 minutes ago? It will look into the .mkv file and attempt to create the metadata for you.
 
-**IMPORTANT:** For applications depending on this project for metadata, the format of the amalgamated metadata file [has both moved as well as changed formats](https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/main/data.json) for 1.0.0, as rewriting this whole project made things a little more efficient at the cost of trying to change around things. This is the _only_ time this change in both location and file format will happen, and there _should_ be no more breaking changes in this format.
+See this for metadata information: [https://github.com/ladyisatis/one-pace-metadata?tab=readme-ov-file#one-pace-metadata](https://github.com/ladyisatis/one-pace-metadata?tab=readme-ov-file#one-pace-metadata)
 
 ## Pixeldrain
 
