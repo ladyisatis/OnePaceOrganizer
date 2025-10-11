@@ -29,6 +29,6 @@ Contributions via Pull Requests are always welcome if I miss a bug or want anoth
 - [matteron/one-pace-plex-api](https://github.com/matteron/one-pace-plex-api) for the code that updates the Plex API
 - [IconArchive](https://www.iconarchive.com/show/one-piece-jolly-roger-icons-by-crountch/Luffys-flag-icon.html) for application icon
 - The [One Pace Team](https://onepace.net/) itself for:
-  - Official posters in *metadata/posters*
-  - One Pace Episode Guide spreadsheet managing, which amalgamates into *metadata/data.json*
+  - [Official posters](https://github.com/ladyisatis/one-pace-metadata/tree/main/posters) present in the Episode Guide
+  - One Pace Episode Guide spreadsheet managing, which amalgamates into [data.json](https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/main/data.json)
   - Fantastic edits and for getting the group I watch One Piece with through without losing their minds
