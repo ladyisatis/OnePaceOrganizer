@@ -1588,10 +1588,10 @@ class OnePaceOrganizer:
             if txt != out:
                 self.logger.info(f"Writing {tvshow_nfo.name} to: {tvshow_nfo.parent}")
                 await utils.write_file(tvshow_nfo, out)
-        else:
-            if not await utils.is_file(tvshow_nfo):
-                self.logger.info(f"Writing {tvshow_nfo.name} to: {tvshow_nfo.parent}")
-                await utils.write_file(tvshow_nfo, out)
+
+        elif not await utils.is_file(tvshow_nfo):
+            self.logger.info(f"Writing {tvshow_nfo.name} to: {tvshow_nfo.parent}")
+            await utils.write_file(tvshow_nfo, out)
 
         index = 0
         completed = 0
@@ -1751,10 +1751,10 @@ class OnePaceOrganizer:
                                 if txt != out:
                                     await utils.write_file(season_nfo, out)
                                     self.logger.info(f"Wrote season.nfo to: {season_nfo.parent}")
-                            else:
-                                if not await utils.is_file(season_nfo):
-                                    await utils.write_file(season_nfo, out)
-                                    self.logger.info(f"Wrote season.nfo to: {season_nfo.parent}")
+
+                            elif not await utils.is_file(season_nfo):
+                                await utils.write_file(season_nfo, out)
+                                self.logger.info(f"Wrote season.nfo to: {season_nfo.parent}")
 
                     else:
                         self.logger.warning(f"Skipping season {season}: Season not found in metadata")
@@ -1906,11 +1906,14 @@ class OnePaceOrganizer:
                             completed += 1
                         else:
                             skipped += 1
+
+                    elif not await utils.is_file(nfo_file):
+                        self.logger.debug(f"Writing metadata to: {nfo_file}")
+                        await utils.write_file(nfo_file, out)
+                        completed += 1
+
                     else:
-                        if not await utils.is_file(nfo_file):
-                            self.logger.debug(f"Writing metadata to: {nfo_file}")
-                            await utils.write_file(nfo_file, out)
-                            completed += 1
+                        skipped += 1
 
                     index += 1
                     await utils.run_func(self.progress_bar_func, int((index / total) * 100))
