@@ -900,13 +900,13 @@ class OnePaceOrganizer:
                         video_files.append(info)
 
                     else:
-                        self.logger.warning(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed [3]")
+                        self.logger.warning(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed (error 3). Make sure you have the latest version of this One Pace release.")
 
                 except:
-                    self.logger.warning(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed [2]")
+                    self.logger.warning(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed (error 2). Make sure you have the latest version of this One Pace release.")
 
             else:
-                self.logger.warning(f"Skipping {info[1].name}: Episode metadata missing, make sure you have the latest version of this One Pace release")
+                self.logger.warning(f"Skipping {info[1].name}: Episode metadata missing, make sure you have the latest version of this One Pace release.")
 
             await utils.run_func(self.progress_bar_func, int(((index + 1) / filelist_total) * 100))
 
