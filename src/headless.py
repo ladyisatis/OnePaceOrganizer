@@ -25,9 +25,13 @@ class Headless:
     async def run(self):
         await self.organizer.load_config()
 
+        logger.info(self.organizer.window_title)
+        logger.info("-")
+
         is_latest, latest_vers = await utils.run(utils.is_up_to_date, self.organizer.toml["version"], self.organizer.base_path)
         if not is_latest:
             logger.info(f"Note: There is a new version of this application available, and can be downloaded from GitHub. (Installed: {self.organizer.toml['version']}, Latest: {latest_vers})")
+            logger.info("-")
 
         _action = "Action after Sorting: Move"
         if self.organizer.file_action == 1:
