@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
     QGroupBox, QMessageBox, QInputDialog, QMainWindow
 )
 from PySide6.QtGui import QAction, QIcon
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QEvent
 
 class Input:
     def __init__(self, layout, label, prop, width=250, button="", connect=None):
@@ -380,7 +380,7 @@ class GUI(QMainWindow):
         self.action_log_level_5.triggered.connect(func_partial(self._set_logger, "DEBUG"))
         menu_log_level.addAction(self.action_log_level_5)
 
-        self.action_log_level_6 = QAction("Trace (slow)", self)
+        self.action_log_level_6 = QAction("Trace", self)
         self.action_log_level_6.setCheckable(True)
         self.action_log_level_6.setChecked(self.log_level == "TRACE")
         self.action_log_level_6.triggered.connect(func_partial(self._set_logger, "TRACE"))
@@ -470,16 +470,33 @@ class GUI(QMainWindow):
         ) == QMessageBox.StandardButtons.Ok
 
     def moveEvent(self, event):
-        _pos = event.pos()
-        self.organizer.extra_fields["gui_x"] = _pos.x()
-        self.organizer.extra_fields["gui_y"] = _pos.y()
+        if not self.isMaximized():
+            _pos = event.pos()
+            self.organizer.extra_fields["gui_x"] = _pos.x()
+            self.organizer.extra_fields["gui_y"] = _pos.y()
+
         super().moveEvent(event)
 
     def resizeEvent(self, event):
-        _size = event.size()
-        self.organizer.extra_fields["gui_width"] = _size.width()
-        self.organizer.extra_fields["gui_height"] = _size.height()
+        if not self.isMaximized():
+            _size = event.size()
+            self.organizer.extra_fields["gui_width"] = _size.width()
+            self.organizer.extra_fields["gui_height"] = _size.height()
+
         super().resizeEvent(event)
+
+    def changeEvent(self, event):
+        if event.type() == QEvent.Type.WindowStateChange:
+            _maximized = self.isMaximized()
+            self.organizer.extra_fields["gui_maximized"] = _maximized
+            if _maximized:
+                _geo = self.normalGeometry()
+                self.organizer.extra_fields["gui_x"] = _geo.x()
+                self.organizer.extra_fields["gui_y"] = _geo.y()
+                self.organizer.extra_fields["gui_width"] = _geo.width()
+                self.organizer.extra_fields["gui_height"] = _geo.height()
+
+        super().changeEvent(event)
 
     def browse_input_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Input Folder")
@@ -1022,7 +1039,11 @@ def main(organizer, log_level):
 
             gui = GUI(organizer, log_level)
             gui.setWindowTitle(organizer.window_title)
-            gui.show()
+
+            if "gui_maximized" in organizer.extra_fields and isinstance(organizer.extra_fields["gui_maximized"], bool) and organizer.extra_fields["gui_maximized"]:
+                gui.showMaximized()
+            else:
+                gui.show()
 
             is_latest, latest_vers = await utils.run(utils.is_up_to_date, organizer.toml["version"], organizer.base_path)
             if not is_latest:
