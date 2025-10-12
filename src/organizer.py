@@ -354,7 +354,7 @@ class OnePaceOrganizer:
             except:
                 self.logger.debug(traceback.format_exc())
                 if self.plexapi_account is not None:
-                    self.logger.warning(f"Unable to use direct connection to {self.plex_config_url}, trying fallback...")
+                    self.logger.warning(f"Unable to use direct connection to {self.plex_config_url}. Trying fallback...")
                 else:
                     self.logger.error(f"Unable to use direct connection to {self.plex_config_url}.")
                     return False
@@ -463,9 +463,12 @@ class OnePaceOrganizer:
 
     async def plex_get_libraries(self):
         if self.plexapi_server is None:
+            logger.info("Reconnecting to Plex server...")
             connected = await self.plex_select_server(self.plex_config_server_id)
             if not connected:
                 return False
+            else:
+                logger.info("Reconnected")
 
         self.plex_config_libraries = {}
 
@@ -474,8 +477,8 @@ class OnePaceOrganizer:
             sections = await utils.run(self.plexapi_server.library.sections)
             self.logger.trace(f"plex_get_libraries: found {len(sections)} total sections")
         except Exception as e:
-            self.logger.error(f"plex_get_libraries: Exception occurred: {e}")
-            self.logger.error(f"plex_get_libraries: Full traceback: {traceback.format_exc()}")
+            self.logger.debug(f"plex_get_libraries: Exception occurred: {e}")
+            self.logger.trace(f"plex_get_libraries: Full traceback: {traceback.format_exc()}")
             if self.message_dialog_func is None:
                 self.logger.error("Unable to fetch Plex libraries from this server.")
             else:
@@ -496,10 +499,18 @@ class OnePaceOrganizer:
                 self.logger.trace(f"plex_get_libraries: added show library '{section.title}' (key: {section_key_str}, selected: {selected})")
 
         self.logger.trace(f"plex_get_libraries: available libraries keys: {list(self.plex_config_libraries.keys())}")
-        self.logger.trace(f"plex_get_libraries: returning {len(self.plex_config_libraries)} > 0 = {len(self.plex_config_libraries) > 0}")
+        self.logger.debug(f"plex_get_libraries: returning {len(self.plex_config_libraries)} > 0 = {len(self.plex_config_libraries) > 0}")
         return len(self.plex_config_libraries) > 0
 
     async def plex_select_library(self, library_key):
+        if self.plexapi_server is None:
+            logger.info("Reconnecting to Plex server...")
+            connected = await self.plex_select_server(self.plex_config_server_id)
+            if not connected:
+                return False
+            else:
+                logger.info("Reconnected")
+
         self.logger.trace(f"plex_select_library: Looking for key '{library_key}' (type: {type(library_key)})")
         self.logger.trace(f"plex_select_library: Available keys: {list(self.plex_config_libraries.keys())}")
 
@@ -519,7 +530,7 @@ class OnePaceOrganizer:
                 if self.plex_config_libraries[k]["selected"]:
                     self.plex_config_library_key = k
 
-        self.logger.trace(f"plex_select_library: Selected library '{library_key}'")
+        self.logger.debug(f"plex_select_library: Selected library '{library_key}'")
         return True
 
     async def plex_get_shows(self):
@@ -546,8 +557,8 @@ class OnePaceOrganizer:
             shows = await utils.run(section.all)
             self.logger.trace(f"plex_get_shows: found {len(shows)} shows")
         except Exception as e:
-            self.logger.error(f"plex_get_shows: Exception occurred: {e}")
-            self.logger.error(f"plex_get_shows: Full traceback: {traceback.format_exc()}")
+            self.logger.debug(f"plex_get_shows: Exception occurred: {e}")
+            self.logger.trace(f"plex_get_shows: Full traceback: {traceback.format_exc()}")
             if self.message_dialog_func is None:
                 self.logger.error("Unable to fetch Plex shows from this server.")
             else:
@@ -567,7 +578,7 @@ class OnePaceOrganizer:
             }
             self.logger.trace(f"plex_get_shows: added show '{show.title}' with GUID '{show.guid}' (selected: {selected})")
 
-        self.logger.trace(f"plex_get_shows: returning {len(self.plex_config_shows)} > 0 = {len(self.plex_config_shows) > 0}")
+        self.logger.debug(f"plex_get_shows: returning {len(self.plex_config_shows)} > 0 = {len(self.plex_config_shows) > 0}")
         return len(self.plex_config_shows) > 0
 
     async def plex_select_show(self, guid):
@@ -596,7 +607,7 @@ class OnePaceOrganizer:
         for k, v in self.plex_config_shows.items():
             self.plex_config_shows[k]["selected"] = guid == k
 
-        self.logger.trace(f"plex_select_show: Selected show '{guid}'")
+        self.logger.debug(f"plex_select_show: Selected show '{guid}'")
         return True
     
     async def plex_art_set(self, art_file, episode, is_poster=True):
