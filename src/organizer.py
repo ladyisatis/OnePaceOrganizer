@@ -463,12 +463,12 @@ class OnePaceOrganizer:
 
     async def plex_get_libraries(self):
         if self.plexapi_server is None:
-            logger.info("Reconnecting to Plex server...")
+            self.logger.info("Reconnecting to Plex server...")
             connected = await self.plex_select_server(self.plex_config_server_id)
             if not connected:
                 return False
             else:
-                logger.info("Reconnected")
+                self.logger.info("Reconnected")
 
         self.plex_config_libraries = {}
 
@@ -504,12 +504,12 @@ class OnePaceOrganizer:
 
     async def plex_select_library(self, library_key):
         if self.plexapi_server is None:
-            logger.info("Reconnecting to Plex server...")
+            self.logger.info("Reconnecting to Plex server...")
             connected = await self.plex_select_server(self.plex_config_server_id)
             if not connected:
                 return False
             else:
-                logger.info("Reconnected")
+                self.logger.info("Reconnected")
 
         self.logger.trace(f"plex_select_library: Looking for key '{library_key}' (type: {type(library_key)})")
         self.logger.trace(f"plex_select_library: Available keys: {list(self.plex_config_libraries.keys())}")
@@ -535,12 +535,12 @@ class OnePaceOrganizer:
 
     async def plex_get_shows(self):
         if self.plexapi_server is None:
-            logger.info("Reconnecting to Plex server...")
+            self.logger.info("Reconnecting to Plex server...")
             connected = await self.plex_select_server(self.plex_config_server_id)
             if not connected:
                 return False
             else:
-                logger.info("Reconnected")
+                self.logger.info("Reconnected")
 
         if not isinstance(self.plex_config_library_key, int) and self.plex_config_library_key == "":
             self.logger.trace("plex_get_shows: library key is empty")
@@ -583,12 +583,12 @@ class OnePaceOrganizer:
 
     async def plex_select_show(self, guid):
         if self.plexapi_server is None:
-            logger.info("Reconnecting to Plex server...")
+            self.logger.info("Reconnecting to Plex server...")
             connected = await self.plex_select_server(self.plex_config_server_id)
             if not connected:
                 return False
             else:
-                logger.info("Reconnected")
+                self.logger.info("Reconnected")
 
         self.logger.trace(f"plex_select_show: Looking for GUID '{guid}' (type: {type(guid)})")
         self.logger.trace(f"plex_select_show: Available GUIDs: {list(self.plex_config_shows.keys())}")
