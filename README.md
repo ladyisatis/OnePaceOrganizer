@@ -12,9 +12,9 @@ By the end, on your Plex or Jellyfin setup, you should have:
 
 You can also re-run the program when new One Pace releases for quick renaming, and this does not require every single One Pace release ever released in order to function. If there's no added metadata in the repository for an episode, like say, the One Pace team just released an episode 2 minutes ago? It will look into the .mkv file and attempt to create the metadata for you.
 
-## Pixeldrain
+## Metadata
 
-Episodes from Pixeldrain that are separated into "English Subtitles" and "English Dub" are unsupported as there's too many to create CRC32 metadata files for, and no automatic way to tell which video files from Pixeldrain correspond to which episode. You're welcome to download the `episodes` folder from the [metadata repository](https://github.com/ladyisatis/one-pace-metadata) and put it inside the `metadata` folder, search for the corresponding [episode file](https://github.com/ladyisatis/one-pace-metadata/tree/main/episodes) and copy its contents [using the instructions here](https://github.com/ladyisatis/one-pace-metadata?tab=readme-ov-file#yaml-episodesyml-arcsyml-tvshowyml), however that may take a lot of time compared to just grabbing the video files the non-Pixeldrain way.
+Metadata is sourced from [one-pace-metadata](https://github.com/ladyisatis/one-pace-metadata?tab=readme-ov-file#one-pace-metadata).
 
 ## Contributing
 
