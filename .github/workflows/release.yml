@@ -72,9 +72,9 @@ jobs:
         with:
           draft: true
           files: |
-            OnePaceOrganizer-*-windows-*
-            OnePaceOrganizer-*-macos-*
-            OnePaceOrganizer-*-linux-*
+            OnePaceOrganizer-*-windows*
+            OnePaceOrganizer-*-macos*
+            OnePaceOrganizer-*-linux*
             posters.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
