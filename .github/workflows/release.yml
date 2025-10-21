@@ -72,21 +72,9 @@ jobs:
         with:
           draft: true
           files: |
-            OnePaceOrganizer-cli-windows-x86_64.exe
-            OnePaceOrganizer-cli-windows-arm64.exe
-            OnePaceOrganizer-cli-macos-arm64.dmg
-            OnePaceOrganizer-cli-linux-x86_64
-            OnePaceOrganizer-cli-linux-arm64
-            OnePaceOrganizer-gui-windows-x86_64.exe
-            OnePaceOrganizer-gui-windows-arm64.exe
-            OnePaceOrganizer-gui-macos-arm64.dmg
-            OnePaceOrganizer-gui-linux-x86_64
-            OnePaceOrganizer-gui-linux-arm64
-            OnePaceOrganizer-windows-x86_64.zip
-            OnePaceOrganizer-windows-arm64.zip
-            OnePaceOrganizer-macos-arm64.zip
-            OnePaceOrganizer-linux-x86_64.zip
-            OnePaceOrganizer-linux-arm64.zip
+            OnePaceOrganizer-cli-windows-*
+            OnePaceOrganizer-cli-macos-*
+            OnePaceOrganizer-cli-linux-*
             posters.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
