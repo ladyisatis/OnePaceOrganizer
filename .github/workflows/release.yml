@@ -69,15 +69,11 @@ jobs:
           draft: true
           files: |
             OnePaceOrganizer-*-linux-aarch64
-            OnePaceOrganizer-*-linux-aarch64.zip
             OnePaceOrganizer-*-linux-arm64
-            OnePaceOrganizer-*-linux-arm64.zip
             OnePaceOrganizer-*-linux-x86_64
-            OnePaceOrganizer-*-linux-x86_64.zip
             OnePaceOrganizer-*-macos-*.dmg
-            OnePaceOrganizer-*-macos-*.zip
             OnePaceOrganizer-*-windows-*.exe
-            OnePaceOrganizer-*-windows-*.zip
+            OnePaceOrganizer*.zip
             posters.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
