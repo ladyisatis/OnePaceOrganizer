@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm, macos-26]
 
     env:
       UV_CACHE_DIR: /tmp/.uv-cache
@@ -38,21 +38,26 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Run build script (Windows)
-        if: matrix.os == 'windows-latest'
+        if: contains(matrix.os, 'windows')
         shell: bash
         run: |
           export BUILD_OS="windows"
           ./misc/build.sh
 
+      - name: Set up Homebrew (macOS)
+        id: set-up-homebrew
+        if: contains(matrix.os, 'macos')
+        uses: Homebrew/actions/setup-homebrew@main
+
       - name: Run build script (macOS)
-        if: matrix.os == 'macos-latest'
+        if: contains(matrix.os, 'macos')
         shell: bash
         run: |
           export BUILD_OS="macos"
           ./misc/build.sh
 
       - name: Run build script (Linux)
-        if: matrix.os == 'ubuntu-latest'
+        if: contains(matrix.os, 'ubuntu')
         shell: bash
         run: |
           export BUILD_OS="linux"
@@ -64,11 +69,10 @@ jobs:
           draft: true
           files: |
             OnePaceOrganizer-cli-windows-x86_64.exe
-            OnePaceOrganizer-cli-macos-arm64
+            OnePaceOrganizer-cli-macos-arm64.dmg
             OnePaceOrganizer-cli-linux-x86_64
             OnePaceOrganizer-gui-windows-x86_64.exe
-            OnePaceOrganizer-gui-macos-arm64.app
-            OnePaceOrganizer-gui-macos-arm64
+            OnePaceOrganizer-gui-macos-arm64.dmg
             OnePaceOrganizer-gui-linux-x86_64
             OnePaceOrganizer-windows-x86_64.zip
             OnePaceOrganizer-macos-arm64.zip

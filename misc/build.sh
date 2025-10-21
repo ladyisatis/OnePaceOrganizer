@@ -117,17 +117,44 @@ if [ "$BUILD_OS" == "windows" ]; then
   mv "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}.exe" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}.exe" .
 
 elif [ "$BUILD_OS" == "macos" ]; then
-  mkdir -p dist/OnePaceOrganizer.app/Contents/MacOS
-  cp "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" dist/OnePaceOrganizer.app/Contents/MacOS/OnePaceOrganizer
+  brew install create-dmg
 
-  cp "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" temp_zip/
-  cp -r dist/OnePaceOrganizer.app temp_zip/
+  [ -d "build/dmg" ] && rm -rf build/dmg
+  [ ! -d "build/dmg" ] && mkdir -p build/dmg
+  cp -r "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}.app" "build/dmg/One Pace Organizer GUI.app"
+
+  create-dmg \
+    --volname "One Pace Organizer GUI" \
+    --volicon "$ICON_FILE" \
+    --window-pos 200 200 \
+    --window-size 600 600 \
+    --icon-size 128 \
+    --icon "One Pace Organizer GUI.app" 175 120 \
+    --hide-extension "One Pace Organizer GUI.app" \
+    --app-drop-link 425 120 \
+    "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}.dmg" \
+    "build/dmg/"
+
+  rm -rf build/dmg/*
+  cp -r "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" "build/dmg/OnePaceOrganizer-cli"
+
+  create-dmg \
+    --volname "One Pace Organizer CLI" \
+    --volicon "$ICON_FILE" \
+    --window-pos 200 200 \
+    --window-size 300 300 \
+    --icon-size 128 \
+    --icon "OnePaceOrganizer-cli" 175 120 \
+    "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}.dmg" \
+    "build/dmg/"
+
+  cp -r "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}.app" "temp_zip/OnePaceOrganizer-gui.app"
+  cp "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" "temp_zip/OnePaceOrganizer-cli"
 
   pushd temp_zip && zip -r "../OnePaceOrganizer-${BUILD_OS}-${OS_ARCH}.zip" . && popd
   rm -rf temp_zip
 
-  mv dist/OnePaceOrganizer.app "OnePaceOrganizer-${BUILD_OS}-${OS_ARCH}.app"
-  mv "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}" .
+  mv "dist/OnePaceOrganizer-gui-${BUILD_OS}-${OS_ARCH}.dmg" "dist/OnePaceOrganizer-cli-${BUILD_OS}-${OS_ARCH}.dmg" .
 
 else
   [ ! -f "posters.zip" ] && zip -r posters.zip posters
