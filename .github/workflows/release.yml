@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm, macos-26]
+        os: [ubuntu-24.04, ubuntu-24.04-arm64, windows-2025, macos-26]
 
     env:
       UV_CACHE_DIR: /tmp/.uv-cache
@@ -41,10 +41,6 @@ jobs:
         if: contains(matrix.os, 'windows')
         shell: bash
         run: |
-          if [[ "$PROCESSOR_ARCHITECTURE" == "ARM64" ]]; then
-            export OS_ARCH="arm64"
-          fi
-
           export BUILD_OS="windows"
           ./misc/build.sh
 
@@ -72,9 +68,16 @@ jobs:
         with:
           draft: true
           files: |
-            OnePaceOrganizer-*-windows*
-            OnePaceOrganizer-*-macos*
-            OnePaceOrganizer-*-linux*
+            OnePaceOrganizer-*-linux-aarch64
+            OnePaceOrganizer-*-linux-aarch64.zip
+            OnePaceOrganizer-*-linux-arm64
+            OnePaceOrganizer-*-linux-arm64.zip
+            OnePaceOrganizer-*-linux-x86_64
+            OnePaceOrganizer-*-linux-x86_64.zip
+            OnePaceOrganizer-*-macos-*.dmg
+            OnePaceOrganizer-*-macos-*.zip
+            OnePaceOrganizer-*-windows-*.exe
+            OnePaceOrganizer-*-windows-*.zip
             posters.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
