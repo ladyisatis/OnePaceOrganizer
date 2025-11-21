@@ -246,17 +246,19 @@ def move_file(src, dst, file_action=0):
                 dst.unlink(missing_ok=True)
 
         if file_action == 1: #Copy
-            shutil.copy2(str(src), str(dst))
-            #logger.info(f"copy2 [{src}] [{dst}]")
+            if sys.version_info >= (3, 14):
+                src.copy(dst, follow_symlinks=True, preserve_metadata=True)
+            else:
+                shutil.copy2(str(src), str(dst))
         elif file_action == 2: #Symlink
             dst.symlink_to(src)
-            #logger.info(f"symlink [{src}] [{dst}]")
         elif file_action == 3: #Hardlink
             dst.hardlink_to(src)
-            #logger.info(f"hardlink [{src}] [{dst}]")
         else: #Move, or other
-            shutil.move(str(src), str(dst))
-            #logger.info(f"move [{src}] [{dst}]")
+            if sys.version_info >= (3, 14):
+                src.move(dst)
+            else:
+                shutil.move(str(src), str(dst))
 
     except UnsupportedOperation:
         return "Aborting: failed due to an 'UnsupportedOperation' error. If you're on Windows, and have chosen the symlink option, you may need administrator privileges."
