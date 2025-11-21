@@ -300,6 +300,13 @@ class GUI(QMainWindow):
         self.action_overwrite_nfo.triggered.connect(self.set_overwrite_nfo)
         menu_configuration.addAction(self.action_overwrite_nfo)
 
+        self.action_set_show = QAction("Overwrite Show Information", self)
+        self.action_set_show.setCheckable(True)
+        self.action_set_show.setChecked(self.organizer.set_show_edits)
+        self.action_set_show.setVisible(self.organizer.plex_config_enabled)
+        self.action_set_show.triggered.connect(self.set_show_edits)
+        menu_configuration.addAction(self.action_set_show)
+
         self.action_lockdata = QAction("Lock Fields after Edits", self)
         self.action_lockdata.setCheckable(True)
         self.action_lockdata.setChecked(self.organizer.lockdata)
@@ -311,6 +318,7 @@ class GUI(QMainWindow):
         self.action_fetch_posters.setChecked(self.organizer.fetch_posters)
         self.action_fetch_posters.triggered.connect(self.set_fetch_posters)
         menu_configuration.addAction(self.action_fetch_posters)
+
 
         menu_configuration.addSeparator()
 
@@ -571,6 +579,7 @@ class GUI(QMainWindow):
         self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
         self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
         self.action_overwrite_nfo.setVisible(not self.organizer.plex_config_enabled)
+        self.action_set_show.setVisible(self.organizer.plex_config_enabled)
         self.output.setVisible(self.organizer.file_action != 4)
         self.input.label.setText(self.input_metadata_str if self.organizer.file_action == 4 else self.input_nometadata_str)
         self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
@@ -936,6 +945,10 @@ class GUI(QMainWindow):
     def set_overwrite_nfo(self):
         self.organizer.overwrite_nfo = not self.organizer.overwrite_nfo
         self.action_overwrite_nfo.setChecked(self.organizer.overwrite_nfo)
+
+    def set_show_edits(self):
+        self.organizer.plex_set_show_edits = not self.organizer.plex_set_show_edits
+        self.action_set_show.setChecked(self.organizer.plex_set_show_edits)
 
     @asyncSlot()
     async def start(self):

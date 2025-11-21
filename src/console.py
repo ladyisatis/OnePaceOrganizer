@@ -269,6 +269,16 @@ class Console:
                     default=self.organizer.filename_tmpl
                 ).run_async()
 
+            else:
+                self.organizer.plex_set_show_edits = await button_dialog(
+                    title=self.window_title,
+                    text="Do you want to automatically set the show name, description, posters, genres, etc. or manually set it yourself?",
+                    buttons=[
+                        ("Automatically Set", True),
+                        ("Set It Myself", False)
+                    ]
+                ).run_async()
+
         if self.organizer.plex_config_enabled:
             success = await self.run_plex_wizard()
             if not success:

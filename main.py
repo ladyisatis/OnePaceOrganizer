@@ -70,6 +70,7 @@ def main():
         parser.add_argument("--plex-server", help="Plex Server ID", default=None)
         parser.add_argument("--plex-library", help="Plex Library Key", default=None)
         parser.add_argument("--plex-show", help="Plex Show GUID", default=None)
+        parser.add_argument("--plex-set-show-edits", help="Overwrite Plex show information", default=None, type=strbool)
         parser.add_argument("--plex-use-token", help="Use Authorization Token instead of Username and Password", default=None, type=strbool)
         parser.add_argument("--plex-code", help="Plex 2-Factor Auth Code (headless mode only)", default=None)
         parser.add_argument("--plex-remember", help="Remember Plex Credentials", default=None, type=strbool)
@@ -135,6 +136,9 @@ def main():
 
         if args.plex_show is not None:
             opo.plex_config_show_guid = args.plex_show
+
+        if args.plex_set_show_edits is not None:
+            opo.plex_set_show_edits = args.plex_set_show_edits
 
         if args.plex_use_token is not None:
             opo.plex_config_use_token = args.plex_use_token
