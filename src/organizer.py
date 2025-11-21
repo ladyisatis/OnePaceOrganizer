@@ -75,6 +75,7 @@ class OnePaceOrganizer:
         self.plex_code = utils.get_env("plex_code", "")
         self.plex_retry_secs = utils.get_env("plex_retry_secs", 30)
         self.plex_retry_times = utils.get_env("plex_retry_times", 3)
+        self.plex_set_show_edits = utils.get_env("plex_set_show_edits", True)
 
         self.progress_bar_func = None
         self.message_dialog_func = None
@@ -178,6 +179,15 @@ class OnePaceOrganizer:
             if "remember" in config["plex"] and config["plex"]["remember"] is not None:
                 self.plex_config_remember = config["plex"]["remember"]
 
+            if "retry_secs" in config["plex"] and config["plex"]["retry_secs"] is not None:
+                self.plex_retry_secs = int(config["plex"]["retry_secs"])
+
+            if "retry_times" in config["plex"] and config["plex"]["retry_times"] is not None:
+                self.plex_retry_times = int(config["plex"]["retry_times"])
+
+            if "set_show_edits" in config["plex"] and config["plex"]["set_show_edits"] is not None:
+                self.plex_set_show_edits = config["plex"]["set_show_edits"]
+
         return True
 
     async def save_config(self):
@@ -206,7 +216,10 @@ class OnePaceOrganizer:
                 "token": self.plex_config_auth_token,
                 "username": self.plex_config_username,
                 "password": self.plex_config_password,
-                "remember": self.plex_config_remember
+                "remember": self.plex_config_remember,
+                "retry_secs": self.plex_retry_secs,
+                "retry_times": self.plex_retry_times,
+                "set_show_edits": self.plex_set_show_edits
             }
         }
 
@@ -1002,70 +1015,71 @@ class OnePaceOrganizer:
 
             await utils.run(show.batchEdits)
 
-            if "title" in self.tvshow and self.tvshow["title"] != "" and show.title != self.tvshow["title"]:
-                self.logger.info(f"Set Title: {show.title} -> {self.tvshow['title']}")
-                await utils.run(show.editTitle, self.tvshow["title"], locked=self.lockdata)
+            if self.plex_set_show_edits:
+                if "title" in self.tvshow and self.tvshow["title"] != "" and show.title != self.tvshow["title"]:
+                    self.logger.info(f"Set Title: {show.title} -> {self.tvshow['title']}")
+                    await utils.run(show.editTitle, self.tvshow["title"], locked=self.lockdata)
 
-            if "originaltitle" in self.tvshow and self.tvshow["originaltitle"] != "" and show.originalTitle != self.tvshow["originaltitle"]:
-                self.logger.info(f"Set Original Title: {show.originalTitle} -> {self.tvshow['originaltitle']}")
-                await utils.run(show.editOriginalTitle, self.tvshow["originaltitle"], locked=self.lockdata)
+                if "originaltitle" in self.tvshow and self.tvshow["originaltitle"] != "" and show.originalTitle != self.tvshow["originaltitle"]:
+                    self.logger.info(f"Set Original Title: {show.originalTitle} -> {self.tvshow['originaltitle']}")
+                    await utils.run(show.editOriginalTitle, self.tvshow["originaltitle"], locked=self.lockdata)
 
-            if "sorttitle" in self.tvshow and self.tvshow["sorttitle"] != "" and show.titleSort != self.tvshow["sorttitle"]:
-                self.logger.info(f"Set Sort Title: {show.titleSort} -> {self.tvshow['sorttitle']}")
-                await utils.run(show.editSortTitle, self.tvshow["sorttitle"], locked=self.lockdata)
+                if "sorttitle" in self.tvshow and self.tvshow["sorttitle"] != "" and show.titleSort != self.tvshow["sorttitle"]:
+                    self.logger.info(f"Set Sort Title: {show.titleSort} -> {self.tvshow['sorttitle']}")
+                    await utils.run(show.editSortTitle, self.tvshow["sorttitle"], locked=self.lockdata)
 
-            if "tagline" in self.tvshow and self.tvshow["tagline"] != "" and show.tagline != self.tvshow["tagline"]:
-                self.logger.info(f"Set Tagline: {show.tagline} -> {self.tvshow['tagline']}")
-                await utils.run(show.editTagline, self.tvshow["tagline"], locked=self.lockdata)
+                if "tagline" in self.tvshow and self.tvshow["tagline"] != "" and show.tagline != self.tvshow["tagline"]:
+                    self.logger.info(f"Set Tagline: {show.tagline} -> {self.tvshow['tagline']}")
+                    await utils.run(show.editTagline, self.tvshow["tagline"], locked=self.lockdata)
 
-            if "customrating" in self.tvshow and self.tvshow["customrating"] != "" and show.contentRating != self.tvshow["customrating"]:
-                self.logger.info(f"Set Rating: {show.contentRating} -> {self.tvshow['customrating']}")
-                await utils.run(show.editContentRating, self.tvshow["customrating"], locked=self.lockdata)
+                if "customrating" in self.tvshow and self.tvshow["customrating"] != "" and show.contentRating != self.tvshow["customrating"]:
+                    self.logger.info(f"Set Rating: {show.contentRating} -> {self.tvshow['customrating']}")
+                    await utils.run(show.editContentRating, self.tvshow["customrating"], locked=self.lockdata)
 
-            if "genre" in self.tvshow and isinstance(self.tvshow, list):
-                _genres = []
-                for genre in show.genres:
-                    _genres.append(genre.tag)
+                if "genre" in self.tvshow and isinstance(self.tvshow, list):
+                    _genres = []
+                    for genre in show.genres:
+                        _genres.append(genre.tag)
 
-                for genre in self.tvshow["genre"]:
-                    if genre not in _genres:
-                        self.logger.info(f"Add Genre: {genre}")
-                        await utils.run(show.addGenre, genre)
+                    for genre in self.tvshow["genre"]:
+                        if genre not in _genres:
+                            self.logger.info(f"Add Genre: {genre}")
+                            await utils.run(show.addGenre, genre)
 
-            if "plot" in self.tvshow and show.summary != self.tvshow["plot"]:
-                await utils.run(show.editSummary, self.tvshow["plot"], locked=self.lockdata)
-                await utils.run(show.editOriginallyAvailable,
-                    self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"]
-                )
+                if "plot" in self.tvshow and show.summary != self.tvshow["plot"]:
+                    await utils.run(show.editSummary, self.tvshow["plot"], locked=self.lockdata)
+                    await utils.run(show.editOriginallyAvailable,
+                        self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"]
+                    )
 
-                poster = await utils.run(utils.find_from_list, self.base_path, [
-                    ("posters", "poster.*"),
-                    ("posters", "folder.*"),
-                    (self.input_path, "poster.*")
-                ])
+                    poster = await utils.run(utils.find_from_list, self.base_path, [
+                        ("posters", "poster.*"),
+                        ("posters", "folder.*"),
+                        (self.input_path, "poster.*")
+                    ])
 
-                if not poster and self.fetch_posters:
-                    poster = Path(self.base_path, "posters", "poster.png")
-                    self.logger.info(f"Downloading: posters/{poster.name}")
+                    if not poster and self.fetch_posters:
+                        poster = Path(self.base_path, "posters", "poster.png")
+                        self.logger.info(f"Downloading: posters/{poster.name}")
 
-                    try:
-                        dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
-                        if not dl:
-                            dl = await utils.download(f"{self.metadata_url}/posters/{poster.name}", poster, self.progress_bar_func)
+                        try:
+                            dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
                             if not dl:
-                                self.logger.info("Unable to download (not found), skipping...")
-                    except:
-                        self.logger.warning("Unable to download, skipping...")
+                                dl = await utils.download(f"{self.metadata_url}/posters/{poster.name}", poster, self.progress_bar_func)
+                                if not dl:
+                                    self.logger.info("Unable to download (not found), skipping...")
+                        except:
+                            self.logger.warning("Unable to download, skipping...")
 
-                await self.plex_art_set(poster, show, True)
+                    await self.plex_art_set(poster, show, True)
 
-                background = await utils.run(utils.find_from_list, self.base_path, [
-                    ("posters", "background.*"),
-                    ("posters", "backdrop.*"),
-                    (self.input_path, "background.*")
-                ])
-                if background is not None:
-                    await self.plex_art_set(background, show, False)
+                    background = await utils.run(utils.find_from_list, self.base_path, [
+                        ("posters", "background.*"),
+                        ("posters", "backdrop.*"),
+                        (self.input_path, "background.*")
+                    ])
+                    if background is not None:
+                        await self.plex_art_set(background, show, False)
 
             index = 0
             total = len(files)
