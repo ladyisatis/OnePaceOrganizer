@@ -1951,7 +1951,7 @@ class OnePaceOrganizer:
                         completed += 1
 
                     else:
-                        skipped += 1
+                        completed += 1
 
                     index += 1
                     await utils.run_func(self.progress_bar_func, int((index / total) * 100))
