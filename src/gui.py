@@ -302,7 +302,7 @@ class GUI(QMainWindow):
 
         self.action_set_show = QAction("Overwrite Show Information", self)
         self.action_set_show.setCheckable(True)
-        self.action_set_show.setChecked(self.organizer.set_show_edits)
+        self.action_set_show.setChecked(self.organizer.plex_set_show_edits)
         self.action_set_show.setVisible(self.organizer.plex_config_enabled)
         self.action_set_show.triggered.connect(self.set_show_edits)
         menu_configuration.addAction(self.action_set_show)
