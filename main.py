@@ -28,8 +28,9 @@ def main():
     mode = "console"
     log_level = "INFO"
     log_file = ""
+    is_bundle = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
 
-    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    if is_bundle:
         try:
             _mode_file = Path(sys._MEIPASS, ".mode")
             if _mode_file.is_file():
@@ -37,17 +38,26 @@ def main():
         except:
             pass
 
-    else:
+    if hasattr(sys, 'argv'):
         toml = utils.get_toml_info()
         parser = ArgumentParser(description=toml["description"]) if "description" in toml else ArgumentParser()
 
-        parser.add_argument(
-            "mode",
-            choices=["gui", "console", "headless"],
-            nargs="?",
-            default=mode,
-            help="Program mode"
-        )
+        if is_bundle and mode == "console":
+            parser.add_argument(
+                "mode",
+                choices=["console", "headless"],
+                nargs="?",
+                default=mode,
+                help="Program mode"
+            )
+        elif not is_bundle:
+            parser.add_argument(
+                "mode",
+                choices=["gui", "console", "headless"],
+                nargs="?",
+                default=mode,
+                help="Program mode"
+            )
 
         parser.add_argument("--input-path", help="where to read unsorted .mkv/.mp4 files from", default=None)
         parser.add_argument("--output-path", help="Where to put sorted .mkv/.mp4 files (and .nfo/posters if Jellyfin)", default=None)
@@ -152,28 +162,43 @@ def main():
         if args.plex_remember is not None:
             opo.plex_config_remember = args.plex_remember
 
-        mode = args.mode
         log_level = args.log_level.upper()
         log_file = args.log_file
 
+        if hasattr(args, "mode"):
+            mode = args.mode
+
     if log_level.lower() not in ["trace", "debug", "info", "success", "warning", "error", "critical"]:
-        log_level = "info"
+        log_level = "INFO"
 
     if log_file != "":
         logger.add(Path(log_file), level=log_level, enqueue=True)
-    else:
-        file_handler = None
 
     if mode == "gui":
-        from src import gui
+        try:
+            from src import gui
+        except:
+            logger.critical("gui mode unavailable")
+            return
+
         gui.main(opo, log_level)
 
     elif mode == "headless":
-        from src import headless
+        try:
+            from src import headless
+        except:
+            logger.critical("headless mode unavailable")
+            return
+
         headless.main(opo, log_level, args.plex_wait_secs)
 
     else:
-        from src import console
+        try:
+            from src import console
+        except:
+            logger.critical("console mode unavailable")
+            return
+
         console.main(opo, log_level)
 
 if __name__ == "__main__":
