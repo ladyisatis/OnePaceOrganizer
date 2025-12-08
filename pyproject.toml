@@ -1,6 +1,6 @@
 [project]
 name = "OnePaceOrganizer"
-version = "1.1.6"
+version = "1.2.0"
 description = "One Pace Organizer for Plex and Jellyfin: Add metadata like summaries, titles and posters to your One Pace collection"
 authors = [
     {name = "Isatis",email = "git@isatis.blue"}
@@ -9,6 +9,7 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "aiosqlite>=0.21.0",
     "enzyme>=0.5.2",
     "httpx-retries>=0.4.5",
     "httpx[http2]>=0.28.1",
@@ -20,5 +21,5 @@ dependencies = [
     "pyinstaller>=6.16.0",
     "pyside6>=6.10.1",
     "pyyaml>=6.0.3",
-    "qasync>=0.28.0"
+    "qasync>=0.28.0",
 ]
