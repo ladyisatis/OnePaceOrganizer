@@ -963,7 +963,7 @@ class OnePaceOrganizer:
                     title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info.get("title", ""))
 
                     if title == "":
-                        self.logger.warning(f"Skipping {file.name}: metadata for {crc32} has no title, please report this issue as a GitHub issue")
+                        self.logger.warning(f"Skipping {file.name}: metadata for {episode_info['hash_crc32']} has no title, please report this issue as a GitHub issue")
                         skipped += 1
                         index += 1
                         await utils.run_func(self.progress_bar_func, int((index / total) * 100))

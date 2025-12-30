@@ -34,13 +34,16 @@ class OrganizerStore:
         if not isinstance(file, Path):
             file = Path(file)
 
-        db_uri = f"file:{file.resolve()}?mode=ro"
+        db_uri = f"file:{str(await utils.resolve(file))}"
 
         try:
-            self.logger.debug(f"Opening SQLite DB: {db_uri}")
+            self.logger.debug(f"Opening SQLite DB: {file}")
             self.conn = await aiosqlite.connect(db_uri, uri=True)
             self.conn.row_factory = aiosqlite.Row
             self.logger.debug("Opened")
+
+            await self.conn.execute("PRAGMA journal_mode = WAL")
+            await self.conn.execute("PRAGMA query_only = ON")
 
             self.tvshow = {}
             async with self.conn.execute("SELECT key, value FROM tvshow WHERE lang = ? ORDER BY id ASC", (self.lang, )) as cursor:

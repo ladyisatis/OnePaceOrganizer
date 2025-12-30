@@ -378,9 +378,10 @@ def get_env(name, default=""):
     key = f"OPO_{name.upper()}"
 
     val = os.environ[key] if key in os.environ else default
-    if val == "true":
+    _val_lower = val.lower()
+    if _val_lower == "true" or _val_lower == "yes" or val == "1":
         return True
-    elif val == "false":
+    elif _val_lower == "false" or _val_lower == "no" or val == "0":
         return False
 
     return val
