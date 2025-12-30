@@ -24,18 +24,15 @@ from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
 from pathlib import Path, UnsupportedOperation
 from multiprocessing import freeze_support
-from src import utils
+from src import utils, store
 
 class OnePaceOrganizer:
     def __init__(self):
         self.window_title = "One Pace Organizer"
-        self.tvshow = {}
-        self.episodes = {}
-        self.arcs = []
 
         self.workers = int(utils.get_env("workers", 0))
         self.base_path = Path(utils.get_env("base_path", Path.cwd().resolve()))
-        self.metadata_url = utils.get_env("metadata_url", "https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/main")
+        self.metadata_url = utils.get_env("metadata_url", "https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/v2")
         self.download_path = utils.get_env("dl_path", "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main")
         self.set_executor(utils.get_env("pool_mode", "process") == "process")
 
@@ -48,6 +45,7 @@ class OnePaceOrganizer:
         self.fetch_posters = utils.get_env("fetch_posters", True)
         self.overwrite_nfo = utils.get_env("overwrite_nfo", False)
         self.lockdata = utils.get_env("lockdata", False)
+        self.lang = utils.get_env("lang", "en")
 
         self.input_path = utils.get_env("input_path")
         self.output_path = utils.get_env("output_path")
@@ -84,6 +82,7 @@ class OnePaceOrganizer:
         self.toml = None
         self.extra_fields = {}
         self.logger = logger
+        self.store = store.OrganizerStore(lang=self.lang, logger=self.logger)
 
     async def load_config(self):
         if self.toml is None or self.toml["version"] == "?":
@@ -662,158 +661,58 @@ class OnePaceOrganizer:
 
         return False
 
-    async def process_yml_metadata(self, file, crc32):
-        parsed = await utils.load_yaml(file)
-        self.logger.trace(f"{file}: {parsed}")
-
-        if not isinstance(parsed, dict):
-            return None
-
-        if "reference" in parsed:
-            ref = parsed["reference"].upper()
-            self.logger.trace(f"{crc32}.yml -> {ref}.yml")
-
-            if ref in self.episodes and isinstance(self.episodes[ref], dict):
-                return self.episodes[ref]
-            else:
-                return await self.process_yml_metadata(Path(file.parent, f"{ref}.yml"), ref)
-
-        if "_" in crc32:
-            crc32 = crc32.split("_")[0]
-
-            if crc32 in self.episodes and isinstance(self.episodes[crc32], list):
-                new_list = [item for item in self.episodes[crc32]]
-                new_list.append(parsed)
-                self.logger.debug(f"add {file} to list {crc32}: {new_list}")
-                return new_list
-
-            self.logger.debug(f"create {crc32} as list: {parsed}")
-            return [parsed]
-
-        self.logger.trace(f"loaded {crc32}: {parsed}")
-        return parsed
-
-    async def cache_yml(self):
-        try:
-            data_folder = Path(self.base_path, "metadata")
-            episodes_folder = Path(data_folder, "episodes")
-
-            self.logger.info(f"Loading local metadata from {data_folder}")
-
-            episode_files = []
-            async for file in utils.glob(episodes_folder, "*.yml", rglob=True):
-                episode_files.append(file)
-
-            tvshow_yml = Path(data_folder, "tvshow.yml")
-            if await utils.is_file(tvshow_yml):
-                episode_files.append(tvshow_yml)
-
-            arcs_yml = Path(data_folder, "arcs.yml")
-            if await utils.is_file(arcs_yml):
-                episode_files.append(arcs_yml)
-
-            total_files = len(episode_files)
-            self.logger.trace(episode_files)
-
-            if total_files == 0:
-                return False
-
-            await utils.run_func(self.progress_bar_func, 0)
-
-            for index, file in enumerate(episode_files):
-                if file == tvshow_yml:
-                    self.tvshow = await utils.load_yaml(tvshow_yml)
-
-                elif file == arcs_yml:
-                    self.arcs = await utils.load_yaml(arcs_yml)
-                    if isinstance(self.arcs, dict) and "arcs" in self.arcs:
-                        self.arcs = self.arcs["arcs"]
-
-                else:
-                    crc32 = file.name.replace(".yml", "")
-                    result = await self.process_yml_metadata(file, crc32)
-
-                    if result is not None:
-                        self.episodes[crc32] = result
-
-                await utils.run_func(self.progress_bar_func, int(((index + 1) / total_files) * 100))
-
-            await utils.run_func(self.progress_bar_func, 100)
-
-        except:
-            await utils.run_func(self.progress_bar_func, 0)
-            self.logger.warning(f"Skipping using local metadata\n{traceback.format_exc()}")
-            return False
-
-        return True
-
     async def cache_episode_data(self):
-        data_file = Path(self.base_path, "metadata", "data.json")
-        data = {}
+        data_file = Path(self.base_path, "metadata", "data.db")
+        update_data_file = True
+        opened = False
 
         if await utils.is_file(data_file):
-            self.logger.info("Checking episode metadata file (data.json)...")
-
             try:
-                data = await utils.load_json(data_file)
-                self.logger.trace(data)
+                opened, status = await self.store.open(data_file)
 
-                if "last_update" in data and data["last_update"] != "":
-                    now = datetime.datetime.now(tz=datetime.UTC)
+                if opened and status.get("last_update_ts", None) is not None:
+                    now = datetime.datetime.now().astimezone(datetime.timezone.utc)
                     data_file_stat = await utils.stat(data_file)
-                    last_update_remote = datetime.datetime.fromisoformat(data["last_update"])
-                    last_update_local = datetime.datetime.fromtimestamp(data_file_stat.st_mtime, tz=datetime.UTC)
+                    last_update_remote = datetime.datetime.fromtimestamp(status["last_update_ts"])
+                    last_update_local = datetime.datetime.fromtimestamp(data_file_stat.st_mtime, tz=datetime.timezone.utc)
 
-                    if (now - last_update_remote < datetime.timedelta(hours=24)) or (now - last_update_local < datetime.timedelta(hours=1)):
-                        self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                        self.arcs = data["arcs"] if "arcs" in data else []
-                        self.episodes = data["episodes"] if "episodes" in data else {}
+                    if (now - last_update_remote < datetime.timedelta(seconds=600)) or (now - last_update_local < datetime.timedelta(seconds=600)):
+                        update_data_file = False
+                    else:
+                        await self.store.close()
 
             except:
                 self.logger.warning(f"Danger: {data_file} might be corrupted!\n{traceback.format_exc()}")
 
-        if await utils.is_dir(Path(self.base_path, "metadata")) and (
-            await utils.is_dir(Path(self.base_path, "metadata", "episodes")) or
-            await utils.is_file(Path(self.base_path, "metadata", "tvshow.yml")) or
-            await utils.is_file(Path(self.base_path, "metadata", "arcs.yml"))
-        ):
-            await self.cache_yml()
-
-        if len(self.tvshow) == 0 or len(self.arcs) == 0 or len(self.episodes) == 0:
+        if update_data_file:
             try:
                 await utils.run(data_file.parent.mkdir, exist_ok=True)
 
-                self.logger.success("Downloading updated metadata into metadata/data.json...")
-                await utils.download(f"{self.metadata_url}/data.min.json", data_file, self.progress_bar_func)
-
-                data = await utils.load_json(data_file)
-                self.logger.trace(data)
-
-                if len(data) > 0:
-                    self.tvshow = data["tvshow"] if "tvshow" in data else {}
-                    self.arcs = data["arcs"] if "arcs" in data else []
-                    self.episodes = data["episodes"] if "episodes" in data else {}
+                self.logger.success("Downloading updated metadata into metadata/data.db...")
+                await utils.download(f"{self.metadata_url}/metadata/data.sqlite", data_file, self.progress_bar_func)
+                opened, status = await self.store.open(data_file)
 
             except Exception as e:
                 self.logger.debug(traceback.format_exc())
                 self.logger.error(f"Unable to download new metadata: {e}")
 
-        return len(self.tvshow) > 0 and len(self.arcs) > 0 and len(self.episodes) > 0
+        if await utils.is_dir(data_file.parent):
+            await self.store.cache_files(data_file.parent)
+
+        self.logger.debug(f"SQLite DB Open: {opened}")
+        return opened or (len(self.store.tvshow) > 0 and len(self.store.arcs) > 0 and len(self.store.episodes) > 0)
 
     async def glob_video_files(self):
         self.logger.success("Searching for .mkv and .mp4 files...")
 
         crc_pattern = re.compile(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
-        video_files = []
         filelist = []
 
-        async for file in utils.glob(self.input_path, "**/*.[mM][kK][vV]", rglob=True):
-            self.logger.trace(file)
-            filelist.append(file)
+        async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, follow_symlinks=True):
+            await utils.run(filelist.append, file)
 
-        async for file in utils.glob(self.input_path, "**/*.[mM][pP]4", rglob=True):
-            self.logger.trace(file)
-            filelist.append(file)
+        async for file in utils.iter(self.input_path.rglob, "*.[mM][pP]4", case_sensitive=False, follow_symlinks=True):
+            await utils.run(filelist.append, file)
 
         num_found = 0
         num_calced = 0
@@ -826,36 +725,78 @@ class OnePaceOrganizer:
             loop = asyncio.get_running_loop()
 
             for file in filelist:
-                match = await utils.run(crc_pattern.search, file.name)
+                file = await utils.resolve(file)
+                match = await utils.run(crc_pattern.search, file.name.lower())
 
-                if match:
+                episode_id = await self.store.get_episode(file_name=file.name, crc32=match.group(1) if match else None, ids_only=True)
+                if episode_id is not None:
                     num_found += 1
-                    results.append((match.group(1), await utils.resolve(file)))
+                    results.append((0, episode_id, file))
+                    continue
 
-                else:
-                    _rf = str(await utils.resolve(file))
-                    self.logger.trace(f"Add to CRC32 Queue: {_rf}")
-                    tasks.append(loop.run_in_executor(executor, utils.crc32, _rf))
+                file_stem = file.stem if hasattr(file, "stem") else file.name
+                key = f"2_{file_stem}"
+                if f"2_{file_stem}" in self.store.episodes:
+                    num_found += 1
+                    results.append((2, key, file))
+                    continue
+
+                self.logger.debug(f"Add to Hash Queue: {file}")
+                tasks.append(loop.run_in_executor(executor, utils.hash, str(file)))
 
             if len(tasks) > 0:
                 await utils.run_func(self.progress_bar_func, 0)
-                self.logger.success(f"Calculating CRC32 for {len(tasks)} file(s)...")
+                self.logger.success(f"Calculating file hashes for {len(tasks)} file(s)...")
 
                 try:
                     i = 0
                     async for result in asyncio.as_completed(tasks):
-                        file, error, crc32 = await result
-                        file = await utils.resolve(file)
                         i += 1
+                        try:
+                            file, error, crc32, blake2s = await result
+                            file = Path(file)
 
-                        if error != "":
-                            self.logger.error(f"[{i}/{len(tasks)}] Unable to calculate {file.name}: {error}")
-                        else:
-                            self.logger.info(f"[{i}/{len(tasks)}] {file.name}: {crc32}")
-                            results.append((crc32, file))
+                            if error != "":
+                                self.logger.error(f"[{i}/{len(tasks)}] Unable to calculate {file.name}: {error}")
+                                continue
+
                             num_calced = num_calced + 1
+                            self.logger.info(f"[{i}/{len(tasks)}] {file.name}: {crc32}/{blake2s}")
 
-                        await utils.run_func(self.progress_bar_func, int((i / len(tasks)) * 100))
+                            #1. Check Other Edits table for blake2s (less likely for CRC32 collision)
+                            result = await self.store.get_other_edit(blake2s=blake2s, ids_only=True)
+                            if result is not None:
+                                results.append((1, result, file))
+                                continue
+
+                            #2. Check official releases [CRC32/Blake2s]
+                            result = await self.store.get_episode(crc32=crc32, blake2s=blake2s, ids_only=True)
+                            if result is not None:
+                                results.append((0, result, file))
+                                continue
+
+                            #3. Check Other Edits for CRC32
+                            result = await self.store.get_other_edit(crc32=crc32, ids_only=True)
+                            if result is not None:
+                                results.append((1, result, file))
+
+                            #4. Check local yml
+                            key = f"1_{crc32}"
+                            if key in self.store.episodes:
+                                results.append((2, key, file))
+                                continue
+
+                            key - f"2_{blake2s}"
+                            if key in self.store.episodes:
+                                results.append((2, key, file))
+                                continue
+
+                            #5. Add to the "rejected" pile (show to user)
+                            results.append((3, crc32, file))
+                            self.logger.warning(f"Skipping {file.name}: Episode metadata missing. Make sure you have the latest version of this One Pace release.")
+
+                        finally:
+                            await utils.run_func(self.progress_bar_func, int((i / len(tasks)) * 100))
 
                 except (asyncio.CancelledError, KeyboardInterrupt) as e:
                     if sys.version_info >= (3, 14):
@@ -867,89 +808,10 @@ class OnePaceOrganizer:
                     raise e
                     return False
 
-        await utils.run_func(self.progress_bar_func, 0)
-
-        for index, info in enumerate(results):
-            if info[0] in self.episodes:
-                self.logger.trace(f"Queue: {info[0]} {info[1]}")
-                video_files.append(info)
-
-            elif isinstance(info[1], Path) and hasattr(info[1], "suffix") and info[1].suffix.lower() == '.mkv':
-                crc32, file_path = info
-
-                try:
-                    try:
-                        f = await utils.run(Path(file_path).open, mode='rb')
-                        mkv = await utils.run(enzyme.MKV, f)
-                        self.logger.trace(mkv)
-                    except:
-                        self.logger.debug(f"Skip loading {file_path}\n{traceback.format_exc()}")
-                    finally:
-                        await utils.run(f.close)
-
-                    if mkv == None or mkv.info == None or mkv.info.title == None or mkv.info.title == "":
-                        self.logger.warning(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed (error 1). Make sure you have the latest version of this One Pace release.")
-                        continue
-
-                    title = mkv.info.title.split(" - ")
-                    match = re.match(r'^(.*\D)?\s*(\d+)$', title[0])
-
-                    ep_title = " - ".join(title[1:]) if len(title) > 1 else title[0]
-                    _s = await utils.stat(file_path)
-                    ep_date = mkv.info.date if mkv.info.date is not None else datetime.date.fromtimestamp(_s.st_ctime)
-
-                    m_season = 0
-                    m_episode = 0
-
-                    if match:
-                        self.logger.trace(match)
-                        arc_name = match.group(1).strip().lower()
-                        ep_num = int(match.group(2))
-
-                        season_items = self.arcs.items() if isinstance(self.arcs, dict) else enumerate(self.arcs)
-                        for season, season_info in season_items:
-                            if (("title" in season_info and season_info["title"].lower() == arc_name) or ("originaltitle" in season_info and season_info["originaltitle"].lower() == arc_name)) and crc32 not in self.episodes:
-                                self.logger.trace(f"found s{season} e{ep_num}")
-                                m_season = season
-                                m_episode = ep_num
-
-                    if m_season != 0 and m_episode != 0:
-                        found_existing = False
-
-                        for j, episode_info in self.episodes.items():
-                            if episode_info["arc"] == m_season and episode_info["episode"] == m_episode:
-                                self.episodes[crc32] = episode_info
-                                found_existing = True
-
-                        self.logger.trace(found_existing)
-                        if not found_existing:
-                            self.episodes[crc32] = {
-                                "arc": m_season,
-                                "episode": m_episode,
-                                "title": ep_title,
-                                "description": "",
-                                "chapters": "",
-                                "episodes": "",
-                                "released": ep_date.isoformat()
-                            }
-
-                        video_files.append(info)
-
-                    else:
-                        self.logger.warning(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed (error 3). Make sure you have the latest version of this One Pace release.")
-
-                except:
-                    self.logger.warning(f"Skipping {file_path.name}: Episode metadata missing, infering information from MKV also failed (error 2). Make sure you have the latest version of this One Pace release.")
-
-            else:
-                self.logger.warning(f"Skipping {info[1].name if isinstance(info[1], Path) and hasattr(info[1], 'name') else info[1]}: Episode metadata missing, make sure you have the latest version of this One Pace release.")
-
-            await utils.run_func(self.progress_bar_func, int(((index + 1) / filelist_total) * 100))
-
         await utils.run_func(self.progress_bar_func, 100)
         self.logger.success(f"Found: {num_found}, Calculated: {num_calced}, Total: {filelist_total}")
 
-        return video_files
+        return results
 
     def get_season_folder(self, season):
         if self.folder_action == 1:
@@ -1016,41 +878,34 @@ class OnePaceOrganizer:
             await utils.run(show.batchEdits)
 
             if self.plex_set_show_edits:
-                if "title" in self.tvshow and self.tvshow["title"] != "" and show.title != self.tvshow["title"]:
-                    self.logger.info(f"Set Title: {show.title} -> {self.tvshow['title']}")
-                    await utils.run(show.editTitle, self.tvshow["title"], locked=self.lockdata)
+                tvshow = self.store.tvshow
 
-                if "originaltitle" in self.tvshow and self.tvshow["originaltitle"] != "" and show.originalTitle != self.tvshow["originaltitle"]:
-                    self.logger.info(f"Set Original Title: {show.originalTitle} -> {self.tvshow['originaltitle']}")
-                    await utils.run(show.editOriginalTitle, self.tvshow["originaltitle"], locked=self.lockdata)
+                if "tagline" in tvshow and tvshow["tagline"] != "" and show.tagline != tvshow["tagline"]:
+                    self.logger.info(f"Set Tagline: {show.tagline} -> {tvshow['tagline']}")
+                    await utils.run(show.editTagline, tvshow["tagline"], locked=self.lockdata)
 
-                if "sorttitle" in self.tvshow and self.tvshow["sorttitle"] != "" and show.titleSort != self.tvshow["sorttitle"]:
-                    self.logger.info(f"Set Sort Title: {show.titleSort} -> {self.tvshow['sorttitle']}")
-                    await utils.run(show.editSortTitle, self.tvshow["sorttitle"], locked=self.lockdata)
+                if "customrating" in tvshow and tvshow["customrating"] != "" and show.contentRating != tvshow["customrating"]:
+                    self.logger.info(f"Set Rating: {show.contentRating} -> {tvshow['customrating']}")
+                    await utils.run(show.editContentRating, tvshow["customrating"], locked=self.lockdata)
 
-                if "tagline" in self.tvshow and self.tvshow["tagline"] != "" and show.tagline != self.tvshow["tagline"]:
-                    self.logger.info(f"Set Tagline: {show.tagline} -> {self.tvshow['tagline']}")
-                    await utils.run(show.editTagline, self.tvshow["tagline"], locked=self.lockdata)
-
-                if "customrating" in self.tvshow and self.tvshow["customrating"] != "" and show.contentRating != self.tvshow["customrating"]:
-                    self.logger.info(f"Set Rating: {show.contentRating} -> {self.tvshow['customrating']}")
-                    await utils.run(show.editContentRating, self.tvshow["customrating"], locked=self.lockdata)
-
-                if "genre" in self.tvshow and isinstance(self.tvshow, list):
+                if "genre" in tvshow and isinstance(tvshow["genre"], list):
                     _genres = []
                     for genre in show.genres:
                         _genres.append(genre.tag)
 
-                    for genre in self.tvshow["genre"]:
+                    for genre in tvshow["genre"]:
                         if genre not in _genres:
                             self.logger.info(f"Add Genre: {genre}")
                             await utils.run(show.addGenre, genre)
 
-                if "plot" in self.tvshow and show.summary != self.tvshow["plot"]:
-                    await utils.run(show.editSummary, self.tvshow["plot"], locked=self.lockdata)
-                    await utils.run(show.editOriginallyAvailable,
-                        self.tvshow["premiered"].isoformat() if isinstance(self.tvshow["premiered"], datetime.date) else self.tvshow["premiered"]
-                    )
+                if "plot" in tvshow and show.summary != tvshow["plot"]:
+                    await utils.run(show.editSummary, tvshow["plot"], locked=self.lockdata)
+
+                    if "premiered" in tvshow:
+                        if isinstance(tvshow["premiered"], (datetime.date, datetime.datetime)):
+                            await utils.run(show.editOriginallyAvailable, str(tvshow["premiered"].isoformat()).split("T")[0])
+                        else:
+                            await utils.run(show.editOriginallyAvailable, tvshow["premiered"])
 
                     poster = await utils.run(utils.find_from_list, self.base_path, [
                         ("posters", "poster.*"),
@@ -1065,9 +920,7 @@ class OnePaceOrganizer:
                         try:
                             dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
                             if not dl:
-                                dl = await utils.download(f"{self.metadata_url}/posters/{poster.name}", poster, self.progress_bar_func)
-                                if not dl:
-                                    self.logger.info("Unable to download (not found), skipping...")
+                                self.logger.info("Unable to download (not found), skipping...")
                         except:
                             self.logger.warning("Unable to download, skipping...")
 
@@ -1092,51 +945,37 @@ class OnePaceOrganizer:
                 tasks = []
                 loop = asyncio.get_running_loop()
 
-                for crc32, file in files:
-                    episode_info = self.episodes[crc32]
-                    self.logger.trace(f"{crc32}: {episode_info}")
-
-                    if isinstance(episode_info, list):
-                        stop = True
-
-                        for v in episode_info:
-                            if "hashes" not in v or "blake2" not in v["hashes"] or v["hashes"]["blake2"] == "":
-                                self.logger.warning(f"Skipping {file.name}: blake2s hash is required but not provided")
-                                continue
-
-                            _b = v["hashes"]["blake2"]
-                            f, err, b2hash = await utils.run(utils.blake2, file)
-
-                            if err != "":
-                                self.logger.error(f"Skipping {file.name}: {err}")
-                                continue
-
-                            if _b == b2hash[:16] or _b == b2hash:
-                                stop = False
-                                episode_info = v
-                                break
-
-                        if stop:
-                            index += 1
-                            skipped += 1
-                            await utils.run_func(self.progress_bar_func, int((index / total) * 100))
-                            continue
-
-                    season = episode_info["arc"]
-                    episode = episode_info["episode"]
-                    title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"]) if "title" in episode_info and episode_info["title"] != "" else ""
-
-                    if title == "":
-                        self.logger.warning(f"Skipping {file.name}: metadata for {crc32} has no title, please report this issue as a GitHub issue")
-                        index += 1
+                for file_type, file_id, file in files:
+                    if file_type == 0:
+                        episode_info = await self.store.get_episode(id=file_id)
+                    elif file_type == 1:
+                        episode_info = await self.store.get_other_edit(id=file_id)
+                    elif file_type == 2:
+                        episode_info = await self.store.episodes.get(file_id, None)
+                    elif file_type == 3:
                         skipped += 1
+                        index += 1
                         await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                         continue
 
+                    season = episode_info.get("arc", 0)
+                    episode = episode_info.get("episode", 0)
+                    title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info.get("title", ""))
+
+                    if title == "":
+                        self.logger.warning(f"Skipping {file.name}: metadata for {crc32} has no title, please report this issue as a GitHub issue")
+                        skipped += 1
+                        index += 1
+                        await utils.run_func(self.progress_bar_func, int((index / total) * 100))
+                        continue
+
+                    if episode_info.get("extended", False):
+                        title = f"{title} (Extended)"
+
                     season_path = Path(self.output_path, "Specials" if season == 0 else f"Season {season:02d}")
                     if season not in seasons:
-                        self.logger.info(f"Season: {season}")
                         seasons.append(season)
+                        self.logger.info(f"Season: {season}")
 
                         if not await utils.is_dir(season_path):
                             self.logger.debug(f"Creating directory: {season_path}")
@@ -1144,23 +983,24 @@ class OnePaceOrganizer:
 
                     dst = str(Path(season_path, f"One Pace - S{season:02d}E{episode:02d} - {title}{file.suffix}"))
                     self.logger.debug(f"Queue: file={file}, dst={dst}, info={episode_info} [{self.file_action}]")
-                    tasks.append(loop.run_in_executor(executor, utils.move_file_worker, str(file), dst, self.file_action, episode_info))
+                    tasks.append(loop.run_in_executor(executor, utils.move_file_worker, str(file), dst, self.file_action, file_type, file_id))
 
                 if len(tasks) > 0:
                     async for result in asyncio.as_completed(tasks):
-                        file, dst, err, episode_info = await result
-                        file = Path(file)
+                        src, file, err, file_type, file_id = await result
+                        file = await utils.resolve(file)
 
                         if err != "":
-                            self.logger.error(f"Skipping {file.name}: {err}")
+                            self.logger.error(f"Skipping {src}: {err}")
                             skipped += 1
+
                         else:
-                            self.logger.debug(f"Complete: [{crc32}] {dst} ({episode_info})")
-                            res.append((crc32, file, dst, episode_info))
+                            self.logger.debug(f"Complete: [{file_id}] {file} ({file_type})")
+                            res.append((file_type, file_id, file))
                             completed += 1
 
                         index += 1
-                        await utils.run(self.progress_bar_func, int((index / total) * 100))
+                        await utils.run_func(self.progress_bar_func, int((index / total) * 100))
 
         except Exception as e:
             return (False, e, completed, skipped)
@@ -1262,17 +1102,12 @@ class OnePaceOrganizer:
 
                     for plex_ep in all_episodes:
                         season = plex_ep.parentIndex if hasattr(plex_ep, 'parentIndex') else plex_ep.seasonNumber
-                        episode = plex_ep.index
-
-                        if season in arc_eps and episode in arc_eps[season]:
-                            crc32 = arc_eps[season][episode]
-                            ep_data = self.episodes[crc32]
-
-                            if isinstance(ep_data, dict):
-                                queue.append((crc32, plex_ep, None, ep_data))
-
-                        else:
+                        ep_id = await self.store.get_episode(arc=season, episode=plex_ep.index, ids_only=True)
+                        if ep_id is None:
                             self.logger.debug(f"No metadata found for S{season}E{episode}")
+                            continue
+
+                        queue.append((4, ep_id, plex_ep))
 
                     self.logger.info(f"Matched {len(queue)} episodes with metadata")
                 except Exception as e:
@@ -1291,11 +1126,21 @@ class OnePaceOrganizer:
                 retry_secs = 1
 
             for index, item in enumerate(queue):
-                crc32, src, file, episode_info = item
-                self.logger.debug(f"Start: [{crc32}] {file} ({episode_info})")
+                file_type, file_id, file = item
+                
+                if file_type == 0 or file_type == 4:
+                    episode_info = await self.store.get_episode(id=file_id, with_descriptions=True)
+                elif file_type == 1:
+                    episode_info = await self.store.get_other_edit(id=file_id)
+                elif file_type == 2:
+                    episode_info = self.store.episodes[file_id]
+                elif file_type == 3:
+                    continue
+
+                self.logger.debug(f"Start: [{file_type}/{file_id}] {file} ({episode_info})")
 
                 season = episode_info["arc"]
-                season_info = self.get_season(season)
+                season_info = await self.store.get_arc(part=season)
                 episode = episode_info["episode"]
                 updated = False
 
@@ -1353,9 +1198,7 @@ class OnePaceOrganizer:
                                         self.logger.info(f"Downloading: posters/{season}/{poster.name}")
                                         dl = await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
                                         if not dl:
-                                            dl = await utils.download(f"{self.metadata_url}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
-                                            if not dl:
-                                                self.logger.info(f"Skipping downloading (not found)")
+                                            self.logger.info(f"Skipping downloading (not found)")
                                     except:
                                         self.logger.warning("Skipping downloading")
 
@@ -1392,8 +1235,8 @@ class OnePaceOrganizer:
 
                     self.logger.info(f"Updating: {_label}")
 
-                    if metadata_only:
-                        plex_episode = src
+                    if file_type == 4:
+                        plex_episode = file
                     else:
                         retry_count = 0
                         while retry_count < max_retries:
@@ -1407,7 +1250,7 @@ class OnePaceOrganizer:
                                 if retry_count == 1:
                                     self.logger.warning(f"Could not fetch S{season:02d}E{episode:02d} from Plex - this " +
                                         "usually means if it's just transferred, the Plex scanner has not gotten around " +
-                                        "to it yet. Waiting {retry_secs} second(s)... (attempt {retry_count}/{max_retries})")
+                                        f"to it yet. Waiting {retry_secs} second(s)... (attempt {retry_count}/{max_retries})")
                                 else:
                                     self.logger.debug(f"S{season:02d}E{episode:02d}: Attempt {retry_count}/{max_retries}")
 
@@ -1423,6 +1266,10 @@ class OnePaceOrganizer:
                         if plex_episode.title != episode_info["title"]:
                             self.logger.debug(f"S{season}E{episode} Title: {plex_episode.title} -> {episode_info['title']}")
                             await utils.run(plex_episode.editTitle, episode_info["title"], locked=self.lockdata)
+
+                            if episode_info["title"].startswith("The "):
+                                await utils.run(plex_episode.editSortTitle, episode_info["title"].replace("The ", "", 1), locked=self.lockdata)
+
                             updated = True
 
                         if "rating" in episode_info and plex_episode.contentRating != episode_info["rating"]:
@@ -1430,41 +1277,43 @@ class OnePaceOrganizer:
                             await utils.run(plex_episode.editContentRating, episode_info["rating"], locked=self.lockdata)
                             updated = True
 
-                        if "sorttitle" in episode_info and plex_episode.titleSort != episode_info["sorttitle"]:
-                            self.logger.debug(f"S{season}E{episode} Sort Title: {plex_episode.titleSort} -> {episode_info['sorttitle']}")
-                            await utils.run(plex_episode.editSortTitle, episode_info["sorttitle"], locked=self.lockdata)
-                            updated = True
-
                         if "released" in episode_info:
-                            r = datetime.datetime.strptime(episode_info["released"], "%Y-%m-%d").date() if isinstance(episode_info["released"], str) else episode_info["released"]
-
-                            needs_update = False
-                            if plex_episode.originallyAvailableAt is None:
-                                needs_update = True
+                            if isinstance(episode_info["released"], str):
+                                r = episode_info["released"]
+                                r = r.split("T")[0]
+                                r = r.split(" ")[0]
+                                r = datetime.datetime.strptime(r, "%Y-%m-%d").date()
                             else:
-                                if plex_episode.originallyAvailableAt.date() != r:
+                                r = episode_info["released"]
+
+                            if isinstance(r, (datetime.datetime, datetime.date)):
+                                needs_update = False
+                                if plex_episode.originallyAvailableAt is None:
                                     needs_update = True
+                                else:
+                                    if plex_episode.originallyAvailableAt.date() != r:
+                                        needs_update = True
 
-                            if needs_update:
-                                self.logger.debug(f"S{season}E{episode} Release Date: {plex_episode.originallyAvailableAt} -> {r}")
-                                await utils.run(plex_episode.editOriginallyAvailable, r, locked=self.lockdata)
-                                updated = True
+                                if needs_update:
+                                    self.logger.debug(f"S{season}E{episode} Release Date: {plex_episode.originallyAvailableAt} -> {r}")
+                                    await utils.run(plex_episode.editOriginallyAvailable, r, locked=self.lockdata)
+                                    updated = True
 
-                        desc_str = str(episode_info["description"] if "description" in episode_info else "")
+                        desc_str = episode_info.get("description", "")
                         manga_str = ""
                         anime_str = ""
 
-                        if str(episode_info["chapters"]) != "":
+                        if str(episode_info["manga_chapters"]) != "":
                             if desc_str != "":
-                                manga_str = f"\n\nChapter(s): {episode_info['chapters']}"
+                                manga_str = f"\n\nChapter(s): {episode_info['manga_chapters']}"
                             else:
-                                manga_str = f"Chapter(s): {episode_info['chapters']}"
+                                manga_str = f"Chapter(s): {episode_info['manga_chapters']}"
 
-                        if str(episode_info["episodes"]) != "":
+                        if str(episode_info["anime_episodes"]) != "":
                             if desc_str != "" or manga_str != "":
-                                anime_str = f"\n\nEpisode(s): {episode_info['episodes']}"
+                                anime_str = f"\n\nEpisode(s): {episode_info['anime_episodes']}"
                             else:
-                                anime_str = f"Episode(s): {episode_info['episodes']}"
+                                anime_str = f"Episode(s): {episode_info['anime_episodes']}"
 
                         description = f"{desc_str}{manga_str}{anime_str}"
 
@@ -1535,14 +1384,15 @@ class OnePaceOrganizer:
         except Exception as e:
             return (False, e, completed, skipped)
 
-    async def _nfo_empty_task(self, src, dst, episode_info):
-        return (src, dst, episode_info, "")
+    async def _nfo_empty_task(self, src, dst, file_type, file_id):
+        return (src, dst, "", file_type, file_id)
 
     async def process_nfo(self, files):
+        tvshow = self.store.tvshow
         tvshow_nfo = Path(self.output_path, "tvshow.nfo")
         root = ET.Element("tvshow")
 
-        for k, v in self.tvshow.items():
+        for k, v in tvshow.items():
             if isinstance(v, datetime.date):
                 ET.SubElement(root, str(k)).text = v.isoformat()
             elif isinstance(v, list):
@@ -1557,11 +1407,12 @@ class OnePaceOrganizer:
                 self.logger.debug(f"[{tvshow_nfo.name}] {k} = {v}")
                 ET.SubElement(root, str(k)).text = str(v)
 
-        _seasons = dict(sorted(self.arcs.items())).items() if isinstance(self.arcs, dict) else enumerate(self.arcs)
-        for k, v in _seasons:
-            text = str(v["title"]) if k == 0 else f"{k}. {v['title']}"
-            self.logger.debug(f"[{tvshow_nfo.name}] season {k} = {text}")
-            ET.SubElement(root, "namedseason", attrib={"number": str(k)}).text = text
+        _seasons = await self.store.get_arcs()
+        for arc_info in _seasons:
+            part = arc_info["part"]
+            text = arc_info["title"] if part == 0 else f"{part}. {arc_info['title']}"
+            self.logger.debug(f"[{tvshow_nfo.name}] season {part} = {text}")
+            ET.SubElement(root, "namedseason", attrib={"number": str(part)}).text = text
 
         src = await utils.run(utils.find_from_list, self.base_path, [
             ("posters", "poster.*"),
@@ -1578,15 +1429,13 @@ class OnePaceOrganizer:
                     self.logger.info(f"Downloading: posters/{src.name}")
                     dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
                     if not dl:
-                        dl = await utils.download(f"{self.metadata_url}/posters/{src.name}", src, self.progress_bar_func)
-                        if not dl:
-                            self.logger.info(f"Skipping downloading (not found)")
+                        self.logger.info(f"Skipping downloading (not found)")
                 except:
                     self.logger.warning(f"Skipping downloading\n{traceback.format_exc()}")
 
             if await utils.is_file(src):
                 self.logger.info(f"Copying {src.name} to: {dst}")
-                await utils.run(shutil.copy2, str(src), str(dst))
+                await utils.copy_async(src, dst)
 
         if await utils.is_file(dst):
             art = ET.SubElement(root, "art")
@@ -1601,7 +1450,7 @@ class OnePaceOrganizer:
 
         if src and not await utils.is_file(dst):
             self.logger.info(f"Copying {src.name} to: {dst}")
-            await utils.run(shutil.copy2, str(src), str(dst))
+            await utils.copy_async(src, dst)
 
         if await utils.is_file(dst):
             if art is None:
@@ -1643,54 +1492,40 @@ class OnePaceOrganizer:
             tasks = []
             loop = asyncio.get_running_loop()
 
-            for crc32, file in files:
-                episode_info = self.episodes[crc32]
-                self.logger.debug(f"{crc32}: {episode_info}")
-
-                if isinstance(episode_info, list):
-                    stop = True
-
-                    for v in episode_info:
-                        if "hashes" not in v or "blake2" not in v["hashes"] or v["hashes"]["blake2"] == "":
-                            self.logger.warning(f"Skipping {file.name}: blake2s hash is required but not provided")
-                            continue
-
-                        _b = v["hashes"]["blake2"]
-                        f, err, b2hash = await utils.run(utils.blake2, file)
-
-                        if err != "":
-                            self.logger.info(f"Skipping {file.name}: {err}")
-                            continue
-
-                        if _b == b2hash[:16] or _b == b2hash:
-                            stop = False
-                            episode_info = v
-                            break
-
-                    if stop:
-                        index += 1
-                        skipped += 1
-                        await utils.run_func(self.progress_bar_func, int((index / total) * 100))
-                        continue
-
-                if "arc" not in episode_info or "episode" not in episode_info:
-                    self.logger.warning(f"Skipping {file.name}: metadata for {crc32} has no arc or part/episode number, please report this as a GitHub issue")
-                    index += 1
+            for file_type, file_id, file in files:
+                if file_type == 0:
+                    episode_info = await self.store.get_episode(id=file_id)
+                elif file_type == 1:
+                    episode_info = await self.store.get_other_edit(id=file_id)
+                elif file_type == 2:
+                    episode_info = await self.store.episodes.get(file_id, None)
+                elif file_type == 3:
                     skipped += 1
+                    index += 1
                     await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                     continue
 
-                season = episode_info["arc"]
-                season_info = self.get_season(season)
-                episode = episode_info["episode"]
-                title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info["title"]) if "title" in episode_info and episode_info["title"] != "" else ""
+                if episode_info is None:
+                    self.logger.warning(f"Skipping {file.name}: Episode metadata missing")
+                    skipped += 1
+                    index += 1
+                    await utils.run_func(self.progress_bar_func, int((index / total) * 100))
+                    continue
+
+                season = episode_info.get("arc", 0)
+                season_info = await self.store.get_arc(part=season)
+                episode = episode_info.get("episode", 0)
+                title = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "", episode_info.get("title", ""))
 
                 if title == "":
-                    self.logger.warning(f"Skipping {file.name}: metadata for {crc32} has no title, please report this issue as a GitHub issue")
+                    self.logger.warning(f"Skipping {file.name}: metadata for {episode_info['hash_crc32']} has no title, please report this issue as a GitHub issue")
                     index += 1
                     skipped += 1
                     await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                     continue
+
+                if episode_info.get("extended", False):
+                    title = f"{title} (Extended)"
 
                 season_path = self.get_season_folder(season)
                 if self.file_action != 4 and season not in seasons and season_path != self.output_path:
@@ -1710,19 +1545,19 @@ class OnePaceOrganizer:
 
                             ET.SubElement(root, "title").text = season_info['title'] if season == 0 else f"{season}. {season_info['title']}"
 
-                            if "originaltitle" in season_info and season_info['originaltitle'] != "":
+                            if season_info.get("originaltitle", "") != "":
                                 ET.SubElement(root, "originaltitle").text = str(season_info['originaltitle'])
 
-                            if "sorttitle" in season_info and season_info['sorttitle'] != "":
+                            if season_info.get("sorttitle", "") != "":
                                 ET.SubElement(root, "sorttitle").text = str(season_info['sorttitle'])
 
                             ET.SubElement(root, "seasonnumber").text = str(season)
 
-                            if "description" in season_info and season_info["description"] != "":
+                            if season_info.get("description", "") != "":
                                 ET.SubElement(root, "plot").text = season_info["description"]
                                 ET.SubElement(root, "outline").text = season_info["description"]
 
-                            ET.SubElement(root, "customrating").text = season_info['rating'] if 'rating' in season_info else self.tvshow['customrating']
+                            ET.SubElement(root, "customrating").text = season_info['rating'] if 'rating' in season_info else tvshow['customrating']
                             ET.SubElement(root, "lockdata").text = "true" if self.lockdata else "false"
 
                             src = await utils.run(utils.find_from_list, self.base_path, [
@@ -1739,15 +1574,13 @@ class OnePaceOrganizer:
                                         self.logger.info(f"Downloading: posters/{src.name}")
                                         dl = await utils.download(f"{self.download_path}/posters/{season}/{src.name}", src, self.progress_bar_func)
                                         if not dl:
-                                            dl = await utils.download(f"{self.metadata_url}/posters/{season}/{src.name}", src, self.progress_bar_func)
-                                            if not dl:
-                                                self.logger.info("Skipping downloading (not found)")
+                                            self.logger.info("Skipping downloading (not found)")
                                     except Exception as e:
                                         self.logger.warning(f"Skipping downloading: {e}")
 
                                 if await utils.is_file(src):
                                     self.logger.info(f"Copying {src.name} to: {dst}")
-                                    await utils.run(shutil.copy, str(src), str(dst))
+                                    await utils.copy_async(src, dst)
 
                             if await utils.is_file(dst):
                                 art = ET.SubElement(root, "art")
@@ -1762,7 +1595,7 @@ class OnePaceOrganizer:
 
                             if src and not await utils.is_file(dst):
                                 self.logger.info(f"Copying {src.name} to: {dst}")
-                                await utils.run(shutil.copy2, str(src), str(dst))
+                                await utils.copy_async(src, dst)
 
                             if await utils.is_file(dst):
                                 if art is None:
@@ -1800,7 +1633,7 @@ class OnePaceOrganizer:
                 if self.file_action == 4:
                     _s = str(file)
                     self.logger.trace(f"Queue [4]: {_s} ({episode_info})")
-                    tasks.append(asyncio.create_task(self._nfo_empty_task(_s, _s, episode_info)))
+                    tasks.append(asyncio.create_task(self._nfo_empty_task(_s, _s, file_type, file_id)))
                 else:
                     _filename = self.filename_tmpl.format(
                         season=season,
@@ -1817,14 +1650,14 @@ class OnePaceOrganizer:
 
                     dst = str(await utils.resolve(season_path, _filename))
                     self.logger.trace(f"Queue [{self.file_action}]: {file} -> {dst} ({episode_info})")
-                    tasks.append(loop.run_in_executor(executor, utils.move_file_worker, str(file), dst, self.file_action, episode_info))
+                    tasks.append(loop.run_in_executor(executor, utils.move_file_worker, str(file), dst, self.file_action, file_type, file_id))
 
             if len(tasks) > 0:
                 index = len(files)
                 total = len(files) + len(tasks)
 
                 async for result in asyncio.as_completed(tasks):
-                    src, dst, err, info = await result
+                    src, dst, err, file_type, file_id = await result
 
                     src = await utils.resolve(src)
                     dst = await utils.resolve(dst) if dst is not None else src
@@ -1836,55 +1669,66 @@ class OnePaceOrganizer:
                         await utils.run_func(self.progress_bar_func, int((index / total) * 100))
                         continue
 
+                    if file_type == 0:
+                        info = await self.store.get_episode(id=file_id, with_descriptions=True)
+                    elif file_type == 1:
+                        info = await self.store.get_other_edit(id=file_id)
+                    elif file_type == 2:
+                        info = self.store.episodes[file_id]
+                    elif file_type == 3:
+                        continue
+
                     nfo_file = Path(dst.parent, f"{dst.stem}.nfo")
-                    season = info["arc"]
-                    episode = info["episode"]
+                    season = info.get("arc", 0)
+                    episode = info.get("episode", 0)
 
                     self.logger.info(f"Updating: Season {season} Episode {episode} ({info['title']})")
 
                     root = ET.Element("episodedetails")
-                    ET.SubElement(root, "title").text = str(info["title"])
+                    title = f"{info['title']} (Extended)" if info.get("extended", False) else f"{info['title']}"
+                    ET.SubElement(root, "title").text = title
 
-                    if "originaltitle" in info and info["originaltitle"] != "":
+                    if info.get("originaltitle", "") != "":
                         ET.SubElement(root, "originaltitle").text = str(info["originaltitle"])
 
-                    if "sorttitle" in info and info["sorttitle"] != "":
-                        ET.SubElement(root, "sorttitle").text = str(info["sorttitle"])
-
-                    ET.SubElement(root, "showtitle").text = self.tvshow["title"]
+                    ET.SubElement(root, "showtitle").text = tvshow["title"]
                     ET.SubElement(root, "season").text = f"{season}"
                     ET.SubElement(root, "episode").text = f"{episode}"
-                    ET.SubElement(root, "customrating").text = info["rating"] if "rating" in info else self.tvshow["customrating"]
+                    ET.SubElement(root, "customrating").text = info["rating"] if "rating" in info else tvshow["customrating"]
 
-                    desc_str = str(info["description"] if "description" in info else "")
+                    desc_str = str(info.get("description", ""))
                     manga_str = ""
                     anime_str = ""
 
-                    if str(info["chapters"]) != "":
+                    if str(info.get("manga_chapters", "")) != "":
                         if desc_str != "":
-                            manga_str = f"\n\nChapter(s): {info['chapters']}"
+                            manga_str = f"\n\nChapter(s): {info['manga_chapters']}"
                         else:
-                            manga_str = f"Chapter(s): {info['chapters']}"
+                            manga_str = f"Chapter(s): {info['manga_chapters']}"
 
-                    if str(info["episodes"]) != "":
+                    if str(info.get("anime_episodes", "")) != "":
                         if desc_str != "" or manga_str != "":
-                            anime_str = f"\n\nEpisode(s): {info['episodes']}"
+                            anime_str = f"\n\nEpisode(s): {info['anime_episodes']}"
                         else:
-                            anime_str = f"Episode(s): {info['episodes']}"
+                            anime_str = f"Episode(s): {info['anime_episodes']}"
 
                     ET.SubElement(root, "plot").text = f"{desc_str}{manga_str}{anime_str}"
 
+                    if "duration" in info and isinstance(info["duration"], int) and info["duration"] > 0:
+                        ET.SubElement(root, "runtime").text = str(info["duration"])
+
                     if "released" in info:
-                        if isinstance(info["released"], datetime.date):
-                            date = info["released"].isoformat()
-                        else:
-                            date = info["released"]
+                        if isinstance(info["released"], str):
+                            r = info["released"]
+                            r = r.split("T")[0]
+                            r = r.split(" ")[0]
+                        elif isinstance(info["released"], (datetime.date, datetime.datetime)):
+                            r = str(info["released"].isoformat()).split("T")[0]
 
-                        year = date.split("-")[0]
-
+                        year = r.split("-")[0]
                         ET.SubElement(root, "year").text = year
-                        ET.SubElement(root, "premiered").text = date
-                        ET.SubElement(root, "aired").text = date
+                        ET.SubElement(root, "premiered").text = r
+                        ET.SubElement(root, "aired").text = r
 
                     ET.SubElement(root, "lockdata").text = "true" if self.lockdata else "false"
 
@@ -1907,7 +1751,7 @@ class OnePaceOrganizer:
 
                         if not await utils.is_file(img_dst) and self.file_action != 4:
                             self.logger.info(f"Copying {poster.name} to: {img_dst}")
-                            await utils.run(shutil.copy2, str(poster), str(img_dst))
+                            await utils.copy_async(poster, img_dst)
 
                         if await utils.is_file(img_dst):
                             art = ET.SubElement(root, "art")
@@ -1918,7 +1762,7 @@ class OnePaceOrganizer:
 
                         if not await utils.is_file(img_dst) and self.file_action != 4:
                             self.logger.info(f"Copying {background.name} to: {img_dst}")
-                            await utils.run(shutil.copy2, str(background), str(img_dst))
+                            await utils.copy_async(background, img_dst)
 
                         if await utils.is_file(img_dst):
                             art = ET.SubElement(root, "art")
@@ -1999,3 +1843,6 @@ class OnePaceOrganizer:
         except RuntimeError as e:
             self.logger.critical(f"RuntimeError\n{traceback.format_exc()}")
             return (False, e, 0, 0)
+
+        finally:
+            await self.store.close()

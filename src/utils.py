@@ -63,29 +63,38 @@ def is_up_to_date(version="", base_path="."):
     return (version == latest or version > latest, latest)
 
 async def read_file(file, binary=False):
-    data = bytearray() if binary else ""
     loop = asyncio.get_running_loop()
+    queue = asyncio.Queue()
+    data = bytearray() if binary else ""
 
-    try:
-        if binary:
-            f = await run(file.open, mode='rb', loop=loop)
-            try:
-                while chunk := await run(f.read, 65536, loop=loop):
-                    await run(data.extend, chunk, loop=loop)
-            finally:
-                await run(f.close, loop=loop)
+    def _worker():
+        try:
+            mode = "rb" if binary else "r"
+            encoding = None if binary else "utf-8"
+            with file.open(mode=mode, encoding=encoding) as f:
+                while chunk := f.read(65536):
+                    asyncio.run_coroutine_threadsafe(queue.put((True, chunk)), loop)
+
+        except Exception as e:
+            asyncio.run_coroutine_threadsafe(queue.put((False, e)))
+
+        finally:
+            asyncio.run_coroutine_threadsafe(queue.put((True, None)), loop)
+
+    loop.run_in_executor(None, _worker)
+
+    while True:
+        is_error, item = await queue.get()
+        if item is None:
+            break
+        elif is_error:
+            raise item
+        elif binary:
+            data.extend(item)
         else:
-            f = await run(file.open, mode='r', encoding='utf-8', loop=loop)
-            try:
-                while chunk := await run(f.read, 65536, loop=loop):
-                    data += chunk
-            finally:
-                await run(f.close, loop=loop)
-    except:
-        await run(logger.exception, f"Unable to read file {file}")
-        return False
+            data += item
 
-    return bytes(data) if binary else data
+    return data
 
 async def write_file(file, data, binary=False):
     loop = asyncio.get_running_loop()
@@ -162,12 +171,24 @@ async def is_file(file):
 async def is_dir(file):
     return await run(file.is_dir)
 
-async def glob(dir, file_pattern, rglob=False, loop=None):
-    if loop is None:
-        loop = asyncio.get_running_loop()
+async def iter(func, *args, **kwargs):
+    loop = kwargs.pop("loop") if "loop" in kwargs else asyncio.get_running_loop()
+    queue = asyncio.Queue()
 
-    for file in await run(dir.rglob if rglob else dir.glob, file_pattern, case_sensitive=False, recurse_symlinks=True, loop=loop):
-        yield file
+    def _worker():
+        try:
+            for f in func(*args, **kwargs):
+                asyncio.run_coroutine_threadsafe(queue.put(f), loop)
+        finally:
+            asyncio.run_coroutine_threadsafe(queue.put(None), loop)
+
+    loop.run_in_executor(None, _worker)
+
+    while True:
+        item = await queue.get()
+        if item is None:
+            break
+        yield item
 
 async def download(url, out, progress_bar_func, loop=None):
     if loop is None:
@@ -231,6 +252,30 @@ def compare_file(file1, file2):
             if c1 != c2:
                 return False
 
+async def copy_async(src, dst):
+    if isinstance(src, str):
+        src = Path(str(src))
+
+    if isinstance(dst, str):
+        dst = Path(str(dst))
+
+    if sys.version_info >= (3, 14):
+        await run(src.copy, dst, follow_symlinks=True, preserve_metadata=True)
+    else:
+        await run(shutil.copy2, str(src), str(dst))
+
+async def move_async(src, dst):
+    if isinstance(src, str):
+        src = Path(str(src))
+
+    if isinstance(dst, str):
+        dst = Path(str(dst))
+
+    if sys.version_info >= (3, 14):
+        await run(src.move, dst)
+    else:
+        await run(shutil.move, str(src), str(dst))
+
 def move_file(src, dst, file_action=0):
     if isinstance(src, str):
         src = Path(str(src))
@@ -271,8 +316,29 @@ def move_file(src, dst, file_action=0):
 
     return ""
 
-def move_file_worker(old_file, new_file, file_action=0, episode_info=None):
-    return (old_file, new_file, move_file(old_file, new_file, file_action), episode_info)
+def move_file_worker(old_file, new_file, file_action=0, file_type=3, file_id=0):
+    return (old_file, new_file, move_file(old_file, new_file, file_action), file_type, file_id)
+
+def hash(video_file):
+    if isinstance(video_file, str):
+        video_file = Path(video_file)
+
+    crc_value = 0
+    h = hashlib.blake2s()
+
+    try:
+        with Path(video_file).open(mode='rb') as f:
+            while chunk := f.read(1024 * 1024):
+                crc_value = zlib.crc32(chunk, crc_value)
+                h.update(chunk)
+
+    except Exception as e:
+        return (video_file, str(e), "", "")
+
+    crc_res = f"{crc_value & 0xFFFFFFFF:08x}"
+    b2s_res = h.hexdigest().lower()
+
+    return (video_file, "", crc_res.upper(), b2s_res[:16])
 
 def crc32(video_file):
     if isinstance(video_file, str):
