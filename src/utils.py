@@ -377,11 +377,12 @@ def blake2s(video_file):
 def get_env(name, default=""):
     key = f"OPO_{name.upper()}"
 
-    val = os.environ[key] if key in os.environ else default
-    _val_lower = val.lower()
-    if _val_lower == "true" or _val_lower == "yes" or val == "1":
-        return True
-    elif _val_lower == "false" or _val_lower == "no" or val == "0":
-        return False
+    if key in os.environ:
+        if v.lower() in ('yes', 'true', 't', 'y', '1'):
+            return True
+        if v.lower() in ('no', 'false', 'f', 'n', '0'):
+            return False
 
-    return val
+        return os.environ[key]
+
+    return default

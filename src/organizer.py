@@ -671,7 +671,7 @@ class OnePaceOrganizer:
                 opened, status = await self.store.open(data_file)
 
                 if opened and status.get("last_update_ts", None) is not None:
-                    now = datetime.datetime.now().astimezone(datetime.timezone.utc)
+                    now = datetime.datetime.now(tz=datetime.timezone.utc)
                     data_file_stat = await utils.stat(data_file)
                     last_update_remote = datetime.datetime.fromtimestamp(status["last_update_ts"])
                     last_update_local = datetime.datetime.fromtimestamp(data_file_stat.st_mtime, tz=datetime.timezone.utc)
