@@ -223,6 +223,7 @@ class GUI(QMainWindow):
         menu = self.menuBar()
         menu_file = menu.addMenu("&File")
         menu_configuration = menu.addMenu("&Configuration")
+        self.menu_lang = menu.addMenu("&Language")
         menu_help = menu.addMenu("&Help")
 
         action_exit = QAction("Exit", self)
@@ -406,6 +407,8 @@ class GUI(QMainWindow):
         action_about.triggered.connect(lambda: webbrowser.open_new_tab("https://github.com/ladyisatis/OnePaceOrganizer?tab=readme-ov-file#one-pace-organizer"))
         menu_help.addSeparator()
         menu_help.addAction(action_about)
+
+        self.menu_lang.aboutToShow.connect(self.open_lang_menu)
 
         self.start_button = QPushButton("Start")
         self.start_button.clicked.connect(self.start)
@@ -615,6 +618,46 @@ class GUI(QMainWindow):
         else:
             self.plex_username.setVisible(is_visible)
             self.plex_password.setVisible(is_visible)
+
+    def set_lang(self, lang):
+        if isinstance(lang, str):
+            logger.info(f"Setting language to: {lang}")
+        else:
+            logger.info(f"Setting language to: {lang.autonym()} ({lang.display_name()})")
+
+        self.organizer.store.language = lang
+
+    @asyncSlot()
+    async def open_lang_menu(self):
+        if len(self.organizer.store.langs) == 0:
+            self.menu_lang.clear()
+            loading_action = QAction("Loading...", self)
+            loading_action.setEnabled(False)
+            self.menu_lang.addAction(loading_action)
+
+        if self.organizer.store.conn is None:
+            data_file = Path(self.organizer.base_path, "metadata", "data.db")
+            if await utils.is_file(data_file):
+                try:
+                    await self.organizer.store.open(data_file)
+                finally:
+                    await self.organizer.store.close()
+
+        self.menu_lang.clear()
+        if len(self.organizer.store.langs) == 0:
+            default_action = QAction("English", self)
+            default_action.setCheckable(True)
+            default_action.setChecked(self.organizer.store.language.startswith("en"))
+            default_action.triggered.connect(func_partial(self.set_lang, "en"))
+            self.menu_lang.addAction(default_action)
+            return
+
+        for lang in self.organizer.store.langs:
+            action = QAction(lang.autonym(), self)
+            action.setCheckable(True)
+            action.setChecked(self.organizer.store.lang == lang)
+            action.triggered.connect(func_partial(self.set_lang, lang))
+            self.menu_lang.addAction(action)
 
     @asyncSlot()
     async def plex_login(self):
