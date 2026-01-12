@@ -13,6 +13,7 @@ dependencies = [
     "enzyme>=0.5.2",
     "httpx-retries>=0.4.5",
     "httpx[http2]>=0.28.1",
+    "langcodes[data]>=3.5.1",
     "loguru>=0.7.3",
     "orjson>=3.11.4",
     "packaging>=25.0",

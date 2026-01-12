@@ -3,6 +3,7 @@ import aiosqlite
 import re
 
 from datetime import date, datetime, timezone
+from langcodes import Language as lc_lang
 from loguru import logger as default_logger
 from pathlib import Path
 from src import utils
@@ -10,10 +11,12 @@ from yaml import safe_load as YamlLoad
 
 class OrganizerStore:
     def __init__(self, lang="en", logger=None):
-        self.lang = lang
+        self.lang = lc_lang.get(lang)
+        self.langs = []
         self.tvshow = {}
         self.arcs = {}
         self.episodes = {}
+        self.status = {"last_update": None, "last_update_ts": None, "base_url": None, "version": None}
         self.conn = None
         self.logger = logger
 
@@ -31,6 +34,9 @@ class OrganizerStore:
         return new_dict
 
     async def open(self, file):
+        if self.conn is not None:
+            await self.close()
+
         if not isinstance(file, Path):
             file = Path(file)
 
@@ -45,8 +51,13 @@ class OrganizerStore:
             await self.conn.execute("PRAGMA journal_mode = WAL")
             await self.conn.execute("PRAGMA query_only = ON")
 
+            self.langs = []
+            async with self.conn.execute("SELECT DISTINCT d.lang FROM descriptions d LEFT JOIN arcs a ON (a.lang = d.lang) ORDER BY d.lang ASC", tuple([])) as cursor:
+                async for row in cursor:
+                    self.langs.append(await utils.run(lc_lang.get, row["lang"]))
+
             self.tvshow = {}
-            async with self.conn.execute("SELECT key, value FROM tvshow WHERE lang = ? ORDER BY id ASC", (self.lang, )) as cursor:
+            async with self.conn.execute("SELECT key, value FROM tvshow WHERE lang = ? ORDER BY id ASC", (self.language, )) as cursor:
                 async for k, v in cursor:
                     if k in self.tvshow:
                         if isinstance(self.tvshow[k], list):
@@ -57,12 +68,12 @@ class OrganizerStore:
                     elif k != "lockdata":
                         self.tvshow[k] = v
 
-            status = {"last_update": None, "last_update_ts": None, "base_url": None, "version": None}
+            self.status = {"last_update": None, "last_update_ts": None, "base_url": None, "version": None}
             async with self.conn.execute("SELECT last_update, last_update_ts, base_url, version FROM status WHERE id = ?", (1, )) as cursor:
                 async for row in cursor:
-                    status = dict(row)
+                    self.status = dict(row)
 
-            return (True, status)
+            return (True, self.status)
 
         except Exception as e:
             self.logger.exception(e)
@@ -76,6 +87,9 @@ class OrganizerStore:
 
         except Exception as e:
             self.logger.debug(f"Ignoring exception {e}")
+
+        finally:
+            self.conn = None
 
     async def cache_files(self, dir):
         self.arcs = {}
@@ -131,9 +145,24 @@ class OrganizerStore:
                         self.logger.info(f"[S{arc_num:02d}E{ep_num:02d}] Adding local file: {arc_file}")
                         self.episodes[f"0_{arc_num}_{ep_num}"] = await utils.load_yaml(arc_file)
 
+    @property
+    def language(self):
+        if isinstance(self.lang, lc_lang):
+            return str(self.lang).replace("-", "_")
+
+        return self.lang.replace("-", "_")
+
+    @language.setter
+    def set_language(self, lang):
+        if isinstance(lang, str):
+            self.lang = lc_lang.get(lang)
+            return
+
+        self.lang = lang
+
     async def get_arcs(self, id=None, part=None, title=None):
         query = "SELECT id, part, saga, title, originaltitle, description FROM arcs WHERE lang = ?"
-        data = [self.lang]
+        data = [self.language]
 
         if id is not None or part is not None or title is not None:
             if id is not None:
@@ -187,7 +216,7 @@ class OrganizerStore:
                 "d.originaltitle, d.description FROM episodes "
                 "LEFT JOIN descriptions d ON e.arc = d.arc AND e.episode = d.episode"
             )
-            data.append(self.lang)
+            data.append(self.language)
         elif ids_only:
             query = "SELECT id FROM episodes"
         else:
