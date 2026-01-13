@@ -1328,15 +1328,15 @@ class OnePaceOrganizer:
 
                         if str(episode_info["manga_chapters"]) != "":
                             if desc_str != "":
-                                manga_str = f"\n\nChapter(s): {episode_info['manga_chapters']}"
+                                manga_str = f"\n\nManga Chapter(s): {episode_info['manga_chapters']}"
                             else:
-                                manga_str = f"Chapter(s): {episode_info['manga_chapters']}"
+                                manga_str = f"Manga Chapter(s): {episode_info['manga_chapters']}"
 
                         if str(episode_info["anime_episodes"]) != "":
                             if desc_str != "" or manga_str != "":
-                                anime_str = f"\n\nEpisode(s): {episode_info['anime_episodes']}"
+                                anime_str = f"\n\nAnime Episode(s): {episode_info['anime_episodes']}"
                             else:
-                                anime_str = f"Episode(s): {episode_info['anime_episodes']}"
+                                anime_str = f"Anime Episode(s): {episode_info['anime_episodes']}"
 
                         description = f"{desc_str}{manga_str}{anime_str}"
 
@@ -1726,15 +1726,15 @@ class OnePaceOrganizer:
 
                     if str(info.get("manga_chapters", "")) != "":
                         if desc_str != "":
-                            manga_str = f"\n\nChapter(s): {info['manga_chapters']}"
+                            manga_str = f"\n\nManga Chapter(s): {info['manga_chapters']}"
                         else:
-                            manga_str = f"Chapter(s): {info['manga_chapters']}"
+                            manga_str = f"Manga Chapter(s): {info['manga_chapters']}"
 
                     if str(info.get("anime_episodes", "")) != "":
                         if desc_str != "" or manga_str != "":
-                            anime_str = f"\n\nEpisode(s): {info['anime_episodes']}"
+                            anime_str = f"\n\nAnime Episode(s): {info['anime_episodes']}"
                         else:
-                            anime_str = f"Episode(s): {info['anime_episodes']}"
+                            anime_str = f"Anime Episode(s): {info['anime_episodes']}"
 
                     ET.SubElement(root, "plot").text = f"{desc_str}{manga_str}{anime_str}"
 
