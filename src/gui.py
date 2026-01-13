@@ -709,8 +709,12 @@ class GUI(QMainWindow):
         if not self.plex_server.prop.isEnabled():
             return
 
+        self.plex_server.setEnabled(False)
+
         _id = self.plex_server.prop.currentData()
         if _id is None or _id == "":
+            self.plex_server.setEnabled(True)
+            logger.debug("No Plex server is selected")
             self.organizer.plexapi_server = None
             self.organizer.plex_config_server_id = ""
             await self.plex_get_servers()
@@ -722,6 +726,7 @@ class GUI(QMainWindow):
 
         logger.debug("Verifying Plex login")
         if not await self.organizer.plex_login():
+            self.plex_server.setEnabled(True)
             await self.organizer.save_config()
             self._plex_toggle_login(True)
             self._plex_toggle_enabled(True)
@@ -735,8 +740,9 @@ class GUI(QMainWindow):
             self.plex_remember_login.button.setEnabled(True)
             return
 
-        logger.debug("Selecting Plex server")
-        if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id == "" and not await self.organizer.select_plex_server(_id):
+        logger.info("Selecting and connecting to Plex server...")
+        if not await self.organizer.plex_select_server(_id):
+            self.plex_server.setEnabled(True)
             self.organizer.plexapi_server = None
             self.organizer.plex_config_server_id = ""
             await self.organizer.save_config()
@@ -746,6 +752,7 @@ class GUI(QMainWindow):
             self.start_button.setEnabled(False)
             return
 
+        self.plex_server.setEnabled(True)
         self.plex_server.setVisible(True)
         self.plex_library.setVisible(True)
         self.plex_show.setVisible(False)
