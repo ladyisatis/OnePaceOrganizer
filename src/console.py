@@ -250,9 +250,9 @@ class Console:
                 values = []
                 default = self.organizer.store.lang
                 for lang in self.organizer.store.langs:
-                    values.append((lang, lang.autonym()))
+                    values.append((str(lang), lang.autonym()))
 
-            self.organizer.store.lang = await radiolist_dialog(
+            self.organizer.store.language = await radiolist_dialog(
                 title=self.window_title,
                 text="Select the language:",
                 values=values,
