@@ -175,11 +175,13 @@ class OrganizerStore:
                 data.append(title)
 
         query = f"{query} ORDER BY part ASC"
-
         results = []
+
+        self.logger.debug(f"get_arcs query: '{query}' / Data: {data}")
 
         async with self.conn.execute(query, tuple(data)) as cursor:
             async for row in cursor:
+                row = dict(row)
                 part = int(row["part"])
                 out = {
                     "id": int(row["id"]),
@@ -198,6 +200,7 @@ class OrganizerStore:
 
                 results.append(out)
 
+        results.sort(key=lambda x: int(x["part"]))
         return results
 
     async def get_arc(self, id=None, part=None, title=None):
@@ -212,12 +215,12 @@ class OrganizerStore:
             query = (
                 "SELECT e.id, e.arc, e.episode, e.manga_chapters, e.anime_episodes, e.released, "
                 "e.duration, e.extended, e.hash_crc32, e.hash_blake2s, e.file_name, d.title, "
-                "d.originaltitle, d.description FROM episodes "
+                "d.originaltitle, d.description FROM episodes e "
                 "LEFT JOIN descriptions d ON e.arc = d.arc AND e.episode = d.episode"
             )
             data.append(self.language)
         elif ids_only:
-            query = "SELECT id FROM episodes"
+            query = "SELECT e.id FROM episodes e"
         else:
             query = (
                 "SELECT e.id, e.arc, e.episode, e.manga_chapters, e.anime_episodes, e.released, "
@@ -257,8 +260,11 @@ class OrganizerStore:
         query = f"{query} ORDER BY e.released DESC"
         results = []
 
+        self.logger.debug(f"get_episodes query: '{query}' / Data: {data}")
+
         async with self.conn.execute(query, tuple(data)) as cursor:
             async for row in cursor:
+                row = dict(row)
                 _id = int(row["id"])
                 if ids_only:
                     results.append(_id)
@@ -291,11 +297,11 @@ class OrganizerStore:
                     "id": _id,
                     "arc": _arc,
                     "episode": _episode,
-                    "title": str(row["title"]).strip() if "title" in row else "",
-                    "originaltitle": str(row["originaltitle"]).strip() if "originaltitle" in row else "",
-                    "description": str(row["description"]).strip() if "description" in row else "",
-                    "manga_chapters": str(row["manga_chapters"]).strip(),
-                    "anime_episodes": str(row["anime_episodes"]).strip(),
+                    "title": str(row.get("title", "")).strip(),
+                    "originaltitle": str(row.get("originaltitle", "")).strip(),
+                    "description": str(row.get("description", "")).strip(),
+                    "manga_chapters": str(row.get("manga_chapters", "")).strip(),
+                    "anime_episodes": str(row.get("anime_episodes", "")).strip(),
                     "released": _released,
                     "duration": int(row["duration"]),
                     "extended": True if int(row["extended"]) == 1 or row["extended"] == "True" else False,
@@ -355,8 +361,11 @@ class OrganizerStore:
 
         results = []
 
+        self.logger.debug(f"get_other_edits query: '{query}' / Data: {data}")
+
         async with self.conn.execute(query, tuple(data)) as cursor:
             async for row in cursor:
+                row = dict(row)
                 _id = int(row["id"])
                 if ids_only:
                     results.append(_id)

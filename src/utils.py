@@ -84,10 +84,10 @@ async def read_file(file, binary=False):
     loop.run_in_executor(None, _worker)
 
     while True:
-        is_error, item = await queue.get()
+        is_chunk, item = await queue.get()
         if item is None:
             break
-        elif is_error:
+        elif not is_chunk:
             raise item
         elif binary:
             data.extend(item)
@@ -178,17 +178,22 @@ async def iter(func, *args, **kwargs):
     def _worker():
         try:
             for f in func(*args, **kwargs):
-                asyncio.run_coroutine_threadsafe(queue.put(f), loop)
+                asyncio.run_coroutine_threadsafe(queue.put((True, f)), loop)
+        except Exception as e:
+            asyncio.run_coroutine_threadsafe(queue.put((False, e)), loop)
         finally:
-            asyncio.run_coroutine_threadsafe(queue.put(None), loop)
+            asyncio.run_coroutine_threadsafe(queue.put((True, None)), loop)
 
     loop.run_in_executor(None, _worker)
 
     while True:
-        item = await queue.get()
+        is_chunk, item = await queue.get()
         if item is None:
             break
-        yield item
+        elif not is_chunk:
+            raise item
+        else:
+            yield item
 
 async def download(url, out, progress_bar_func, loop=None):
     if loop is None:

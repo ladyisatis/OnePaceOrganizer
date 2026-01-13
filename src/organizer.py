@@ -693,8 +693,10 @@ class OnePaceOrganizer:
                 if self.opened and self.status.get("last_update_ts", None) is not None:
                     now = datetime.datetime.now(tz=datetime.timezone.utc)
                     data_file_stat = await utils.stat(data_file)
-                    last_update_remote = datetime.datetime.fromtimestamp(self.status["last_update_ts"])
+
+                    last_update_remote = datetime.datetime.fromtimestamp(self.status["last_update_ts"], tz=datetime.timezone.utc)
                     last_update_local = datetime.datetime.fromtimestamp(data_file_stat.st_mtime, tz=datetime.timezone.utc)
+                    self.logger.trace(f"last_update_remote: {last_update_remote} / last_update_local: {last_update_local}")
 
                     if (now - last_update_remote < datetime.timedelta(seconds=600)) or (now - last_update_local < datetime.timedelta(seconds=600)):
                         update_data_file = False
@@ -728,10 +730,10 @@ class OnePaceOrganizer:
         crc_pattern = re.compile(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
         filelist = []
 
-        async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, follow_symlinks=True):
+        async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, recurse_symlinks=True):
             await utils.run(filelist.append, file)
 
-        async for file in utils.iter(self.input_path.rglob, "*.[mM][pP]4", case_sensitive=False, follow_symlinks=True):
+        async for file in utils.iter(self.input_path.rglob, "*.[mM][pP]4", case_sensitive=False, recurse_symlinks=True):
             await utils.run(filelist.append, file)
 
         num_found = 0
@@ -967,7 +969,7 @@ class OnePaceOrganizer:
 
                 for file_type, file_id, file in files:
                     if file_type == 0:
-                        episode_info = await self.store.get_episode(id=file_id)
+                        episode_info = await self.store.get_episode(id=file_id, with_descriptions=True)
                     elif file_type == 1:
                         episode_info = await self.store.get_other_edit(id=file_id)
                     elif file_type == 2:
@@ -1514,7 +1516,7 @@ class OnePaceOrganizer:
 
             for file_type, file_id, file in files:
                 if file_type == 0:
-                    episode_info = await self.store.get_episode(id=file_id)
+                    episode_info = await self.store.get_episode(id=file_id, with_descriptions=True)
                 elif file_type == 1:
                     episode_info = await self.store.get_other_edit(id=file_id)
                 elif file_type == 2:
@@ -1663,7 +1665,8 @@ class OnePaceOrganizer:
                         name=file.name if hasattr(file, "name") else "",
                         stem=file.stem if hasattr(file, "stem") else "",
                         suffix=file.suffix if hasattr(file, "suffix") else "",
-                        crc32=crc32,
+                        crc32=episode_info.get("hash_crc32", ""),
+                        blake2s=episode_info.get("hash_blake2s", ""),
                         arc_title=season_info["title"] if season_info is not None else "",
                         arc_saga=season_info["saga"] if season_info is not None else ""
                     )
