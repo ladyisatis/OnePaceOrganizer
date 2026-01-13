@@ -76,7 +76,7 @@ async def read_file(file, binary=False):
                     asyncio.run_coroutine_threadsafe(queue.put((True, chunk)), loop)
 
         except Exception as e:
-            asyncio.run_coroutine_threadsafe(queue.put((False, e)))
+            asyncio.run_coroutine_threadsafe(queue.put((False, e)), loop)
 
         finally:
             asyncio.run_coroutine_threadsafe(queue.put((True, None)), loop)

@@ -516,6 +516,7 @@ class OnePaceOrganizer:
             self.logger.trace("plex_get_libraries: fetching all library sections")
             sections = await utils.run(self.plexapi_server.library.sections)
             self.logger.trace(f"plex_get_libraries: found {len(sections)} total sections")
+
         except Exception as e:
             self.logger.debug(f"plex_get_libraries: Exception occurred: {e}")
             self.logger.trace(f"plex_get_libraries: Full traceback: {traceback.format_exc()}")
