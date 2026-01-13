@@ -469,8 +469,8 @@ class OnePaceOrganizer:
                     token=self.plex_config_auth_token if self.plexapi_account is None else self.plexapi_account.authenticationToken
                 )
 
+                self.logger.debug(f"Found Plex server: {server_id}")
                 self.plex_config_server_id = server_id
-
                 return self.plexapi_server.machineIdentifier == server_id
             except:
                 self.logger.debug(traceback.format_exc())

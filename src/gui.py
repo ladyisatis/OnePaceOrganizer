@@ -779,7 +779,7 @@ class GUI(QMainWindow):
             return
 
         logger.debug("Selecting Plex server")
-        if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id == "" and not await self.organizer.select_plex_server(_id):
+        if not await self.organizer.select_plex_server(_id):
             self.organizer.plexapi_server = None
             self.organizer.plex_config_server_id = ""
             await self.organizer.save_config()
