@@ -635,11 +635,11 @@ class GUI(QMainWindow):
             loading_action.setEnabled(False)
             self.menu_lang.addAction(loading_action)
 
-        if self.organizer.store.conn is None:
+        if not self.organizer.opened:
             data_file = Path(self.organizer.base_path, "metadata", "data.db")
             if await utils.is_file(data_file):
                 try:
-                    await self.organizer.store.open(data_file)
+                    await self.organizer.open_db(data_file)
                 finally:
                     await self.organizer.store.close()
 

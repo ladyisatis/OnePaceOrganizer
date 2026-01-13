@@ -81,8 +81,11 @@ class OnePaceOrganizer:
         self.worker_task = None
         self.toml = None
         self.extra_fields = {}
+
         self.logger = logger
         self.store = store.OrganizerStore(lang=self.lang, logger=self.logger)
+        self.opened = False
+        self.status = {}
 
     async def load_config(self):
         if self.toml is None or self.toml["version"] == "?":
@@ -235,6 +238,24 @@ class OnePaceOrganizer:
 
         out = await utils.run(orjson.dumps, out, option=orjson.OPT_NON_STR_KEYS | orjson.OPT_INDENT_2)
         return await utils.write_file(self.config_file, out)
+
+    async def open_db(self, data_file=None):
+        if self.opened or self.store.conn is not None:
+            await self.store.close()
+
+        if data_file is None:
+            data_file = Path(self.base_path, "metadata", "data.db")
+
+        if await utils.is_file(data_file):
+            res = await self.store.open(data_file)
+            if res[0]:
+                self.opened = True
+                self.status = res[1]
+            else:
+                self.opened = False
+                raise res[1]
+        else:
+            self.opened = False
 
     def set_executor(self, process=True):
         self.executor_func = concurrent.futures.ProcessPoolExecutor if process else concurrent.futures.ThreadPoolExecutor
@@ -664,16 +685,15 @@ class OnePaceOrganizer:
     async def cache_episode_data(self):
         data_file = Path(self.base_path, "metadata", "data.db")
         update_data_file = True
-        opened = False
 
         if await utils.is_file(data_file):
             try:
-                opened, status = await self.store.open(data_file)
+                await self.open_db(data_file)
 
-                if opened and status.get("last_update_ts", None) is not None:
+                if self.opened and self.status.get("last_update_ts", None) is not None:
                     now = datetime.datetime.now(tz=datetime.timezone.utc)
                     data_file_stat = await utils.stat(data_file)
-                    last_update_remote = datetime.datetime.fromtimestamp(status["last_update_ts"])
+                    last_update_remote = datetime.datetime.fromtimestamp(self.status["last_update_ts"])
                     last_update_local = datetime.datetime.fromtimestamp(data_file_stat.st_mtime, tz=datetime.timezone.utc)
 
                     if (now - last_update_remote < datetime.timedelta(seconds=600)) or (now - last_update_local < datetime.timedelta(seconds=600)):
@@ -690,7 +710,7 @@ class OnePaceOrganizer:
 
                 self.logger.success("Downloading updated metadata into metadata/data.db...")
                 await utils.download(f"{self.metadata_url}/metadata/data.sqlite", data_file, self.progress_bar_func)
-                opened, status = await self.store.open(data_file)
+                await self.store.open(data_file)
 
             except Exception as e:
                 self.logger.debug(traceback.format_exc())
@@ -699,8 +719,8 @@ class OnePaceOrganizer:
         if await utils.is_dir(data_file.parent):
             await self.store.cache_files(data_file.parent)
 
-        self.logger.debug(f"SQLite DB Open: {opened}")
-        return opened or (len(self.store.tvshow) > 0 and len(self.store.arcs) > 0 and len(self.store.episodes) > 0)
+        self.logger.debug(f"SQLite DB Open: {self.opened}")
+        return self.opened or (len(self.store.tvshow) > 0 and len(self.store.arcs) > 0 and len(self.store.episodes) > 0)
 
     async def glob_video_files(self):
         self.logger.success("Searching for .mkv and .mp4 files...")

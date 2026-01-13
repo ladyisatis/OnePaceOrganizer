@@ -235,6 +235,30 @@ class Console:
         ).run_async()
 
         if yn:
+            if not self.organizer.opened:
+                data_file = Path(self.organizer.base_path, "metadata", "data.db")
+                if await utils.is_file(data_file):
+                    try:
+                        await self.organizer.open_db(data_file)
+                    finally:
+                        await self.organizer.store.close()
+
+            if len(self.organizer.store.langs) == 0:
+                values = [("en", "English")]
+                default = "en"
+            else:
+                values = []
+                default = self.organizer.store.lang
+                for lang in self.organizer.store.langs:
+                    values.append((lang, lang.autonym()))
+
+            self.organizer.store.lang = await radiolist_dialog(
+                title=self.window_title,
+                text="Select the language:",
+                values=values,
+                default=default
+            ).run_async()
+
             values = [
                 (0, "Move (recommended)"),
                 (1, "Copy"),

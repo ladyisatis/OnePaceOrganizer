@@ -16,7 +16,6 @@ class OrganizerStore:
         self.tvshow = {}
         self.arcs = {}
         self.episodes = {}
-        self.status = {"last_update": None, "last_update_ts": None, "base_url": None, "version": None}
         self.conn = None
         self.logger = logger
 
@@ -68,12 +67,12 @@ class OrganizerStore:
                     elif k != "lockdata":
                         self.tvshow[k] = v
 
-            self.status = {"last_update": None, "last_update_ts": None, "base_url": None, "version": None}
+            status = {"last_update": None, "last_update_ts": None, "base_url": None, "version": None}
             async with self.conn.execute("SELECT last_update, last_update_ts, base_url, version FROM status WHERE id = ?", (1, )) as cursor:
                 async for row in cursor:
-                    self.status = dict(row)
+                    status = dict(row)
 
-            return (True, self.status)
+            return (True, status)
 
         except Exception as e:
             self.logger.exception(e)
