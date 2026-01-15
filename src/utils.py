@@ -245,11 +245,11 @@ async def download(url, out, progress_bar_func, loop=None):
     await run_func(progress_bar_func, 100)
     return True
 
-def compare_file(file1, file2):
+def compare_file(file1, file2, buffer=65536):
     with file1.open(mode='rb') as f1, file2.open(mode='rb') as f2:
         while True:
-            c1 = f1.read(65536)
-            c2 = f2.read(65536)
+            c1 = f1.read(buffer)
+            c2 = f2.read(buffer)
 
             if not c1 and not c2:
                 return True
@@ -288,24 +288,38 @@ def move_file(src, dst, file_action=0):
     if isinstance(dst, str):
         dst = Path(str(dst))
 
+    network_mode = sys.platform == "win32" and (src.drive.startswith("\\\\") or dst.drive.startswith("\\\\"))
+    file_buffer = 65536 if not network_mode else 16 * 1024 * 1024
+
     try:
-        if dst.exists():
-            if compare_file(src, dst):
+        if not network_mode and dst.exists():
+            if compare_file(src, dst, buffer=file_buffer):
                 return ""
             else:
                 dst.unlink(missing_ok=True)
 
         if file_action == 1: #Copy
-            if sys.version_info >= (3, 14):
+            if network_mode:
+                with src.open(mode="rb", buffering=0) as fsrc, dst.open(mode="rb", buffering=0) as fdst:
+                    shutil.copyfileobj(fsrc, fdst, file_buffer)
+            elif sys.version_info >= (3, 14):
                 src.copy(dst, follow_symlinks=True, preserve_metadata=True)
             else:
                 shutil.copy2(str(src), str(dst))
+
         elif file_action == 2: #Symlink
             dst.symlink_to(src)
+
         elif file_action == 3: #Hardlink
             dst.hardlink_to(src)
+
         else: #Move, or other
-            if sys.version_info >= (3, 14):
+            if network_mode:
+                with src.open(mode="rb", buffering=0) as fsrc, dst.open(mode="rb", buffering=0) as fdst:
+                    shutil.copyfileobj(fsrc, fdst, file_buffer)
+
+                src.unlink(missing_ok=True)
+            elif sys.version_info >= (3, 14):
                 src.move(dst)
             else:
                 shutil.move(str(src), str(dst))
