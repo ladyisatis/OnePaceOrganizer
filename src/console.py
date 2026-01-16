@@ -426,9 +426,9 @@ class Console:
         if not await self.organizer.plex_get_shows():
             return False
 
-        values = []
+        values = [("", "(show not listed)")]
         default = None
-        
+
         for id, show in self.organizer.plex_config_shows.items():
             values.append((id, show["title"]))
 
@@ -547,12 +547,35 @@ class Console:
                     if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id is not None and self.organizer.plex_config_server_id != "":
                         await self.organizer.plex_select_server(self.organizer.plex_config_server_id)
 
-            self.process_task = asyncio.create_task(self.organizer.start())
+            if "new_show" in self.organizer.extra_fields and self.organizer.plex_config_show_guid != "":
+                self.organizer.extra_fields["new_show"] = self.organizer.file_action
+                self.organizer.file_action = 4 # Set metadata only mode
+                self.process_task = asyncio.create_task(self.process_plex_episodes([], True))
+            else:
+                self.process_task = asyncio.create_task(self.organizer.start())
 
             if self.organizer.plex_config_enabled:
                 success, queue, completed, skipped = await self.process_task
 
-                if isinstance(queue, list) and len(queue) > 0:
+                if self.organizer.plex_config_show_guid == "":
+                    await self.pb_exit()
+                    self.organizer.extra_fields["new_show"] = True
+
+                    await message_dialog(
+                        title=self.window_title,
+                        text=(
+                                f"Completed: {completed} processed, {skipped} skipped\n"
+                                "--------------\n\n"
+                                f"All of the One Pace files have been created in:\n"
+                                f"{str(self.organizer.output_path)}\n\n"
+                                f"Please move the \"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
+                                "and make sure that it appears in Plex. When all seasons and episodes appear in Plex, re-run this wizard "
+                                "and select the Plex show."
+                            )
+                    ).run_async()
+                    return
+
+                elif isinstance(queue, list) and len(queue) > 0:
                     await utils.run(self.pb_log_output, f"Completed: {completed} processed, {skipped} skipped")
                     await utils.run(self.pb_log_output, "--------------")
                     await self.pb_exit()
@@ -597,6 +620,11 @@ class Console:
                     await utils.run(self.dialog.exit, result=True)
 
         finally:
+            file_action_val = self.organizer.extra_fields.get("new_show", False)
+            if isinstance(file_action_val, int):
+                self.organizer.file_action = file_action_val
+                del self.organizer.extra_fields["new_show"]
+
             await self.organizer.save_config()
 
 def main(organizer, log_level):

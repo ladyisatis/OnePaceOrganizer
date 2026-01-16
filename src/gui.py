@@ -170,7 +170,7 @@ class GUI(QMainWindow):
         self.plex_remember_login.prop.setChecked(self.organizer.plex_config_remember)
 
         self.plex_server = Input(self.plex_group_layout, "Server:", QComboBox(), width=self.plex_width)
-        self.plex_server.prop.addItem("", userData=None)
+        self.plex_server.prop.addItem("", userData="")
 
         i = 1
         for server_id, item in self.organizer.plex_config_servers.items():
@@ -183,7 +183,7 @@ class GUI(QMainWindow):
         self.plex_server.prop.activated.connect(self.select_plex_server)
         self.plex_server.setVisible(_plex_remembered_login and len(self.organizer.plex_config_servers) > 0)
 
-        self.plex_library = Input(self.plex_group_layout, "Library:", QComboBox(), width=self.plex_width)
+        self.plex_library = Input(self.plex_group_layout, "Library:", QComboBox(), width=self.plex_width, button="Refresh", connect=self.refresh_plex_library)
         self.plex_library.prop.addItem("", userData=None)
 
         i = 1
@@ -201,7 +201,7 @@ class GUI(QMainWindow):
         self.plex_library.setVisible(_plex_remembered_login and len(self.organizer.plex_config_servers) > 0 and len(self.organizer.plex_config_libraries) > 0)
 
         self.plex_show = Input(self.plex_group_layout, "Show:", QComboBox(), width=self.plex_width)
-        self.plex_show.prop.addItem("", userData=None)
+        self.plex_show.prop.addItem("(show not listed)", userData="")
 
         i = 1
         for show_guid, item in self.organizer.plex_config_shows.items():
@@ -518,7 +518,7 @@ class GUI(QMainWindow):
             QMessageBox.information(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
             return
 
-        if len(folder) > 2 and (folder[:2] == "\\\\" or folder[:2] == "//"):
+        if len(folder) > 2 and (folder.startswith("\\\\") or folder.startswith("//")):
             yn = QMessageBox.question(
                 None,
                 self.organizer.window_title,
@@ -546,7 +546,7 @@ class GUI(QMainWindow):
             QMessageBox.information(None, self.organizer.window_title, "The input folder should not be the same as the output folder.")
             return
 
-        if len(folder) > 2 and (folder[:2] == "\\\\" or folder[:2] == "//"):
+        if len(folder) > 2 and (folder.startswith("\\\\") or folder.startswith("//")):
             yn = QMessageBox.question(
                 None,
                 self.organizer.window_title,
@@ -561,13 +561,44 @@ class GUI(QMainWindow):
         self.organizer.output_path = Path(folder).resolve()
         self.output.prop.setText(str(self.organizer.output_path))
 
+    @asyncSlot()
+    async def refresh_plex_library(self):
+        self.plex_server.prop.setEnabled(False)
+        self.plex_library.prop.setEnabled(False)
+        self.plex_show.prop.setEnabled(False)
+        logger.info("Refreshing list of libraries...")
+
+        try:
+            self.plex_library.prop.clear()
+            self.plex_library.prop.addItem("Loading...", userData=None)
+
+            if not await self.organizer.plex_get_libraries():
+                await self.organizer.save_config()
+                self.plex_library.prop.clear()
+                self.plex_library.prop.addItem("", userData=None)
+                return
+
+            self.plex_library.prop.clear()
+            self.plex_library.prop.addItem("", userData=None)
+
+            for identifier, item in self.organizer.plex_config_libraries.items():
+                self.plex_library.prop.addItem(item["title"], userData=identifier)
+
+            logger.info("Reloaded all Plex libraries")
+
+        finally:
+            await self.organizer.save_config()
+            self._update_start_btn()
+            self.plex_server.prop.setEnabled(True)
+            self.plex_library.prop.setEnabled(True)
+            self.plex_show.prop.setEnabled(False)
+
     def _update_start_btn(self):
         self.start_button.setEnabled(
             not self.organizer.plex_config_enabled or (
                 self.organizer.plex_config_enabled and 
                 self.organizer.plex_config_server_id != "" and 
-                self.organizer.plex_config_library_key != "" and 
-                self.organizer.plex_config_show_guid != ""
+                self.organizer.plex_config_library_key != ""
             )
         )
 
@@ -863,12 +894,12 @@ class GUI(QMainWindow):
 
         if not await self.organizer.plex_get_shows():
             self.plex_show.prop.clear()
-            self.plex_show.prop.addItem("", userData=None)
+            self.plex_show.prop.addItem("", userData="")
             self.plex_show.prop.setEnabled(True)
             return
 
         self.plex_show.prop.clear()
-        self.plex_show.prop.addItem("", userData=None)
+        self.plex_show.prop.addItem("(show not listed)", userData="")
 
         for identifier, item in self.organizer.plex_config_shows.items():
             self.plex_show.prop.addItem(item["title"], userData=identifier)
@@ -886,12 +917,6 @@ class GUI(QMainWindow):
             return
 
         _id = self.plex_show.prop.currentData()
-        if _id is None or _id == "":
-            self.plex_server.setVisible(True)
-            self.plex_library.setVisible(True)
-            self.plex_show.setVisible(True)
-            self.start_button.setEnabled(False)
-            return
 
         if not await self.organizer.plex_login():
             await self.organizer.save_config()
@@ -1008,6 +1033,7 @@ class GUI(QMainWindow):
         self.organizer.output_path = Path(self.output.prop.text())
 
         if self.organizer.plex_config_enabled:
+            guid = self.organizer.plex_config_show_guid
             self.plex_server.prop.setEnabled(False)
             self.plex_library.prop.setEnabled(False)
             self.plex_show.prop.setEnabled(False)
@@ -1037,40 +1063,64 @@ class GUI(QMainWindow):
                 if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id is not None and self.organizer.plex_config_server_id != "":
                     await self.organizer.plex_select_server(self.organizer.plex_config_server_id)
 
-            res = await asyncio.create_task(self.organizer.start())
-            if isinstance(res, tuple):
-                success, queue, completed, skipped = res
+            if "new_show" in self.organizer.extra_fields and guid != "":
+                del self.organizer.extra_fields["new_show"]
+                old_file_action = self.organizer.file_action
+                self.organizer.file_action = 4 # Set metadata only mode
 
-                if not success:
-                    self.plex_server.prop.setEnabled(True)
-                    self.plex_library.prop.setEnabled(True)
-                    self.plex_show.prop.setEnabled(True)
-                    self.plex_remember_login.button.setEnabled(True)
-                    self.plex_remember_login.prop.setEnabled(True)
-                    await self.organizer.save_config()
-                    self.start_button.setEnabled(True)
-                    return
+                res = asyncio.create_task(self.process_plex_episodes([], True))
+                success, queue, completed, skipped = await res
+                self.log_output.append(self.spacer)
+                self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
 
-                if isinstance(queue, list):
-                    if len(queue) > 0:
-                        QMessageBox.information(None, self.organizer.window_title,
-                            (
-                                f"All of the One Pace files have been created in:\n"
-                                f"{str(self.organizer.output_path)}\n\n"
-                                f"Please move the\"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
-                                "and make sure that it appears in Plex. Seasons and episodes will temporarily "
-                                "have incorrect information, and the next step will correct them.\n\n"
-                                "Click OK once this has been done and you can see the One Pace video files in Plex."
+                self.organizer.file_action = old_file_action
+
+            else:
+                res = await asyncio.create_task(self.organizer.start())
+                if isinstance(res, tuple):
+                    success, queue, completed, skipped = res
+
+                    if not success:
+                        self.plex_server.prop.setEnabled(True)
+                        self.plex_library.prop.setEnabled(True)
+                        self.plex_show.prop.setEnabled(True)
+                        self.plex_remember_login.button.setEnabled(True)
+                        self.plex_remember_login.prop.setEnabled(True)
+                        await self.organizer.save_config()
+                        self.start_button.setEnabled(True)
+                        return
+
+                    if guid != "":
+                        if isinstance(queue, list) and len(queue) > 0:
+                            QMessageBox.information(None, self.organizer.window_title,
+                                (
+                                    "All of the One Pace files have been created in:\n"
+                                    f"{str(self.organizer.output_path)}\n\n"
+                                    f"Please move the\"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
+                                    "and make sure that it appears in Plex. Seasons and episodes will temporarily "
+                                    "have incorrect information, and the next step will correct them.\n\n"
+                                    "Click OK once this has been done and you can see the One Pace video files in Plex."
+                                )
                             )
-                        )
 
-                        res = asyncio.create_task(self.organizer.process_plex_episodes(queue))
-                        success, queue, completed, skipped = await res
+                            res = asyncio.create_task(self.organizer.process_plex_episodes(queue))
+                            success, queue, completed, skipped = await res
+                            self.log_output.append(self.spacer)
+                            self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
+                        else:
+                            self.log_output.append(self.spacer)
+                            self.log_output.append("Nothing to do")
+
+                    elif guid == "":
+                        self.organizer.extra_fields["new_show"] = True
                         self.log_output.append(self.spacer)
-                        self.log_output.append(f"Completed: {completed} processed, {skipped} skipped")
-                    else:
-                        self.log_output.append(self.spacer)
-                        self.log_output.append("Nothing to do")
+                        self.log_output.append((
+                            "All of the One Pace files have been created in:\n"
+                            f"{str(self.organizer.output_path)}\n\n"
+                            f"Please move the\"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
+                            "and make sure that it appears in Plex. When all seasons and episodes appear in Plex, click Refresh to the "
+                            "right of the selected library and select the show, then click Start again."
+                        ))
 
             self.plex_server.prop.setEnabled(True)
             self.plex_library.prop.setEnabled(True)

@@ -121,12 +121,18 @@ class Headless:
         if success:
             if self.organizer.plex_config_enabled and self.organizer.file_action != 4:
                 logger.success(f"Completed: {completed} completed, {skipped} skipped")
-                logger.info(f"Pausing {self.plex_wait_secs} seconds to allow file transfers")
-                await asyncio.sleep(float(self.plex_wait_secs))
 
-                success, queue, completed, skipped = await self.organizer.process_plex_episodes(queue)
+                if self.organizer.plex_config_show_guid != "":
+                    logger.info(f"Pausing {self.plex_wait_secs} seconds to allow file transfers")
+                    await asyncio.sleep(float(self.plex_wait_secs))
+                    success, queue, completed, skipped = await self.organizer.process_plex_episodes(queue)
+                    logger.success(f"Completed: {completed} processed, {skipped} skipped")
 
-            logger.success(f"Completed: {completed} processed, {skipped} skipped")
+                else:
+                    logger.info((
+                        "Files are sorted in the output folder, please re-run this program in "
+                        "metadata-only mode after transferring to Plex to complete the process."
+                    ))
 
         await self.organizer.save_config()
         return 0 if success else 1

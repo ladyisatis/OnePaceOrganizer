@@ -646,7 +646,7 @@ class OnePaceOrganizer:
             self.plex_config_show_guid = guid
             return True
 
-        if guid not in self.plex_config_shows:
+        if guid != "" and guid not in self.plex_config_shows:
             self.logger.error(f"plex_select_show: Show GUID '{guid}' not found in available shows")
             return False
 
@@ -866,99 +866,118 @@ class OnePaceOrganizer:
         show = None
 
         try:
-            section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
+            if self.plex_config_show_guid != "":
+                section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
 
-            if self.plex_config_show_guid.startswith("local://"):
-                rating_key = self.plex_config_show_guid.replace("local://", "")
-                try:
-                    item = await utils.run(section.fetchItem, int(rating_key))
-                    self.logger.debug(f"Found item by rating key: {rating_key} (type: {type(item)})")
+                if self.plex_config_show_guid.startswith("local://"):
+                    rating_key = self.plex_config_show_guid.replace("local://", "")
+                    try:
+                        item = await utils.run(section.fetchItem, int(rating_key))
+                        self.logger.debug(f"Found item by rating key: {rating_key} (type: {type(item)})")
 
-                    # Handle case where we get an Episode instead of a Show
-                    if hasattr(item, 'type'):
-                        if item.type == 'show':
+                        # Handle case where we get an Episode instead of a Show
+                        if hasattr(item, 'type'):
+                            if item.type == 'show':
+                                show = item
+                                self.logger.debug(f"Item is a show: {show.title}")
+                            elif item.type == 'episode':
+                                self.logger.debug(f"Item is an episode, getting show from episode: {item.title}")
+                                show = await utils.run(item.show)
+                                self.logger.debug(f"Retrieved show: {show.title}")
+                            else:
+                                self.logger.error(f"Item with rating key '{rating_key}' is not a show or episode (type: {item.type})")
+                                return (False, None, completed, skipped)
+                        else:
+                            # Fallback: assume it's a show if type attribute is missing
                             show = item
-                            self.logger.debug(f"Item is a show: {show.title}")
-                        elif item.type == 'episode':
-                            self.logger.debug(f"Item is an episode, getting show from episode: {item.title}")
-                            show = await utils.run(item.show)
-                            self.logger.debug(f"Retrieved show: {show.title}")
-                        else:
-                            self.logger.error(f"Item with rating key '{rating_key}' is not a show or episode (type: {item.type})")
-                            return (False, None, completed, skipped)
-                    else:
-                        # Fallback: assume it's a show if type attribute is missing
-                        show = item
-                        self.logger.debug(f"Assuming item is a show: {show.title}")
+                            self.logger.debug(f"Assuming item is a show: {show.title}")
 
-                except Exception as e:
-                    self.logger.error(f"Failed to fetch show by rating key '{rating_key}': {e}")
-                    return (False, e, completed, skipped)
+                    except Exception as e:
+                        self.logger.error(f"Failed to fetch show by rating key '{rating_key}': {e}")
+                        return (False, e, completed, skipped)
 
-            else:
-                show = await utils.run(section.getGuid, self.plex_config_show_guid)
-                if show is None:
-                    self.logger.error(f"Unable to find show with GUID '{self.plex_config_show_guid}'")
-                    return (False, None, completed, skipped)
+                else:
+                    show = await utils.run(section.getGuid, self.plex_config_show_guid)
+                    if show is None:
+                        self.logger.error(f"Unable to find show with GUID '{self.plex_config_show_guid}'")
+                        return (False, None, completed, skipped)
 
-            await utils.run(show.batchEdits)
+                await utils.run(show.batchEdits)
 
-            if self.plex_set_show_edits:
-                tvshow = self.store.tvshow
+                if self.plex_set_show_edits:
+                    tvshow = self.store.tvshow
 
-                if "tagline" in tvshow and tvshow["tagline"] != "" and show.tagline != tvshow["tagline"]:
-                    self.logger.info(f"Set Tagline: {show.tagline} -> {tvshow['tagline']}")
-                    await utils.run(show.editTagline, tvshow["tagline"], locked=self.lockdata)
+                    if "tagline" in tvshow and tvshow["tagline"] != "" and show.tagline != tvshow["tagline"]:
+                        self.logger.info(f"Set Tagline: {show.tagline} -> {tvshow['tagline']}")
+                        await utils.run(show.editTagline, tvshow["tagline"], locked=self.lockdata)
 
-                if "customrating" in tvshow and tvshow["customrating"] != "" and show.contentRating != tvshow["customrating"]:
-                    self.logger.info(f"Set Rating: {show.contentRating} -> {tvshow['customrating']}")
-                    await utils.run(show.editContentRating, tvshow["customrating"], locked=self.lockdata)
+                    if "customrating" in tvshow and tvshow["customrating"] != "" and show.contentRating != tvshow["customrating"]:
+                        self.logger.info(f"Set Rating: {show.contentRating} -> {tvshow['customrating']}")
+                        await utils.run(show.editContentRating, tvshow["customrating"], locked=self.lockdata)
 
-                if "genre" in tvshow and isinstance(tvshow["genre"], list):
-                    _genres = []
-                    for genre in show.genres:
-                        _genres.append(genre.tag)
+                    if "genre" in tvshow and isinstance(tvshow["genre"], list):
+                        _genres = []
+                        for genre in show.genres:
+                            _genres.append(genre.tag)
 
-                    for genre in tvshow["genre"]:
-                        if genre not in _genres:
-                            self.logger.info(f"Add Genre: {genre}")
-                            await utils.run(show.addGenre, genre)
+                        for genre in tvshow["genre"]:
+                            if genre not in _genres:
+                                self.logger.info(f"Add Genre: {genre}")
+                                await utils.run(show.addGenre, genre)
 
-                if "plot" in tvshow and show.summary != tvshow["plot"]:
-                    await utils.run(show.editSummary, tvshow["plot"], locked=self.lockdata)
+                    if "plot" in tvshow and show.summary != tvshow["plot"]:
+                        await utils.run(show.editSummary, tvshow["plot"], locked=self.lockdata)
 
-                    if "premiered" in tvshow:
-                        if isinstance(tvshow["premiered"], (datetime.date, datetime.datetime)):
-                            await utils.run(show.editOriginallyAvailable, str(tvshow["premiered"].isoformat()).split("T")[0])
-                        else:
-                            await utils.run(show.editOriginallyAvailable, tvshow["premiered"])
+                        if "premiered" in tvshow:
+                            if isinstance(tvshow["premiered"], (datetime.date, datetime.datetime)):
+                                await utils.run(show.editOriginallyAvailable, str(tvshow["premiered"].isoformat()).split("T")[0])
+                            else:
+                                await utils.run(show.editOriginallyAvailable, tvshow["premiered"])
 
-                    poster = await utils.run(utils.find_from_list, self.base_path, [
-                        ("posters", "poster.*"),
-                        ("posters", "folder.*"),
-                        (self.input_path, "poster.*")
-                    ])
+                        poster = await utils.run(utils.find_from_list, self.base_path, [
+                            ("posters", "poster.*"),
+                            ("posters", "folder.*"),
+                            (self.input_path, "poster.*")
+                        ])
 
-                    if not poster and self.fetch_posters:
-                        poster = Path(self.base_path, "posters", "poster.png")
-                        self.logger.info(f"Downloading: posters/{poster.name}")
+                        if not poster and self.fetch_posters:
+                            poster = Path(self.base_path, "posters", "poster.png")
+                            self.logger.info(f"Downloading: posters/{poster.name}")
 
-                        try:
-                            dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
-                            if not dl:
-                                self.logger.info("Unable to download (not found), skipping...")
-                        except:
-                            self.logger.warning("Unable to download, skipping...")
+                            try:
+                                dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
+                                if not dl:
+                                    self.logger.info("Unable to download (not found), skipping...")
+                            except:
+                                self.logger.warning("Unable to download, skipping...")
 
-                    await self.plex_art_set(poster, show, True)
+                        dst = await utils.resolve(self.output_path, poster.name if poster is not None else "Season{}")
+                        art = None
 
-                    background = await utils.run(utils.find_from_list, self.base_path, [
-                        ("posters", "background.*"),
-                        ("posters", "backdrop.*"),
-                        (self.input_path, "background.*")
-                    ])
-                    if background is not None:
-                        await self.plex_art_set(background, show, False)
+                        if not await utils.exists(dst):
+                            if not src and self.fetch_posters:
+                                try:
+                                    src = Path(self.base_path, "posters", "poster.png")
+                                    self.logger.info(f"Downloading: posters/{src.name}")
+                                    dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
+                                    if not dl:
+                                        self.logger.info(f"Skipping downloading (not found)")
+                                except:
+                                    self.logger.warning(f"Skipping downloading\n{traceback.format_exc()}")
+
+                            if await utils.is_file(src):
+                                self.logger.info(f"Copying {src.name} to: {dst}")
+                                await utils.copy_async(src, dst)
+
+                        await self.plex_art_set(poster, show, True)
+
+                        background = await utils.run(utils.find_from_list, self.base_path, [
+                            ("posters", "background.*"),
+                            ("posters", "backdrop.*"),
+                            (self.input_path, "background.*")
+                        ])
+                        if background is not None:
+                            await self.plex_art_set(background, show, False)
 
             index = 0
             total = len(files)
