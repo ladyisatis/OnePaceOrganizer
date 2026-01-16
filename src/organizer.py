@@ -489,17 +489,20 @@ class OnePaceOrganizer:
                     self.plex_config_server_id = resource.clientIdentifier
 
                     for id, item in self.plex_config_servers.items():
-                        self.plex_config_servers[id]["selected"] = self.plex_config_server_id == resource.clientIdentifier
+                        self.plex_config_servers[id]["selected"] = self.plex_config_server_id == id
 
-                    break
+                    return True
 
             except Exception as e:
-                self.plexapi_server = None
                 self.logger.debug(traceback.format_exc())
                 self.logger.error(f"Unable to connect to Plex server '{resource.name}': {e}")
-                return False
 
-        return self.plexapi_server is not None
+        self.plexapi_server = None
+        self.plex_config_server_id = ""
+        for id in self.plex_config_servers.keys():
+            self.plex_config_servers[id]["selected"] = False
+
+        return False
 
     async def plex_get_libraries(self):
         if self.plexapi_server is None:
