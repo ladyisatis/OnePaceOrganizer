@@ -171,7 +171,8 @@ class OrganizerStore:
                 query = f"{query} AND part = ?"
                 data.append(int(part))
             elif title is not None:
-                query = f"{query} AND title = ?"
+                query = f"{query} AND (title = ? OR originaltitle = ?)"
+                data.append(title)
                 data.append(title)
 
         query = f"{query} ORDER BY part ASC"

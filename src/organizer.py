@@ -732,6 +732,7 @@ class OnePaceOrganizer:
         self.logger.success("Searching for .mkv and .mp4 files...")
 
         crc_pattern = re.compile(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
+        fname_pattern = re.compile(r'\[(?:One Pace)?\]\[\d+(?:[-,]\d+)*\]\s+(.+?)(?:\s+(\d{2,})(?:\s+(.+?))?)?\s+\[\d+p\](?:\[[^\]]+\])*\[([A-Fa-f0-9]{8})\]\.(?:mkv|mp4)')
         filelist = []
 
         async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, recurse_symlinks=True):
@@ -801,12 +802,27 @@ class OnePaceOrganizer:
                                 results.append((0, result, file))
                                 continue
 
-                            #3. Check Other Edits for CRC32
+                            #3. Check episodes by matching
+                            match = fname_pattern.match(file.name)
+                            if match:
+                                arc_name, ep_num, extra, crc32 = match.groups()
+
+                                arc_res = await self.store.get_arc(title=arc_name)
+                                if arc_res is not None:
+                                    arc_num = arc_res["part"]
+
+                                    result = await self.store.get_episode(arc=arc_num, episode=int(ep_num), crc32=crc32, ids_only=True)
+                                    if result is not None:
+                                        results.append((0, result, file))
+                                        continue
+
+                            #4. Check Other Edits for CRC32
                             result = await self.store.get_other_edit(crc32=crc32, ids_only=True)
                             if result is not None:
                                 results.append((1, result, file))
+                                continue
 
-                            #4. Check local yml
+                            #5. Check local yml
                             key = f"1_{crc32}"
                             if key in self.store.episodes:
                                 results.append((2, key, file))
