@@ -758,14 +758,14 @@ class OnePaceOrganizer:
                 episode_id = await self.store.get_episode(file_name=file.name, crc32=match.group(1) if match else None, ids_only=True)
                 if episode_id is not None:
                     num_found += 1
-                    results.append((0, episode_id, file))
+                    results.append((0, episode_id, file, None))
                     continue
 
                 file_stem = file.stem if hasattr(file, "stem") else file.name
                 key = f"2_{file_stem}"
                 if f"2_{file_stem}" in self.store.episodes:
                     num_found += 1
-                    results.append((2, key, file))
+                    results.append((2, key, file, None))
                     continue
 
                 self.logger.debug(f"Add to Hash Queue: {file}")
@@ -793,13 +793,13 @@ class OnePaceOrganizer:
                             #1. Check Other Edits table for blake2s (less likely for CRC32 collision)
                             result = await self.store.get_other_edit(blake2s=blake2s, ids_only=True)
                             if result is not None:
-                                results.append((1, result, file))
+                                results.append((1, result, file, None))
                                 continue
 
                             #2. Check official releases [CRC32/Blake2s]
                             result = await self.store.get_episode(crc32=crc32, blake2s=blake2s, ids_only=True)
                             if result is not None:
-                                results.append((0, result, file))
+                                results.append((0, result, file, None))
                                 continue
 
                             #3. Check episodes by matching
@@ -807,34 +807,39 @@ class OnePaceOrganizer:
                             if match:
                                 arc_name, ep_num, extra, crc32 = match.groups()
 
+                                if ep_num is None:
+                                    results.append((3, crc32, file, None))
+                                    self.logger.warning(f"Skipping {file.name}: This seems to be a Specials/April Fools release, but we have no metadata for it.")
+                                    continue
+
                                 arc_res = await self.store.get_arc(title=arc_name)
                                 if arc_res is not None:
                                     arc_num = arc_res["part"]
 
                                     result = await self.store.get_episode(arc=arc_num, episode=int(ep_num), crc32=crc32, ids_only=True)
                                     if result is not None:
-                                        results.append((0, result, file))
+                                        results.append((0, result, file, extra))
                                         continue
 
                             #4. Check Other Edits for CRC32
                             result = await self.store.get_other_edit(crc32=crc32, ids_only=True)
                             if result is not None:
-                                results.append((1, result, file))
+                                results.append((1, result, file, None))
                                 continue
 
                             #5. Check local yml
                             key = f"1_{crc32}"
                             if key in self.store.episodes:
-                                results.append((2, key, file))
+                                results.append((2, key, file, None))
                                 continue
 
                             key - f"2_{blake2s}"
                             if key in self.store.episodes:
-                                results.append((2, key, file))
+                                results.append((2, key, file, None))
                                 continue
 
                             #5. Add to the "rejected" pile (show to user)
-                            results.append((3, crc32, file))
+                            results.append((3, crc32, file, None))
                             self.logger.warning(f"Skipping {file.name}: Episode metadata missing. Make sure you have the latest version of this One Pace release.")
 
                         finally:

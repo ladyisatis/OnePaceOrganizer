@@ -208,7 +208,7 @@ class OrganizerStore:
         result = await self.get_arcs(id, part, title)
         return result[0] if len(result) > 0 else None
 
-    async def get_episodes(self, id: int = None, arc=None, episode=None, crc32: str = None, blake2s: str = None, file_name: str = None, with_descriptions: bool = False, ids_only: bool = False):
+    async def get_episodes(self, id: int = None, arc=None, episode=None, extended: bool = None, crc32: str = None, blake2s: str = None, file_name: str = None, with_descriptions: bool = False, ids_only: bool = False):
         where_op = []
         data = []
 
@@ -246,6 +246,10 @@ class OrganizerStore:
         if blake2s is not None:
             where_op.append("e.hash_blake2s = ?")
             data.append(blake2s)
+
+        if extended is not None:
+            where_op.append("e.extended = ?")
+            data.append(extended)
 
         if file_name is not None:
             where_op.append("e.file_name = ?")
@@ -324,8 +328,8 @@ class OrganizerStore:
 
         return results
 
-    async def get_episode(self, id: int = None, arc=None, episode=None, crc32: str = None, blake2s: str = None, file_name: str = None, with_descriptions: bool = False, ids_only: bool = False):
-        result = await self.get_episodes(id, arc, episode, crc32, blake2s, file_name, with_descriptions, ids_only)
+    async def get_episode(self, id: int = None, arc=None, episode=None, extended: bool = None, crc32: str = None, blake2s: str = None, file_name: str = None, with_descriptions: bool = False, ids_only: bool = False):
+        result = await self.get_episodes(id, arc, episode, extended, crc32, blake2s, file_name, with_descriptions, ids_only)
         return result[0] if len(result) > 0 else None
 
     async def get_other_edits(self, id: int = None, crc32: str = None, blake2s: str = None, edit_name: str = None, ids_only: bool = False):
