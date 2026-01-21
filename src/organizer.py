@@ -822,6 +822,7 @@ class OnePaceOrganizer:
                 await self.open_db(data_file)
 
                 if self.opened and self.status.get("last_update_ts", None) is not None:
+                    update_data_file = False
                     now = datetime.datetime.now(tz=datetime.timezone.utc)
                     data_file_stat = await utils.stat(data_file)
 
@@ -829,21 +830,32 @@ class OnePaceOrganizer:
                     last_update_local = datetime.datetime.fromtimestamp(data_file_stat.st_mtime, tz=datetime.timezone.utc)
                     self.logger.trace(f"last_update_remote: {last_update_remote} / last_update_local: {last_update_local}")
 
-                    if (now - last_update_remote < datetime.timedelta(seconds=600)) or (now - last_update_local < datetime.timedelta(seconds=600)):
-                        update_data_file = False
-                    else:
-                        await self.store.close()
+                    if (now - last_update_remote > datetime.timedelta(seconds=3600)) or (now - last_update_local > datetime.timedelta(seconds=3600)):
+                        try:
+                            status_resp = await utils.run(httpx.get, f"{self.metadata_url}/metadata/status.json", follow_redirects=True)
+                            if status_resp.status_code >= 200 and status_resp.status_code < 400:
+                                status_json = await utils.run(orjson.loads, status_resp.content)
+                                update_data_file = status_json["last_update_ts"] != self.status["last_update_ts"]
+
+                                self.status["last_update"] = status_json["last_update"]
+                                self.status["last_update_ts"] = status_json["last_update_ts"]
+                        except:
+                            self.logger.debug(f"Skipping status.json check\n{traceback.format_exc()}")
+                            update_data_file = True
 
             except:
                 self.logger.warning(f"Danger: {data_file} might be corrupted!\n{traceback.format_exc()}")
 
         if update_data_file:
             try:
+                if self.opened:
+                    await self.store.close()
+
                 await utils.run(data_file.parent.mkdir, exist_ok=True)
 
                 self.logger.success("Downloading updated metadata into metadata/data.db...")
                 await utils.download(f"{self.metadata_url}/metadata/data.sqlite", data_file, self.progress_bar_func)
-                await self.store.open(data_file)
+                await self.open_db(data_file)
 
             except Exception as e:
                 self.logger.debug(traceback.format_exc())
