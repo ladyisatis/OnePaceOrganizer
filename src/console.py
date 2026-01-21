@@ -338,20 +338,13 @@ class Console:
             default=self.organizer.mode
         ).run_async()
 
-        self.organizer.plex_config_use_token = await yes_no_dialog(
-            title=self.window_title,
-            text='Choose your Plex login method:',
-            yes_text="Auth Token",
-            no_text="User/Pass"
-        ).run_async()
-
         self.organizer.plex_config_remember = await yes_no_dialog(
             title=self.window_title,
             text="Do you want to remember your Plex credentials?"
         ).run_async()
 
         while not authenticated:
-            if self.organizer.plex_config_use_token:
+            if self.organizer.mode == 3:
                 self.organizer.plex_config_auth_token = await input_dialog(
                     title=self.window_title,
                     text='Enter the authentication token:',
@@ -362,7 +355,7 @@ class Console:
                 if self.organizer.plex_config_auth_token is None:
                     return False
 
-            else:
+            elif self.organizer.mode == 1:
                 self.organizer.plex_config_username = await input_dialog(
                     title=self.window_title,
                     text='Plex Account Username:',

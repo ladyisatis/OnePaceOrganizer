@@ -148,8 +148,7 @@ class GUI(QMainWindow):
         self.plex_token = Input(self.plex_group_layout, "Authentication Token:", QLineEdit(), width=self.plex_width)
         self.plex_token.prop.setEchoMode(QLineEdit.EchoMode.Password)
         self.plex_token.prop.setText(self.organizer.plex_config_auth_token)
-        self.plex_token.setVisible(self.organizer.mode == 3)
-        self.plex_token.setVisible(self.organizer.plex_config_use_token and not _plex_remembered_login)
+        self.plex_token.setVisible(self.organizer.mode == 3 and not _plex_remembered_login)
 
         self.plex_username = Input(self.plex_group_layout, "Username:", QLineEdit(), width=self.plex_width)
         self.plex_username.prop.setText(self.organizer.plex_config_username)
@@ -623,15 +622,6 @@ class GUI(QMainWindow):
         self.organizer.lockdata = not self.organizer.lockdata
         self.action_lockdata.setChecked(self.organizer.lockdata)
 
-    def switch_plex_method(self, text):
-        self.organizer.plex_config_use_token = text == "Authentication Token"
-
-        self.plex_token.setVisible(self.organizer.plex_config_use_token)
-        self.plex_username.setVisible(not self.organizer.plex_config_use_token)
-        self.plex_password.setVisible(not self.organizer.plex_config_use_token)
-        self.output.setVisible(self.organizer.file_action != 4)
-        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.mode != 0 else True)
-
     def _plex_toggle_enabled(self, enable_all: bool):
         self.plex_method.prop.setEnabled(enable_all)
         self.plex_token.prop.setEnabled(enable_all)
@@ -644,12 +634,14 @@ class GUI(QMainWindow):
         self.plex_show.prop.setEnabled(enable_all)
 
     def _plex_toggle_login(self, is_visible: bool):
-        self.plex_method.setVisible(is_visible)
-        if self.organizer.plex_config_use_token:
-            self.plex_token.setVisible(is_visible)
+        if is_visible:
+            self.plex_token.setVisible(self.organizer.mode == 3)
+            self.plex_username.setVisible(self.organizer.mode == 1)
+            self.plex_password.setVisible(self.organizer.mode == 1)
         else:
-            self.plex_username.setVisible(is_visible)
-            self.plex_password.setVisible(is_visible)
+            self.plex_token.setVisible(False)
+            self.plex_username.setVisible(False)
+            self.plex_password.setVisible(False)
 
     def set_lang(self, lang):
         if isinstance(lang, str):
@@ -713,11 +705,13 @@ class GUI(QMainWindow):
         self._plex_toggle_enabled(False)
         await self.organizer.save_config()
 
-        self.organizer.plex_config_use_token = self.plex_method.prop.currentText() == "Authentication Token"
         self.organizer.plex_config_remember = self.plex_remember_login.prop.checkState() == Qt.Checked
-        self.organizer.plex_config_auth_token = self.plex_token.prop.text()
-        self.organizer.plex_config_username = self.plex_username.prop.text()
-        self.organizer.plex_config_password = self.plex_password.prop.text()
+
+        if self.organizer.mode == 3:
+            self.organizer.plex_config_auth_token = self.plex_token.prop.text()
+        elif self.organizer.mode == 1:
+            self.organizer.plex_config_username = self.plex_username.prop.text()
+            self.organizer.plex_config_password = self.plex_password.prop.text()
 
         if not await self.organizer.plex_login(True):
             logger.info("Could not log in, please try again")
