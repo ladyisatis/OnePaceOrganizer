@@ -858,48 +858,75 @@ class OnePaceOrganizer:
     async def glob_video_files(self):
         self.logger.success("Searching for .mkv and .mp4 files...")
 
-        crc_pattern = re.compile(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
-        fname_pattern = re.compile(r'\[(?:One Pace)?\]\[\d+(?:[-,]\d+)*\]\s+(.+?)(?:\s+(\d{2,})(?:\s+(.+?))?)?\s+\[\d+p\](?:\[[^\]]+\])*\[([A-Fa-f0-9]{8})\]\.(?:mkv|mp4)')
-        filelist = []
-
-        async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, recurse_symlinks=True):
-            await utils.run(filelist.append, file)
-
-        async for file in utils.iter(self.input_path.rglob, "*.[mM][pP]4", case_sensitive=False, recurse_symlinks=True):
-            await utils.run(filelist.append, file)
-
-        num_found = 0
-        num_calced = 0
-        filelist_total = len(filelist)
-        results = []
-        self.logger.debug(f"{filelist_total} files found")
-
         with self.executor_func(max_workers=self.workers) as executor:
+            crc_pattern = re.compile(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
+            fname_pattern = re.compile(r'\[(?:One Pace)?\]\[\d+(?:[-,]\d+)*\]\s+(.+?)(?:\s+(\d{2,})(?:\s+(.+?))?)?\s+\[\d+p\](?:\[[^\]]+\])*\[([A-Fa-f0-9]{8})\]\.(?:mkv|mp4)')
+            filelist = []
+
+            async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, recurse_symlinks=True, executor=executor):
+                await utils.run(filelist.append, file)
+
+            async for file in utils.iter(self.input_path.rglob, "*.[mM][pP]4", case_sensitive=False, recurse_symlinks=True, executor=executor):
+                await utils.run(filelist.append, file)
+
+            num_found = 0
+            num_calced = 0
+            filelist_total = len(filelist)
+            results = []
+            self.logger.debug(f"{filelist_total} files found")
+
             tasks = []
             loop = asyncio.get_running_loop()
 
+            await utils.run_func(self.progress_bar_func, 0)
+
             for file in filelist:
                 file = await utils.resolve(file)
-                match = await utils.run(crc_pattern.search, file.name.lower())
+                file_name = f"{file.stem if hasattr(file, 'stem') else ''}{file.suffix.lower() if hasattr(file, 'suffix') else ''}"
 
-                episode_id = await self.store.get_episode(file_name=file.name, crc32=match.group(1) if match else None, ids_only=True)
-                if episode_id is not None:
-                    num_found += 1
-                    results.append((0, episode_id, file, None))
-                    continue
+                match = await utils.run(crc_pattern.search, file_name, loop=loop, executor=executor)
+                if match:
+                    episode_id = await self.store.get_episode(file_name=file_name, crc32=match.group(1).upper() if match else None, ids_only=True)
+                    if episode_id is not None:
+                        num_found += 1
+                        results.append((0, episode_id, file, None))
+                        await utils.run_func(self.progress_bar_func, int((num_found / len(filelist_total)) * 100))
+                        continue
+
+                match = await utils.run(fname_pattern.match, file_name, loop=loop, executor=executor)
+                if match:
+                    arc_name, ep_num, extra, crc32 = await utils.run(match.groups)
+
+                    if ep_num is None:
+                        num_found += 1
+                        results.append((3, crc32, file, None))
+                        self.logger.warning(f"Skipping {file.name}: This seems to be a Specials/April Fools release, but there is no metadata for it.")
+                        await utils.run_func(self.progress_bar_func, int((num_found / len(filelist_total)) * 100))
+                        continue
+
+                    arc_res = await self.store.get_arc(title=arc_name)
+                    if arc_res is not None:
+                        arc_num = arc_res.get("part", 0)
+
+                        episode_id = await self.store.get_episode(arc=arc_num, episode=int(ep_num), crc32=crc32, ids_only=True)
+                        if episode_id is not None:
+                            num_found += 1
+                            results.append((0, episode_id, file, extra))
+                            await utils.run_func(self.progress_bar_func, int((num_found / len(filelist_total)) * 100))
+                            continue
 
                 file_stem = file.stem if hasattr(file, "stem") else file.name
                 key = f"2_{file_stem}"
                 if f"2_{file_stem}" in self.store.episodes:
                     num_found += 1
                     results.append((2, key, file, None))
+                    await utils.run_func(self.progress_bar_func, int((num_found / len(filelist_total)) * 100))
                     continue
 
                 self.logger.debug(f"Add to Hash Queue: {file}")
                 tasks.append(loop.run_in_executor(executor, utils.hash, str(file)))
 
             if len(tasks) > 0:
-                await utils.run_func(self.progress_bar_func, 0)
                 self.logger.success(f"Calculating file hashes for {len(tasks)} file(s)...")
 
                 try:
@@ -929,32 +956,13 @@ class OnePaceOrganizer:
                                 results.append((0, result, file, None))
                                 continue
 
-                            #3. Check episodes by matching
-                            match = fname_pattern.match(file.name)
-                            if match:
-                                arc_name, ep_num, extra, crc32 = match.groups()
-
-                                if ep_num is None:
-                                    results.append((3, crc32, file, None))
-                                    self.logger.warning(f"Skipping {file.name}: This seems to be a Specials/April Fools release, but we have no metadata for it.")
-                                    continue
-
-                                arc_res = await self.store.get_arc(title=arc_name)
-                                if arc_res is not None:
-                                    arc_num = arc_res["part"]
-
-                                    result = await self.store.get_episode(arc=arc_num, episode=int(ep_num), crc32=crc32, ids_only=True)
-                                    if result is not None:
-                                        results.append((0, result, file, extra))
-                                        continue
-
-                            #4. Check Other Edits for CRC32
+                            #3. Check Other Edits for CRC32
                             result = await self.store.get_other_edit(crc32=crc32, ids_only=True)
                             if result is not None:
                                 results.append((1, result, file, None))
                                 continue
 
-                            #5. Check local yml
+                            #4. Check local yml
                             key = f"1_{crc32}"
                             if key in self.store.episodes:
                                 results.append((2, key, file, None))
@@ -970,7 +978,7 @@ class OnePaceOrganizer:
                             self.logger.warning(f"Skipping {file.name}: Episode metadata missing. Make sure you have the latest version of this One Pace release.")
 
                         finally:
-                            await utils.run_func(self.progress_bar_func, int((i / len(tasks)) * 100))
+                            await utils.run_func(self.progress_bar_func, int(((num_found + i) / len(filelist_total)) * 100))
 
                 except (asyncio.CancelledError, KeyboardInterrupt) as e:
                     if sys.version_info >= (3, 14):

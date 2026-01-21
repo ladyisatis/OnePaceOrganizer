@@ -173,6 +173,7 @@ async def is_dir(file):
 
 async def iter(func, *args, **kwargs):
     loop = kwargs.pop("loop") if "loop" in kwargs else asyncio.get_running_loop()
+    executor = kwargs.pop("executor") if "executor" in kwargs else None
     queue = asyncio.Queue()
 
     def _worker():
@@ -184,7 +185,7 @@ async def iter(func, *args, **kwargs):
         finally:
             asyncio.run_coroutine_threadsafe(queue.put((True, None)), loop)
 
-    loop.run_in_executor(None, _worker)
+    loop.run_in_executor(executor, _worker)
 
     while True:
         is_chunk, item = await queue.get()
