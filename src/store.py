@@ -208,14 +208,14 @@ class OrganizerStore:
         result = await self.get_arcs(id, part, title)
         return result[0] if len(result) > 0 else None
 
-    async def get_episodes(self, id: int = None, arc=None, episode=None, extended: bool = None, crc32: str = None, blake2s: str = None, file_name: str = None, with_descriptions: bool = False, ids_only: bool = False):
+    async def get_episodes(self, id: int = None, arc=None, episode=None, extended: bool = None, crc32: str = None, blake2s: str = None, file_name: str = None, with_descriptions: bool = False, ids_only: bool = False, exclude_archived: bool = True):
         where_op = []
         data = []
 
         if with_descriptions:
             query = (
                 "SELECT e.id, e.arc, e.episode, e.manga_chapters, e.anime_episodes, e.released, "
-                "e.duration, e.extended, e.hash_crc32, e.hash_blake2s, e.file_name, d.title, "
+                "e.duration, e.extended, e.archived, e.hash_crc32, e.hash_blake2s, e.file_name, d.title, "
                 "d.originaltitle, d.description FROM episodes e "
                 "LEFT JOIN descriptions d ON e.arc = d.arc AND e.episode = d.episode"
             )
@@ -225,7 +225,7 @@ class OrganizerStore:
         else:
             query = (
                 "SELECT e.id, e.arc, e.episode, e.manga_chapters, e.anime_episodes, e.released, "
-                "e.duration, e.extended, e.hash_crc32, e.hash_blake2s, e.file_name FROM episodes e"
+                "e.duration, e.extended, e.archived, e.hash_crc32, e.hash_blake2s, e.file_name FROM episodes e"
             )
 
         if id is not None:
@@ -254,6 +254,10 @@ class OrganizerStore:
         if file_name is not None:
             where_op.append("e.file_name = ?")
             data.append(file_name)
+
+        if exclude_archived:
+            where_op.append("e.archived = ?")
+            data.append(0)
 
         if len(where_op) > 0:
             full_where_op = " OR ".join(where_op)
@@ -292,8 +296,6 @@ class OrganizerStore:
                         _released = datetime.fromtimestamp(float(_released))
                     elif "-" in _released and " " not in _released:
                         _released = date.fromisoformat(_released)
-                    else:
-                        _released = ""
 
                 except Exception as e:
                     self.logger.warning(f"[{_id}] Unknown time format: {_released} ({e})")
@@ -309,7 +311,8 @@ class OrganizerStore:
                     "anime_episodes": str(row.get("anime_episodes", "")).strip(),
                     "released": _released,
                     "duration": int(row["duration"]),
-                    "extended": True if int(row["extended"]) == 1 or row["extended"] == "True" else False,
+                    "extended": True if int(row["extended"]) == 1 else False,
+                    "archived": True if int(row["archived"]) == 1 else False,
                     "hash_crc32": _crc32,
                     "hash_blake2s": _b2s,
                     "file_name": _fn
@@ -329,8 +332,15 @@ class OrganizerStore:
         return results
 
     async def get_episode(self, id: int = None, arc=None, episode=None, extended: bool = None, crc32: str = None, blake2s: str = None, file_name: str = None, with_descriptions: bool = False, ids_only: bool = False):
-        result = await self.get_episodes(id, arc, episode, extended, crc32, blake2s, file_name, with_descriptions, ids_only)
-        return result[0] if len(result) > 0 else None
+        result = await self.get_episodes(id, arc, episode, extended, crc32, blake2s, file_name, with_descriptions, ids_only, exclude_archived=False)
+        i = len(result)
+
+        if i > 1:
+            for res in result:
+                if not res["archived"]:
+                    return res
+
+        return result[0] if i > 0 else None
 
     async def get_other_edits(self, id: int = None, crc32: str = None, blake2s: str = None, edit_name: str = None, ids_only: bool = False):
         where_op = []
