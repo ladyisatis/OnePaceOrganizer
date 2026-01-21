@@ -41,7 +41,7 @@ class Headless:
         elif self.organizer.file_action == 3:
             _action = "Action after Sorting: Hardlink"
         elif self.organizer.file_action == 4:
-            if self.organizer.plex_config_enabled:
+            if self.organizer.mode != 0:
                 _action = "After Scan: Update Plex metadata only"
             else:
                 _action = "After Scan: Generate metadata only"
@@ -52,12 +52,17 @@ class Headless:
             f"{_action}\n"
         )
 
-        if self.organizer.plex_config_enabled:
-            if self.organizer.plex_config_use_token:
+        if self.organizer.mode != 0:
+            if self.organizer.mode == 3:
                 plex_method = (
                     f"Plex Login Method: Authentication Token\n"
                     f"Plex Token: {'*'*len(self.organizer.plex_config_auth_token) if self.organizer.plex_config_auth_token != '' else '(not set)'}\n"
                     f"Remember Token: {'Yes' if self.organizer.plex_config_remember else 'No'}\n"
+                )
+            elif self.organizer.mode == 2:
+                plex_method = (
+                    f"Plex Login Method: External Login\n"
+                    f"Logged In: {'Yes' if self.organizer.plex_jwt_token != '' else 'No'}\n"
                 )
             else:
                 plex_method = (
@@ -102,7 +107,7 @@ class Headless:
 
         logger.info("-")
 
-        if self.organizer.plex_config_enabled:
+        if self.organizer.mode != 0:
             tasks = [
                 func_partial(self.organizer.plex_login),
                 func_partial(self.organizer.plex_get_servers),
@@ -119,7 +124,7 @@ class Headless:
 
         success, queue, completed, skipped = await self.organizer.start()
         if success:
-            if self.organizer.plex_config_enabled and self.organizer.file_action != 4:
+            if self.organizer.mode != 0 and self.organizer.file_action != 4:
                 logger.success(f"Completed: {completed} completed, {skipped} skipped")
 
                 if self.organizer.plex_config_show_guid != "":

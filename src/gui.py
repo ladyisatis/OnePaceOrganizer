@@ -103,6 +103,7 @@ class GUI(QMainWindow):
 
         self.organizer.message_dialog_func = self._message_dialog
         self.organizer.input_dialog_func = self._input_dialog
+        self.organizer.browser_func = webbrowser.open_new_tab
         self.plex_width = 125
         self.spacer = "------------------------------------------------------------------"
 
@@ -119,7 +120,7 @@ class GUI(QMainWindow):
         self.input_metadata_str = "Directory of your One Pace collection:"
         self.input = Input(layout, self.input_nometadata_str, QLineEdit(), button="Browse...", connect=self.browse_input_folder)
         self.input.prop.setPlaceholderText(str(Path.home() / "Downloads"))
-        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
+        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.mode != 0 else True)
         if self.organizer.input_path != "":
             self.input.prop.setText(str(self.organizer.input_path))
 
@@ -131,34 +132,33 @@ class GUI(QMainWindow):
             self.output.prop.setText(str(self.organizer.output_path))
 
         self.method = Input(layout, "I'm watching via...", QComboBox())
-        self.method.prop.addItems(["Jellyfin/Emby (.nfo mode)", "Plex"])
-        self.method.prop.setCurrentIndex(1 if self.organizer.plex_config_enabled else 0)
-        self.method.prop.currentTextChanged.connect(self.set_method)
+        self.method.prop.addItems([
+            ".nfo (Jellyfin, Emby, etc.)",
+            "Plex: Username and Password",
+            "Plex: External Login",
+            "Plex: Authorization Token"
+        ])
+        self.method.prop.setCurrentIndex(self.organizer.mode)
+        self.method.prop.currentIndexChanged.connect(self.set_method)
 
         self.plex_group = QGroupBox("Plex")
         self.plex_group_layout = QVBoxLayout()
         _plex_remembered_login = self.organizer.plex_config_auth_token != "" and self.organizer.plex_config_remember
 
-        self.plex_method = Input(self.plex_group_layout, "Login Method:", QComboBox(), width=self.plex_width)
-        self.plex_method.prop.addItems(["Username and Password", "Authentication Token"])
-        self.plex_method.prop.currentTextChanged.connect(self.switch_plex_method)
-        self.plex_method.prop.setCurrentText("Authentication Token" if self.organizer.plex_config_use_token else "Username and Password")
-        self.plex_method.setVisible(not _plex_remembered_login)
-
         self.plex_token = Input(self.plex_group_layout, "Authentication Token:", QLineEdit(), width=self.plex_width)
         self.plex_token.prop.setEchoMode(QLineEdit.EchoMode.Password)
         self.plex_token.prop.setText(self.organizer.plex_config_auth_token)
-        self.plex_token.setVisible(self.organizer.plex_config_use_token)
+        self.plex_token.setVisible(self.organizer.mode == 3)
         self.plex_token.setVisible(self.organizer.plex_config_use_token and not _plex_remembered_login)
 
         self.plex_username = Input(self.plex_group_layout, "Username:", QLineEdit(), width=self.plex_width)
         self.plex_username.prop.setText(self.organizer.plex_config_username)
-        self.plex_username.setVisible(not self.organizer.plex_config_use_token and not _plex_remembered_login)
+        self.plex_username.setVisible(self.organizer.mode == 1 and not _plex_remembered_login)
 
         self.plex_password = Input(self.plex_group_layout, "Password:", QLineEdit(), width=self.plex_width)
         self.plex_password.prop.setEchoMode(QLineEdit.EchoMode.Password)
         self.plex_password.prop.setText(self.organizer.plex_config_password)
-        self.plex_password.setVisible(not self.organizer.plex_config_use_token and not _plex_remembered_login)
+        self.plex_password.setVisible(self.organizer.mode == 1 and not _plex_remembered_login)
 
         self.plex_remember_login = Input(
             self.plex_group_layout, 
@@ -217,7 +217,7 @@ class GUI(QMainWindow):
         self.plex_group.setLayout(self.plex_group_layout)
         layout.addWidget(self.plex_group)
 
-        if not self.organizer.plex_config_enabled:
+        if self.organizer.mode == 0:
             self.plex_group.hide()
 
         menu = self.menuBar()
@@ -263,7 +263,7 @@ class GUI(QMainWindow):
         action_after_sort.addAction(self.action_after_sort_metadata)
 
         self.action_season = menu_configuration.addMenu("Set Season Folder Names")
-        self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
+        self.action_season.menuAction().setVisible(self.organizer.mode == 0)
         #menu_configuration.addAction(self.action_season)
 
         self.action_season_0 = QAction("Season 01-09, 10-... (recommended)", self)
@@ -285,26 +285,26 @@ class GUI(QMainWindow):
         self.action_season.addAction(self.action_season_2)
 
         self.action_edit_output_tmpl = QAction("Set Output Filenames", self)
-        self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
+        self.action_edit_output_tmpl.setVisible(self.organizer.mode == 0)
         self.action_edit_output_tmpl.triggered.connect(self.edit_output_template)
         menu_configuration.addAction(self.action_edit_output_tmpl)
 
         self.action_edit_plex_url = QAction("Edit Plex Server URL", self)
-        self.action_edit_plex_url.setVisible(self.organizer.plex_config_enabled)
+        self.action_edit_plex_url.setVisible(self.organizer.mode != 0)
         self.action_edit_plex_url.triggered.connect(self.edit_plex_url)
         menu_configuration.addAction(self.action_edit_plex_url)
 
         self.action_overwrite_nfo = QAction("Overwrite .nfo Files", self)
         self.action_overwrite_nfo.setCheckable(True)
         self.action_overwrite_nfo.setChecked(self.organizer.overwrite_nfo)
-        self.action_overwrite_nfo.setVisible(not self.organizer.plex_config_enabled)
+        self.action_overwrite_nfo.setVisible(self.organizer.mode == 0)
         self.action_overwrite_nfo.triggered.connect(self.set_overwrite_nfo)
         menu_configuration.addAction(self.action_overwrite_nfo)
 
         self.action_set_show = QAction("Overwrite Show Information", self)
         self.action_set_show.setCheckable(True)
         self.action_set_show.setChecked(self.organizer.plex_set_show_edits)
-        self.action_set_show.setVisible(self.organizer.plex_config_enabled)
+        self.action_set_show.setVisible(self.organizer.mode != 0)
         self.action_set_show.triggered.connect(self.set_show_edits)
         menu_configuration.addAction(self.action_set_show)
 
@@ -328,12 +328,12 @@ class GUI(QMainWindow):
         menu_advanced.addSeparator()
 
         self.action_edit_plex_retry_times = QAction("(Plex) Edit Maximum Retries", self)
-        self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
+        self.action_edit_plex_retry_times.setVisible(self.organizer.mode != 0)
         self.action_edit_plex_retry_times.triggered.connect(self.edit_plex_retry_times)
         menu_advanced.addAction(self.action_edit_plex_retry_times)
 
         self.action_edit_plex_retry_secs = QAction("(Plex) Edit Seconds Between Retries", self)
-        self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
+        self.action_edit_plex_retry_secs.setVisible(self.organizer.mode != 0)
         self.action_edit_plex_retry_secs.triggered.connect(self.edit_plex_retry_secs)
         menu_advanced.addAction(self.action_edit_plex_retry_secs)
 
@@ -464,7 +464,7 @@ class GUI(QMainWindow):
         self.output.label.setText(f"{_action} the sorted and renamed files to:")
         self.output.setVisible(self.organizer.file_action != 4)
         self.input.label.setText(self.input_metadata_str if self.organizer.file_action == 4 else self.input_nometadata_str)
-        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
+        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.mode != 0 else True)
 
     async def _input_dialog(self, text, default=""):
         res, ok = await asyncWrap(
@@ -595,28 +595,29 @@ class GUI(QMainWindow):
 
     def _update_start_btn(self):
         self.start_button.setEnabled(
-            not self.organizer.plex_config_enabled or (
-                self.organizer.plex_config_enabled and 
+            self.organizer.mode == 0 or (
+                self.organizer.mode != 0 and
                 self.organizer.plex_config_server_id != "" and 
                 self.organizer.plex_config_library_key != ""
             )
         )
 
-    def set_method(self, text):
-        self.organizer.plex_config_enabled = text == "Plex"
+    def set_method(self, mode):
+        self.organizer.mode = mode
         self._update_start_btn()
+        plex_enabled = self.organizer.mode != 0
 
-        self.plex_group.setVisible(self.organizer.plex_config_enabled)
-        self.action_season.menuAction().setVisible(not self.organizer.plex_config_enabled)
-        self.action_edit_output_tmpl.setVisible(not self.organizer.plex_config_enabled)
-        self.action_edit_plex_url.setVisible(self.organizer.plex_config_enabled)
-        self.action_edit_plex_retry_times.setVisible(self.organizer.plex_config_enabled)
-        self.action_edit_plex_retry_secs.setVisible(self.organizer.plex_config_enabled)
-        self.action_overwrite_nfo.setVisible(not self.organizer.plex_config_enabled)
-        self.action_set_show.setVisible(self.organizer.plex_config_enabled)
+        self.plex_group.setVisible(plex_enabled)
+        self.action_season.menuAction().setVisible(not plex_enabled)
+        self.action_edit_output_tmpl.setVisible(not plex_enabled)
+        self.action_edit_plex_url.setVisible(plex_enabled)
+        self.action_edit_plex_retry_times.setVisible(plex_enabled)
+        self.action_edit_plex_retry_secs.setVisible(plex_enabled)
+        self.action_overwrite_nfo.setVisible(not plex_enabled)
+        self.action_set_show.setVisible(plex_enabled)
         self.output.setVisible(self.organizer.file_action != 4)
         self.input.label.setText(self.input_metadata_str if self.organizer.file_action == 4 else self.input_nometadata_str)
-        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
+        self.input.setVisible(self.organizer.file_action != 4 if plex_enabled else True)
 
     def set_lockdata(self):
         self.organizer.lockdata = not self.organizer.lockdata
@@ -629,7 +630,7 @@ class GUI(QMainWindow):
         self.plex_username.setVisible(not self.organizer.plex_config_use_token)
         self.plex_password.setVisible(not self.organizer.plex_config_use_token)
         self.output.setVisible(self.organizer.file_action != 4)
-        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.plex_config_enabled else True)
+        self.input.setVisible(self.organizer.file_action != 4 if self.organizer.mode != 0 else True)
 
     def _plex_toggle_enabled(self, enable_all: bool):
         self.plex_method.prop.setEnabled(enable_all)
@@ -1032,7 +1033,7 @@ class GUI(QMainWindow):
         self.organizer.input_path = Path(self.input.prop.text())
         self.organizer.output_path = Path(self.output.prop.text())
 
-        if self.organizer.plex_config_enabled:
+        if self.organizer.mode != 0:
             guid = self.organizer.plex_config_show_guid
             self.plex_server.prop.setEnabled(False)
             self.plex_library.prop.setEnabled(False)

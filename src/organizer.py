@@ -187,7 +187,7 @@ class OnePaceOrganizer:
                         break
 
             if "use_token" in config["plex"] and config["plex"]["use_token"] is not None:
-                self.mode = 3
+                self.mode = 3 if config["plex"]["use_token"] else 1
 
             if "token" in config["plex"] and config["plex"]["token"] is not None and config["plex"]["token"] != "":
                 self.plex_config_auth_token = config["plex"]["token"]

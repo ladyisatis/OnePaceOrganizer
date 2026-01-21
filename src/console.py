@@ -95,7 +95,7 @@ class Console:
             elif self.organizer.file_action == 3:
                 _action = "Action after Sorting: Hardlink"
             elif self.organizer.file_action == 4:
-                if self.organizer.plex_config_enabled:
+                if self.organizer.mode != 0:
                     _action = "After Scan: Update Plex metadata only"
                 else:
                     _action = "After Scan: Generate metadata only"
@@ -106,12 +106,17 @@ class Console:
                 f"{_action}\n"
             )
 
-            if self.organizer.plex_config_enabled:
-                if self.organizer.plex_config_use_token:
+            if self.organizer.mode != 0:
+                if self.organizer.mode == 3:
                     plex_method = (
                         f"Plex Login Method: Authentication Token\n"
                         f"Plex Token: {'*'*len(self.organizer.plex_config_auth_token) if self.organizer.plex_config_auth_token != '' else '(not set)'}\n"
                         f"Remember Token: {'Yes' if self.organizer.plex_config_remember else 'No'}\n"
+                    )
+                elif self.organizer.mode == 2:
+                    plex_method = (
+                        f"Plex Login Method: External Login\n"
+                        f"Logged In: {'Yes' if self.organizer.plex_jwt_token != '' else 'No'}\n"
                     )
                 else:
                     plex_method = (
@@ -164,7 +169,7 @@ class Console:
                 return 0
 
             elif yn:
-                if self.organizer.plex_config_enabled:
+                if self.organizer.mode != 0:
                     logged_in = await self.organizer.plex_login()
 
                     if not logged_in:
@@ -224,10 +229,13 @@ class Console:
             else:
                 proceed = True
 
-        self.organizer.plex_config_enabled = await yes_no_dialog(
+        plex_config_enabled = await yes_no_dialog(
             title=self.window_title,
             text='Are you watching via Plex?'
         ).run_async()
+
+        if not plex_config_enabled:
+            self.organizer.mode = 0
 
         yn = await yes_no_dialog(
             title=self.window_title,
@@ -286,7 +294,7 @@ class Console:
                 default=self.organizer.folder_action
             ).run_async()
 
-            if not self.organizer.plex_config_enabled:
+            if self.organizer.mode == 0:
                 self.organizer.filename_tmpl = await input_dialog(
                     title=self.window_title,
                     text="Filename template: (see wiki for details)",
@@ -303,7 +311,7 @@ class Console:
                     ]
                 ).run_async()
 
-        if self.organizer.plex_config_enabled:
+        if plex_config_enabled:
             success = await self.run_plex_wizard()
             if not success:
                 return 1
@@ -317,6 +325,17 @@ class Console:
             title=self.window_title,
             text="URL to your Plex instance: (leave blank if you want to connect via Plex's servers instead)",
             default=self.organizer.plex_config_url
+        ).run_async()
+
+        self.organizer.mode = await radiolist_dialog(
+            title=self.window_title,
+            text="Choose your Plex login method:",
+            values=[
+                (1, "Plex: Username and Password"),
+                (2, "Plex: External Login"),
+                (3, "Plex: Authorization Token")
+            ],
+            default=self.organizer.mode
         ).run_async()
 
         self.organizer.plex_config_use_token = await yes_no_dialog(
@@ -372,7 +391,7 @@ class Console:
             ).run_async()
 
             if yn:
-                self.organizer.plex_config_enabled = False
+                self.organizer.mode = 0
                 return True
             else:
                 return False
@@ -537,7 +556,7 @@ class Console:
         self.organizer.progress_bar_func = self.pb_progress
 
         try:
-            if self.organizer.plex_config_enabled:
+            if self.organizer.mode != 0:
                 if self.organizer.plexapi_account is None:
                     await self.organizer.plex_login()
 
@@ -554,7 +573,7 @@ class Console:
             else:
                 self.process_task = asyncio.create_task(self.organizer.start())
 
-            if self.organizer.plex_config_enabled:
+            if self.organizer.mode != 0:
                 success, queue, completed, skipped = await self.process_task
 
                 if self.organizer.plex_config_show_guid == "":
