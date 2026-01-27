@@ -21,7 +21,7 @@ import zlib
 from cryptography.hazmat.primitives import serialization, asymmetric
 from loguru import logger
 from plexapi.exceptions import TwoFactorRequired as PlexApiTwoFactorRequired, Unauthorized as PlexApiUnauthorized, NotFound as PlexApiNotFound
-from plexapi.myplex import MyPlexAccount
+from plexapi.myplex import MyPlexAccount, MyPlexJWTLogin
 from plexapi.server import PlexServer
 from pathlib import Path, UnsupportedOperation
 from multiprocessing import freeze_support
@@ -61,6 +61,7 @@ class OnePaceOrganizer:
 
         self.plexapi_account: MyPlexAccount = None
         self.plexapi_server: PlexServer = None
+        self.plex_last_login = None
         self.plex_config_url = utils.get_env("plex_url", "")
 
         self.plex_config_servers = {}
@@ -78,13 +79,17 @@ class OnePaceOrganizer:
         self.plex_config_password = utils.get_env("plex_password")
         self.plex_config_remember = utils.get_env("plex_remember", False)
 
-        self.plex_jwt_privkey = utils.get_env("plex_jwt_privkey", None)
-        if self.plex_jwt_privkey is not None:
+        self.plex_jwt_privkey = utils.get_env("plex_jwt_privkey", "")
+        if isinstance(self.plex_jwt_privkey, str) and len(self.plex_jwt_privkey) > 0:
             self.plex_jwt_privkey = bytes.fromhex(self.plex_jwt_privkey)
+        else:
+            self.plex_jwt_privkey = None
 
-        self.plex_jwt_pubkey = utils.get_env("plex_jwt_pubkey", None)
-        if self.plex_jwt_pubkey is not None:
+        self.plex_jwt_pubkey = utils.get_env("plex_jwt_pubkey", "")
+        if isinstance(self.plex_jwt_pubkey, str) and len(self.plex_jwt_pubkey) > 0:
             self.plex_jwt_pubkey = bytes.fromhex(self.plex_jwt_pubkey)
+        else:
+            self.plex_jwt_pubkey = None
 
         self.plex_jwt_token = utils.get_env("plex_jwt_token", "")
         self.plex_jwt_timeout = int(utils.get_env("plex_jwt_timeout", 120))
@@ -97,7 +102,7 @@ class OnePaceOrganizer:
         self.progress_bar_func = None
         self.message_dialog_func = None
         self.input_dialog_func = None
-        self.browser_func = None
+        self.plex_jwt_func = None
         self.worker_task = None
         self.toml = None
         self.extra_fields = {}
@@ -159,6 +164,9 @@ class OnePaceOrganizer:
             if "enabled" in config["plex"] and config["plex"]["enabled"] is not None:
                 self.mode = 1
 
+            if "last_login" in config["plex"] and config["plex"]["last_login"] is not None:
+                self.plex_last_login = datetime.datetime.fromisoformat(config["plex"]["last_login"])
+
             if "url" in config["plex"] and config["plex"]["url"] is not None and config["plex"]["url"] != "":
                 self.plex_config_url = config["plex"]["url"]
 
@@ -202,10 +210,10 @@ class OnePaceOrganizer:
                 self.plex_config_remember = config["plex"]["remember"]
 
             if "jwt" in config["plex"] and isinstance(config["plex"]["jwt"], dict):
-                if config["plex"]["jwt"].get("pri", "") != "":
+                if config["plex"]["jwt"].get("pri", None) is not None:
                     self.plex_jwt_privkey = bytes.fromhex(config["plex"]["jwt"]["pri"])
 
-                if config["plex"]["jwt"].get("pub", "") != "":
+                if config["plex"]["jwt"].get("pub", None) is not None:
                     self.plex_jwt_pubkey = bytes.fromhex(config["plex"]["jwt"]["pub"])
 
                 if config["plex"]["jwt"].get("token", "") != "":
@@ -232,6 +240,18 @@ class OnePaceOrganizer:
         if not isinstance(self.config_file, Path):
             self.config_file = Path(self.config_file)
 
+        privkey = None
+        if isinstance(self.plex_jwt_privkey, str):
+            privkey = self.plex_jwt_privkey
+        elif isinstance(self.plex_jwt_privkey, bytes):
+            privkey = self.plex_jwt_privkey.hex()
+
+        pubkey = None
+        if isinstance(self.plex_jwt_pubkey, str):
+            pubkey = self.plex_jwt_pubkey
+        elif isinstance(self.plex_jwt_pubkey, bytes):
+            pubkey = self.plex_jwt_pubkey.hex()
+
         out = {
             "mode": int(self.mode),
             "input": str(self.input_path),
@@ -244,6 +264,7 @@ class OnePaceOrganizer:
             "extra_fields": self.extra_fields,
             "plex": {
                 "url": self.plex_config_url,
+                "last_login": self.plex_last_login.isoformat() if isinstance(self.plex_last_login, datetime.datetime) else None,
                 "servers": self.plex_config_servers,
                 "libraries": self.plex_config_libraries,
                 "shows": self.plex_config_shows,
@@ -252,8 +273,8 @@ class OnePaceOrganizer:
                 "password": self.plex_config_password,
                 "remember": self.plex_config_remember,
                 "jwt": {
-                    "pri": self.plex_jwt_privkey.hex(),
-                    "pub": self.plex_jwt_pubkey.hex(),
+                    "pri": privkey,
+                    "pub": pubkey,
                     "token": self.plex_jwt_token
                 },
                 "retry_secs": self.plex_retry_secs,
@@ -263,10 +284,12 @@ class OnePaceOrganizer:
         }
 
         if not self.plex_config_remember:
+            out["plex"]["last_login"] = ""
             out["plex"]["servers"] = {}
             out["plex"]["libraries"] = {}
             out["plex"]["shows"] = {}
             out["plex"]["token"] = ""
+            out["plex"]["jwt"]["token"] = ""
             out["plex"]["username"] = ""
             out["plex"]["password"] = ""
 
@@ -303,17 +326,20 @@ class OnePaceOrganizer:
             self.plexapi_server = None
             self.plex_config_auth_token = ""
 
-        if self.plexapi_account is None and self.plexapi_server is None and not self.mode == 3 and self.plex_config_auth_token != "" and self.plex_config_remember:
+        if self.plexapi_account is None and self.plexapi_server is None and self.mode != 2 and self.plex_config_auth_token != "" and self.plex_config_remember:
             try:
                 if self.plex_config_url == "":
                     self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_config_auth_token)
+                    self.plex_last_login = self.plexapi_account.rememberExpiresAt
                 else:
                     self.plexapi_server = await utils.run(PlexServer, baseurl=self.plex_config_url, token=self.plex_config_auth_token)
+                    self.plex_last_login = None
             except:
                 self.logger.debug(traceback.format_exc())
                 self.plex_config_auth_token = ""
                 self.plexapi_account = None
                 self.plexapi_server = None
+                self.plex_last_login = None
 
         if self.plexapi_account is None and self.plexapi_server is None:
             self.plex_config_servers = {}
@@ -324,8 +350,10 @@ class OnePaceOrganizer:
                 try:
                     if self.plex_config_url == "":
                         self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_config_auth_token)
+                        self.plex_last_login = self.plexapi_account.rememberExpiresAt
                     else:
                         self.plexapi_server = await utils.run(PlexServer, baseurl=self.plex_config_url, token=self.plex_config_auth_token)
+                        self.plex_last_login = None
 
                 except PlexApiUnauthorized:
                     self.logger.debug(traceback.format_exc())
@@ -334,6 +362,7 @@ class OnePaceOrganizer:
                     else:
                         self.logger.error("Invalid Plex account token, please try again.")
 
+                    self.plex_last_login = None
                     return False
 
                 except:
@@ -345,8 +374,10 @@ class OnePaceOrganizer:
                     return False
 
             elif self.mode == 2:
+                if self.plex_jwt_func is None:
+                    raise Exception("plex_jwt_func is None, please report this as a bug")
+
                 if self.plex_jwt_privkey is None:
-                    self.logger.info("Generating Ed25519 private and public keypair for Plex login...")
                     privkey = await utils.run(asymmetric.ed25519.Ed25519PrivateKey.generate)
                     pubkey = await utils.run(privkey.public_key)
 
@@ -365,6 +396,8 @@ class OnePaceOrganizer:
 
                 if self.plexapi_account is None and self.plex_jwt_token != "":
                     try:
+                        await utils.run_func(self.plex_jwt_func, 0, None)
+
                         jwtlogin = MyPlexJWTLogin(
                             jwtToken=self.plex_jwt_token,
                             keypair=(self.plex_jwt_privkey, self.plex_jwt_pubkey),
@@ -373,13 +406,9 @@ class OnePaceOrganizer:
 
                         if not await utils.run(jwtlogin.verifyJWT):
                             self.plex_jwt_token = await utils.run(jwtlogin.refreshJWT)
-                            self.logger.debug("Plex JWT token refreshed")
-
-                        self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_jwt_token)
 
                     except plexapi.exceptions.BadRequest:
                         self.logger.debug(traceback.format_exc())
-                        self.plex_jwt_token = ""
 
                     except:
                         if self.message_dialog_func is not None:
@@ -389,44 +418,44 @@ class OnePaceOrganizer:
 
                         return False
 
+                    finally:
+                        if self.plex_jwt_token != "":
+                            self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_jwt_token)
+                            self.plex_last_login = self.plexapi_account.rememberExpiresAt
+
                 if self.plex_jwt_token == "":
+                    self.logger.debug("No token found, setting up authorization...")
+                    await utils.run_func(self.plex_jwt_func, 1, None)
+
                     jwtlogin = MyPlexJWTLogin(
                         oauth=True,
                         keypair=(self.plex_jwt_privkey, self.plex_jwt_pubkey),
                         scopes=['username', 'email', 'friendly_name']
                     )
 
-                    waitlogin_task = None
-
                     try:
-                        await utils.run(jwtlogin._getCode)
-                        jwtlogin._clientJWT = await utils.run(jwtlogin._encodeClientJWT)
-                        jwtlogin._loginTimeout = self.plex_jwt_timeout
-                        jwtlogin._callback = None
-                        jwtlogin._abort = False
-                        jwtlogin.finished = False
+                        await utils.run(jwtlogin.run)
 
-                        waitlong_task = asyncio.create_task(utils.run(jwtlogin._pollLogin))
+                        oauthUrl = jwtlogin.oauthUrl()
+                        await utils.run_func(self.plex_jwt_func, 2, oauthUrl)
 
-                        if self.browser_func is not None:
-                            await utils.run_func(self.browser_func, jwtlogin.oauthUrl())
-                            self.logger.info(f"Waiting up to {self.plex_jwt_timeout} seconds for authorization...")
-                        else:
-                            self.logger.info(f"Please login at the following URL: (expires in {self.plex_jwt_timeout}s)\n\n{jwtlogin.oauthUrl()}")
+                        success = await utils.run(jwtlogin.waitForLogin)
+                        await utils.run_func(self.plex_jwt_func, 3, success)
 
-                        await waitlogin_task
-
-                        if not jwtlogin._abort and not jwtlogin.expired and jwtlogin.jwtToken:
+                        if success:
                             self.plex_jwt_token = jwtlogin.jwtToken
                             self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_jwt_token)
+                            self.plex_last_login = self.plexapi_account.rememberExpiresAt
 
                         else:
-                            self.logger.warning("Plex login did not succeed")
                             self.plex_jwt_token = ""
+                            self.plex_last_login = None
                             return False
 
                     except asyncio.CancelledError:
-                        jwtlogin._abort = True
+                        jwtlogin.stop()
+                        self.plex_jwt_token = ""
+                        self.plex_last_login = None
 
                     except:
                         if self.message_dialog_func is not None:
@@ -441,6 +470,7 @@ class OnePaceOrganizer:
                         password=self.plex_config_password, 
                         remember=self.plex_config_remember
                     )
+                    self.plex_last_login = self.plexapi_account.rememberExpiresAt
 
                 except PlexApiTwoFactorRequired:
                     self.logger.debug(traceback.format_exc())
@@ -475,6 +505,7 @@ class OnePaceOrganizer:
 
                 except PlexApiUnauthorized:
                     self.logger.trace(traceback.format_exc())
+                    self.plex_last_login = None
                     return False
 
                 except:
@@ -529,6 +560,7 @@ class OnePaceOrganizer:
             resources = await utils.run(self.plexapi_account.resources)
         except:
             self.logger.debug(traceback.format_exc())
+            self.logger.trace(self.plexapi_account.authenticationToken)
             self.logger.error("Unable to find any Plex servers.")
             return False
 

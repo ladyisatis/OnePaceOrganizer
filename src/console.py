@@ -39,6 +39,7 @@ class Console:
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.organizer.message_dialog_func = self._message_dialog
         self.organizer.input_dialog_func = self._input_dialog
+        self.organizer.plex_jwt_func = self._plex_jwt
         self.window_title = self.organizer.window_title
         self.pb_lock = asyncio.Lock()
 
@@ -68,6 +69,19 @@ class Console:
             text=text,
             default=default
         ).run_async()
+
+    async def _plex_jwt(self, step, data):
+        if step == 0:
+            logger.info(f"Logging into Plex...")
+        elif step == 1:
+            logger.info(f"Setting up authorization...")
+        elif step == 2:
+            logger.info(f"Please navigate to the following URL to log in:\n\n{data}")
+        elif step == 3:
+            if data:
+                logger.info("Logged in, retrieving credentials...")
+            else:
+                logger.info("Unable to log in to Plex")
 
     async def run(self):
         if hasattr(sys, "stderr"):

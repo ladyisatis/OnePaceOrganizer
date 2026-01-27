@@ -21,6 +21,20 @@ class Headless:
 
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.organizer.progress_bar_func = logger.trace
+        self.organizer.plex_jwt_func = self._plex_jwt
+
+    def _plex_jwt(self, step, data):
+        if step == 0:
+            logger.info(f"Logging into Plex...")
+        elif step == 1:
+            logger.info(f"Setting up authorization...")
+        elif step == 2:
+            logger.info(f"Please navigate to the following URL to log in:\n\n{data}")
+        elif step == 3:
+            if data:
+                logger.info("Logged in, retrieving credentials...")
+            else:
+                logger.info("Unable to log in to Plex")
 
     async def run(self):
         await self.organizer.load_config()
