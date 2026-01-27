@@ -93,6 +93,7 @@ class OnePaceOrganizer:
 
         self.plex_jwt_token = utils.get_env("plex_jwt_token", "")
         self.plex_jwt_timeout = int(utils.get_env("plex_jwt_timeout", 120))
+        self._jwtlogin = None
 
         self.plex_code = utils.get_env("plex_code", "")
         self.plex_retry_secs = utils.get_env("plex_retry_secs", 30)
@@ -398,14 +399,14 @@ class OnePaceOrganizer:
                     try:
                         await utils.run_func(self.plex_jwt_func, 0, None)
 
-                        jwtlogin = MyPlexJWTLogin(
+                        self._jwtlogin = MyPlexJWTLogin(
                             jwtToken=self.plex_jwt_token,
                             keypair=(self.plex_jwt_privkey, self.plex_jwt_pubkey),
                             scopes=['username', 'email', 'friendly_name']
                         )
 
-                        if not await utils.run(jwtlogin.verifyJWT):
-                            self.plex_jwt_token = await utils.run(jwtlogin.refreshJWT)
+                        if not await utils.run(self._jwtlogin.verifyJWT):
+                            self.plex_jwt_token = await utils.run(self._jwtlogin.refreshJWT)
 
                     except plexapi.exceptions.BadRequest:
                         self.logger.debug(traceback.format_exc())
@@ -427,23 +428,23 @@ class OnePaceOrganizer:
                     self.logger.debug("No token found, setting up authorization...")
                     await utils.run_func(self.plex_jwt_func, 1, None)
 
-                    jwtlogin = MyPlexJWTLogin(
+                    self._jwtlogin = MyPlexJWTLogin(
                         oauth=True,
                         keypair=(self.plex_jwt_privkey, self.plex_jwt_pubkey),
                         scopes=['username', 'email', 'friendly_name']
                     )
 
                     try:
-                        await utils.run(jwtlogin.run)
+                        await utils.run(self._jwtlogin.run)
 
-                        oauthUrl = jwtlogin.oauthUrl()
+                        oauthUrl = self._jwtlogin.oauthUrl()
                         await utils.run_func(self.plex_jwt_func, 2, oauthUrl)
 
-                        success = await utils.run(jwtlogin.waitForLogin)
+                        success = await utils.run(self._jwtlogin.waitForLogin)
                         await utils.run_func(self.plex_jwt_func, 3, success)
 
                         if success:
-                            self.plex_jwt_token = jwtlogin.jwtToken
+                            self.plex_jwt_token = self._jwtlogin.jwtToken
                             self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_jwt_token)
                             self.plex_last_login = self.plexapi_account.rememberExpiresAt
 
@@ -453,9 +454,10 @@ class OnePaceOrganizer:
                             return False
 
                     except asyncio.CancelledError:
-                        jwtlogin.stop()
-                        self.plex_jwt_token = ""
-                        self.plex_last_login = None
+                        if self._jwtlogin is not None:
+                            self._jwtlogin.stop()
+                            self.plex_jwt_token = ""
+                            self.plex_last_login = None
 
                     except:
                         if self.message_dialog_func is not None:

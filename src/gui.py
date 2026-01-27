@@ -151,8 +151,9 @@ class GUI(QMainWindow):
         self.plex_token.prop.setText(self.organizer.plex_config_auth_token)
         self.plex_token.setVisible(self.organizer.mode == 3)
 
-        self.plex_status = Input(self.plex_group_layout, "Status:", QLabel(self.plex_status_text()), width=self.plex_width)
+        self.plex_status = Input(self.plex_group_layout, "Status:", QLabel(self.plex_status_text()), width=self.plex_width, button="Cancel", connect=self.plex_jwt_cancel)
         self.plex_status.setVisible(self.organizer.mode == 2)
+        self.plex_status.button.setEnabled(False)
 
         self.plex_username = Input(self.plex_group_layout, "Username:", QLineEdit(), width=self.plex_width)
         self.plex_username.prop.setText(self.organizer.plex_config_username)
@@ -705,6 +706,21 @@ class GUI(QMainWindow):
 
         return False
 
+    def plex_jwt_cancel(self):
+        if self.plex_status.button.isEnabled():
+            try:
+                self.plex_status.prop.setText("Cancelling...")
+                if self.organizer._jwtlogin is not None:
+                    self.organizer._jwtlogin.stop()
+
+            except Exception as e:
+                logger.trace(e)
+            finally:
+                self.organizer.plex_jwt_token = ""
+                self.organizer.plex_last_login = None
+                self.plex_status.button.setEnabled(False)
+                self.plex_status.prop.setText("Cancelled")
+
     def _plex_jwt(self, step, data):
         if step == 0:
             self.plex_status.prop.setText(f"Logging into Plex...")
@@ -780,7 +796,10 @@ class GUI(QMainWindow):
             self.organizer.plex_config_password = self.plex_password.prop.text()
 
         self.plex_status.prop.setText(self.plex_status_text())
+        self.plex_status.button.setEnabled(True)
         if not await self.organizer.plex_login(True):
+            self.plex_status.button.setEnabled(False)
+
             logger.info("Could not log in, please try again")
             self.organizer.plex_config_servers = {}
             self.organizer.plex_config_server_id = ""
@@ -814,6 +833,7 @@ class GUI(QMainWindow):
             return
 
         logger.info("Logged in")
+        self.plex_status.button.setEnabled(False)
         logger.trace(self.organizer.plexapi_account.authenticationToken)
         self.plex_status.prop.setText(self.plex_status_text())
         self.plex_remember_login.button.setText("Disconnect")
