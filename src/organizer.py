@@ -1848,8 +1848,10 @@ class OnePaceOrganizer:
                                 (f"posters/{season}", "folder.*"),
                                 (self.input_path, f"poster-s{season:02d}.*")
                             ])
-                            dst_fn = "season-specials-poster" if season == 0 else f"Season{season:02d}"
-                            dst = await utils.resolve(season_path, f"{dst_fn}.png" if src is None else f"{dst_fn}{src.suffix}")
+                            dst = await utils.resolve(season_path, "poster.png" if src is None else f"poster{src.suffix}")
+                            if not await utils.exists(dst):
+                                dst_fn = "season-specials-poster" if season == 0 else f"Season{season:02d}"
+                                dst = await utils.resolve(season_path, f"{dst_fn}.png" if src is None else f"{dst_fn}{src.suffix}")
 
                             if not await utils.exists(dst):
                                 if not src and self.fetch_posters:
@@ -1875,8 +1877,10 @@ class OnePaceOrganizer:
                                 (f"posters/{season}", "backdrop.*"),
                                 (self.input_path, f"background-s{season:02d}.*")
                             ])
-                            dst_fn = "season-specials" if season == 0 else f"Season{season:02d}"
-                            dst = await utils.resolve(season_path, f"{dst_fn}-banner.png" if src is None else f"{dst_fn}-banner{src.suffix}")
+                            dst = await utils.resolve(season_path, "background.png" if src is None else f"background{src.suffix}")
+                            if not await utils.exists(dst):
+                                dst_fn = "season-specials" if season == 0 else f"Season{season:02d}"
+                                dst = await utils.resolve(season_path, f"{dst_fn}-banner.png" if src is None else f"{dst_fn}-banner{src.suffix}")
 
                             if src and not await utils.is_file(dst):
                                 self.logger.info(f"Copying {src.name} to: {dst}")
@@ -2033,7 +2037,9 @@ class OnePaceOrganizer:
                     ])
 
                     if poster is not None:
-                        img_dst = await utils.resolve(dst.parent, f"{dst.stem}{poster.suffix}")
+                        img_dst = await utils.resolve(dst.parent, f"{dst.stem}-thumb{poster.suffix}")
+                        if not await utils.is_file(img_dst):
+                            img_dst = await utils.resolve(dst.parent, f"{dst.stem}{poster.suffix}")
 
                         if not await utils.is_file(img_dst) and self.file_action != 4:
                             self.logger.info(f"Copying {poster.name} to: {img_dst}")
