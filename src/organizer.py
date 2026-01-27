@@ -818,34 +818,6 @@ class OnePaceOrganizer:
 
         self.logger.debug(f"plex_select_show: Selected show '{guid}'")
         return True
-    
-    async def plex_art_set(self, art_file, episode, is_poster=True):
-        if not isinstance(art_file, Path):
-            art_file = Path(self.base_path, "posters", file)
-
-        if await utils.is_file(art_file):
-            arts = await utils.run(episode.posters if is_poster else episode.arts)
-
-            for art in arts:
-                if (art.provider is None or art.provider == "local") and art.selected:
-                    return False
-
-            self.logger.info(f"Uploading {'poster' if is_poster else 'background'}: {art_file}")
-            await utils.run(episode.uploadPoster if is_poster else episode.uploadArt, filepath=str(art_file))
-
-            try:
-                await utils.run(episode.saveEdits)
-                await utils.run(episode.batchEdits)
-            except:
-                pass
-
-            arts = await utils.run(episode.posters if is_poster else episode.arts)
-            if len(arts) > 0:
-                await utils.run(episode.setPoster if is_poster else episode.setArt, arts[len(arts)-1])
-
-            return True
-
-        return False
 
     async def cache_episode_data(self):
         data_file = Path(self.base_path, "metadata", "data.db")
@@ -1136,50 +1108,69 @@ class OnePaceOrganizer:
                             else:
                                 await utils.run(show.editOriginallyAvailable, tvshow["premiered"])
 
-                        poster = await utils.run(utils.find_from_list, self.base_path, [
-                            ("posters", "poster.*"),
-                            ("posters", "folder.*"),
-                            (self.input_path, "poster.*")
-                        ])
+            # Poster
+            src = await utils.run(utils.find_from_list, self.base_path, [
+                ("posters", "poster.*"),
+                ("posters", "folder.*"),
+                (self.input_path, "poster.*")
+            ])
 
-                        if not poster and self.fetch_posters:
-                            poster = Path(self.base_path, "posters", "poster.png")
-                            self.logger.info(f"Downloading: posters/{poster.name}")
+            if not src and self.fetch_posters:
+                src = Path(self.base_path, "posters", "poster.png")
+                self.logger.info(f"Downloading: posters/{src.name}")
 
-                            try:
-                                dl = await utils.download(f"{self.download_path}/posters/{poster.name}", poster, self.progress_bar_func)
-                                if not dl:
-                                    self.logger.info("Unable to download (not found), skipping...")
-                            except:
-                                self.logger.warning("Unable to download, skipping...")
+                try:
+                    dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
+                    if not dl:
+                        self.logger.info("Unable to download (not found), skipping...")
+                except:
+                    self.logger.warning("Unable to download, skipping...")
 
-                        dst = await utils.resolve(self.output_path, poster.name if poster is not None else "Season{}")
-                        art = None
+            dst = await utils.resolve(self.output_path, f"poster{src.suffix}" if src is not None else "poster.png")
 
-                        if not await utils.exists(dst):
-                            if not src and self.fetch_posters:
-                                try:
-                                    src = Path(self.base_path, "posters", "poster.png")
-                                    self.logger.info(f"Downloading: posters/{src.name}")
-                                    dl = await utils.download(f"{self.download_path}/posters/{src.name}", src, self.progress_bar_func)
-                                    if not dl:
-                                        self.logger.info(f"Skipping downloading (not found)")
-                                except:
-                                    self.logger.warning(f"Skipping downloading\n{traceback.format_exc()}")
+            if not await utils.exists(dst) and await utils.is_file(src):
+                self.logger.info(f"Copying {src.name} to: {dst}")
+                await utils.copy_async(src, dst)
 
-                            if await utils.is_file(src):
-                                self.logger.info(f"Copying {src.name} to: {dst}")
-                                await utils.copy_async(src, dst)
+            #Background
+            src = await utils.run(utils.find_from_list, self.base_path, [
+                ("posters", "background.*"),
+                ("posters", "backdrop.*"),
+                ("posters", "fanart.*"),
+                (self.input_path, "background.*")
+                (self.input_path, "fanart.*")
+            ])
+            if src is not None:
+                dst = await utils.resolve(self.output_path, f"background{src.suffix}")
+                if not await utils.exists(dst) and await utils.is_file(src):
+                    self.logger.info(f"Copying {src.name} to: {dst}")
+                    await utils.copy_async(src, dst)
 
-                        await self.plex_art_set(poster, show, True)
+            #Square Art
+            src = await utils.run(utils.find_from_list, self.base_path, [
+                ("posters", "square.*"),
+                ("posters", "squareArt.*"),
+                ("posters", "backgroundSquare.*"),
+                (self.input_path, "square.*"),
+                (self.input_path, "squareArt.*"),
+                (self.input_path, "backgroundSquare.*")
+            ])
+            if src is not None:
+                dst = await utils.resolve(self.output_path, f"square{src.suffix}")
+                if not await utils.exists(dst) and await utils.is_file(src):
+                    self.logger.info(f"Copying {src.name} to: {dst}")
+                    await utils.copy_async(src, dst)
 
-                        background = await utils.run(utils.find_from_list, self.base_path, [
-                            ("posters", "background.*"),
-                            ("posters", "backdrop.*"),
-                            (self.input_path, "background.*")
-                        ])
-                        if background is not None:
-                            await self.plex_art_set(background, show, False)
+            #Banners
+            src = await utils.run(utils.find_from_list, self.base_path, [
+                ("posters", "banner.*"),
+                (self.input_path, "banner.*")
+            ])
+            if src is not None:
+                dst = await utils.resolve(self.output_path, f"banner{src.suffix}")
+                if not await utils.exists(dst) and await utils.is_file(src):
+                    self.logger.info(f"Copying {src.name} to: {dst}")
+                    await utils.copy_async(src, dst)
 
             index = 0
             total = len(files)
@@ -1433,31 +1424,65 @@ class OnePaceOrganizer:
                                     self.logger.debug(f"Season {season} Summary: {season_desc}")
                                     await utils.run(plex_season.editSummary, season_desc, locked=self.lockdata)
 
-                                poster = await utils.run(utils.find_from_list, self.base_path, [
+                                # Poster
+                                src = await utils.run(utils.find_from_list, self.base_path, [
                                     (f"posters/{season}", "poster.*"),
                                     (f"posters/{season}", "folder.*"),
                                     (self.input_path, f"poster-s{season:02d}.*")
                                 ])
 
-                                if not poster and self.fetch_posters:
-                                    poster = Path(self.base_path, "posters", str(season), "poster.png")
+                                if not src and self.fetch_posters:
+                                    src = Path(self.base_path, "posters", str(season), "poster.png")
+                                    self.logger.info(f"Downloading: posters/{season}/{src.name}")
+
                                     try:
-                                        self.logger.info(f"Downloading: posters/{season}/{poster.name}")
-                                        dl = await utils.download(f"{self.download_path}/posters/{season}/{poster.name}", poster, self.progress_bar_func)
+                                        dl = await utils.download(f"{self.download_path}/posters/{season}/{src.name}", src, self.progress_bar_func)
                                         if not dl:
-                                            self.logger.info(f"Skipping downloading (not found)")
+                                            self.logger.info("Unable to download (not found), skipping...")
                                     except:
-                                        self.logger.warning("Skipping downloading")
+                                        self.logger.warning("Unable to download, skipping...")
 
-                                await self.plex_art_set(poster, plex_season, True)
+                                dst = await utils.resolve(
+                                    self.output_path,
+                                    f"Season {season:02d}",
+                                    f"Season{season:02d}{src.suffix}" if src is not None else f"Season{season:02d}.png"
+                                )
 
-                                background = await utils.run(utils.find_from_list, self.base_path, [
+                                if not await utils.exists(dst) and await utils.is_file(src):
+                                    self.logger.info(f"Copying {src.name} to: {dst}")
+                                    await utils.copy_async(src, dst)
+
+                                #Background
+                                src = await utils.run(utils.find_from_list, self.base_path, [
                                     (f"posters/{season}", "background.*"),
                                     (f"posters/{season}", "backdrop.*"),
-                                    (self.input_path, f"background-s{season:02d}.*"),
+                                    (f"posters/{season}", "fanart.*"),
+                                    (self.input_path, f"background-s{season:02d}.*")
                                 ])
-                                if background is not None:
-                                    await self.plex_art_set(background, plex_season, False)
+                                if src is not None:
+                                    dst = await utils.resolve(
+                                        self.output_path,
+                                        f"Season {season:02d}",
+                                        f"season-specials-banner{src.suffix}" if season == 0 else f"Season{season:02d}-banner{src.suffix}"
+                                    )
+                                    if not await utils.exists(dst) and await utils.is_file(src):
+                                        self.logger.info(f"Copying {src.name} to: {dst}")
+                                        await utils.copy_async(src, dst)
+
+                                #Theme
+                                src = await utils.run(utils.find_from_list, self.base_path, [
+                                    (f"posters/{season}", "theme.*"),
+                                    (self.input_path, f"theme-s{season:02d}.*")
+                                ])
+                                if src is not None:
+                                    dst = await utils.resolve(
+                                        self.output_path,
+                                        f"Season {season:02d}",
+                                        f"theme{src.suffix}"
+                                    )
+                                    if not await utils.exists(dst) and await utils.is_file(src):
+                                        self.logger.info(f"Copying {src.name} to: {dst}")
+                                        await utils.copy_async(src, dst)
 
                         except:
                             self.logger.exception(f"Skipping season {season}")
@@ -1570,38 +1595,49 @@ class OnePaceOrganizer:
                             updated = True
 
                         poster_search_paths = [
+                            (f"posters/{season}/{episode}", "background.*"),
+                            (self.input_path, f"background-s{season:02d}e{episode:02d}.*"),
                             (f"posters/{season}/{episode}", "poster.*"),
                             (self.input_path, f"poster-s{season:02d}e{episode:02d}.*")
                         ]
 
                         if hasattr(src, 'stem'):
                             poster_search_paths.extend([
+                                (self.input_path, f"{src.stem}-background.*"),
+                                (self.input_path, f"{src.stem}-backdrop.*"),
                                 (self.input_path, f"{src.stem}-poster.*"),
                                 (self.input_path, f"{src.stem}-thumb.*")
                             ])
 
                         poster = await utils.run(utils.find_from_list, self.base_path, poster_search_paths)
 
-                        background_search_paths = [
-                            (f"posters/{season}/{episode}", "background.*"),
-                            (self.input_path, f"background-s{season:02d}e{episode:02d}.*")
+                        if poster is not None and hasattr(poster, 'suffix') and hasattr(src, 'stem'):
+                            stem_suffix = f"{src.stem}{poster.suffix}"
+                            dst = await utils.resolve(self.output_path, f"Season {season:02d}", stem_suffix)
+                            if stem_suffix != "" and not await utils.exists(dst) and await utils.is_file(poster):
+                                self.logger.info(f"Copying {poster.name} to: {dst}")
+                                await utils.copy_async(poster, dst)
+                                updated = True
+
+                        subtitle_search_paths = [
+                            (self.input_path, f"subtitle-s{season:02d}e{episode:02d}.*")
                         ]
 
                         if hasattr(src, 'stem'):
-                            background_search_paths.extend([
-                                (self.input_path, f"{src.stem}-background.*"),
-                                (self.input_path, f"{src.stem}-backdrop.*")
-                            ])
+                            subtitle_search_paths.append(
+                                (self.input_path, f"{src.stem}-subtitle.*")
+                            )
 
-                        background = await utils.run(utils.find_from_list, self.base_path, background_search_paths)
+                        subtitle = await utils.run(utils.find_from_list, self.base_path, subtitle_search_paths)
 
-                        if poster and await self.plex_art_set(poster, plex_episode, True):
-                            self.logger.debug(f"S{season}E{episode} Poster Uploaded: {poster}")
-                            updated = True
-
-                        if background and await self.plex_art_set(background, plex_episode, False):
-                            self.logger.debug(f"S{season}E{episode} Background Uploaded: {background}")
-                            updated = True
+                        if subtitle is not None and hasattr(subtitle, 'suffixes') and hasattr(src, 'stem'):
+                            suffixes = "".join(subtitle.suffixes)
+                            stem_suffix = f"{src.stem}{suffixes}"
+                            dst = await utils.resolve(self.output_path, f"Season {season:02d}", stem_suffix)
+                            if stem_suffix != "" and not await utils.exists(dst) and await utils.is_file(poster):
+                                self.logger.info(f"Copying {poster.name} to: {dst}")
+                                await utils.copy_async(poster, dst)
+                                updated = True
 
                         if updated:
                             completed += 1
@@ -1812,7 +1848,8 @@ class OnePaceOrganizer:
                                 (f"posters/{season}", "folder.*"),
                                 (self.input_path, f"poster-s{season:02d}.*")
                             ])
-                            dst = await utils.resolve(season_path, "poster.png" if src is None else f"poster{src.suffix}")
+                            dst_fn = "season-specials-poster" if season == 0 else f"Season{season:02d}"
+                            dst = await utils.resolve(season_path, f"{dst_fn}.png" if src is None else f"{dst_fn}{src.suffix}")
 
                             if not await utils.exists(dst):
                                 if not src and self.fetch_posters:
@@ -1838,7 +1875,8 @@ class OnePaceOrganizer:
                                 (f"posters/{season}", "backdrop.*"),
                                 (self.input_path, f"background-s{season:02d}.*")
                             ])
-                            dst = await utils.resolve(season_path, "background.png" if src is None else f"background{src.suffix}")
+                            dst_fn = "season-specials" if season == 0 else f"Season{season:02d}"
+                            dst = await utils.resolve(season_path, f"{dst_fn}-banner.png" if src is None else f"{dst_fn}-banner{src.suffix}")
 
                             if src and not await utils.is_file(dst):
                                 self.logger.info(f"Copying {src.name} to: {dst}")
@@ -1995,7 +2033,7 @@ class OnePaceOrganizer:
                     ])
 
                     if poster is not None:
-                        img_dst = await utils.resolve(dst.parent, f"{dst.stem}-thumb{poster.suffix}")
+                        img_dst = await utils.resolve(dst.parent, f"{dst.stem}{poster.suffix}")
 
                         if not await utils.is_file(img_dst) and self.file_action != 4:
                             self.logger.info(f"Copying {poster.name} to: {img_dst}")
