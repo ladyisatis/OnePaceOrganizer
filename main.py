@@ -44,7 +44,7 @@ def main():
 
         if is_bundle and mode == "console":
             parser.add_argument(
-                "mode",
+                "programmode",
                 choices=["console", "headless"],
                 nargs="?",
                 default=mode,
@@ -52,7 +52,7 @@ def main():
             )
         elif not is_bundle:
             parser.add_argument(
-                "mode",
+                "programmode",
                 choices=["gui", "console", "headless"],
                 nargs="?",
                 default=mode,
@@ -161,8 +161,8 @@ def main():
         log_level = args.log_level.upper()
         log_file = args.log_file
 
-        if hasattr(args, "mode"):
-            mode = args.mode
+        if hasattr(args, "programmode"):
+            mode = args.programmode
 
     if log_level.lower() not in ["trace", "debug", "info", "success", "warning", "error", "critical"]:
         log_level = "INFO"
