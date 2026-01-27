@@ -39,6 +39,7 @@ class Console:
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.organizer.message_dialog_func = self._message_dialog
         self.organizer.input_dialog_func = self._input_dialog
+        self.organizer.plex_jwt_func = self._plex_jwt
         self.window_title = self.organizer.window_title
         self.pb_lock = asyncio.Lock()
 
@@ -69,6 +70,19 @@ class Console:
             default=default
         ).run_async()
 
+    async def _plex_jwt(self, step, data):
+        if step == 0:
+            logger.info(f"Logging into Plex...")
+        elif step == 1:
+            logger.info(f"Setting up authorization...")
+        elif step == 2:
+            logger.info(f"Please navigate to the following URL to log in:\n\n{data}")
+        elif step == 3:
+            if data:
+                logger.info("Logged in, retrieving credentials...")
+            else:
+                logger.info("Unable to log in to Plex")
+
     async def run(self):
         if hasattr(sys, "stderr"):
             self._set_logger_sink(sys.stderr)
@@ -95,7 +109,7 @@ class Console:
             elif self.organizer.file_action == 3:
                 _action = "Action after Sorting: Hardlink"
             elif self.organizer.file_action == 4:
-                if self.organizer.plex_config_enabled:
+                if self.organizer.mode != 0:
                     _action = "After Scan: Update Plex metadata only"
                 else:
                     _action = "After Scan: Generate metadata only"
@@ -106,12 +120,17 @@ class Console:
                 f"{_action}\n"
             )
 
-            if self.organizer.plex_config_enabled:
-                if self.organizer.plex_config_use_token:
+            if self.organizer.mode != 0:
+                if self.organizer.mode == 3:
                     plex_method = (
                         f"Plex Login Method: Authentication Token\n"
                         f"Plex Token: {'*'*len(self.organizer.plex_config_auth_token) if self.organizer.plex_config_auth_token != '' else '(not set)'}\n"
                         f"Remember Token: {'Yes' if self.organizer.plex_config_remember else 'No'}\n"
+                    )
+                elif self.organizer.mode == 2:
+                    plex_method = (
+                        f"Plex Login Method: External Login\n"
+                        f"Logged In: {'Yes' if self.organizer.plex_jwt_token != '' else 'No'}\n"
                     )
                 else:
                     plex_method = (
@@ -164,7 +183,7 @@ class Console:
                 return 0
 
             elif yn:
-                if self.organizer.plex_config_enabled:
+                if self.organizer.mode != 0:
                     logged_in = await self.organizer.plex_login()
 
                     if not logged_in:
@@ -224,10 +243,13 @@ class Console:
             else:
                 proceed = True
 
-        self.organizer.plex_config_enabled = await yes_no_dialog(
+        plex_config_enabled = await yes_no_dialog(
             title=self.window_title,
             text='Are you watching via Plex?'
         ).run_async()
+
+        if not plex_config_enabled:
+            self.organizer.mode = 0
 
         yn = await yes_no_dialog(
             title=self.window_title,
@@ -235,6 +257,30 @@ class Console:
         ).run_async()
 
         if yn:
+            if not self.organizer.opened:
+                data_file = Path(self.organizer.base_path, "metadata", "data.db")
+                if await utils.is_file(data_file):
+                    try:
+                        await self.organizer.open_db(data_file)
+                    finally:
+                        await self.organizer.store.close()
+
+            if len(self.organizer.store.langs) == 0:
+                values = [("en", "English")]
+                default = "en"
+            else:
+                values = []
+                default = self.organizer.store.lang
+                for lang in self.organizer.store.langs:
+                    values.append((str(lang), lang.autonym()))
+
+            self.organizer.store.language = await radiolist_dialog(
+                title=self.window_title,
+                text="Select the language:",
+                values=values,
+                default=default
+            ).run_async()
+
             values = [
                 (0, "Move (recommended)"),
                 (1, "Copy"),
@@ -262,7 +308,7 @@ class Console:
                 default=self.organizer.folder_action
             ).run_async()
 
-            if not self.organizer.plex_config_enabled:
+            if self.organizer.mode == 0:
                 self.organizer.filename_tmpl = await input_dialog(
                     title=self.window_title,
                     text="Filename template: (see wiki for details)",
@@ -279,7 +325,7 @@ class Console:
                     ]
                 ).run_async()
 
-        if self.organizer.plex_config_enabled:
+        if plex_config_enabled:
             success = await self.run_plex_wizard()
             if not success:
                 return 1
@@ -295,11 +341,15 @@ class Console:
             default=self.organizer.plex_config_url
         ).run_async()
 
-        self.organizer.plex_config_use_token = await yes_no_dialog(
+        self.organizer.mode = await radiolist_dialog(
             title=self.window_title,
-            text='Choose your Plex login method:',
-            yes_text="Auth Token",
-            no_text="User/Pass"
+            text="Choose your Plex login method:",
+            values=[
+                (1, "Plex: Username and Password"),
+                (2, "Plex: External Login"),
+                (3, "Plex: Authorization Token")
+            ],
+            default=self.organizer.mode
         ).run_async()
 
         self.organizer.plex_config_remember = await yes_no_dialog(
@@ -308,7 +358,7 @@ class Console:
         ).run_async()
 
         while not authenticated:
-            if self.organizer.plex_config_use_token:
+            if self.organizer.mode == 3:
                 self.organizer.plex_config_auth_token = await input_dialog(
                     title=self.window_title,
                     text='Enter the authentication token:',
@@ -319,7 +369,7 @@ class Console:
                 if self.organizer.plex_config_auth_token is None:
                     return False
 
-            else:
+            elif self.organizer.mode == 1:
                 self.organizer.plex_config_username = await input_dialog(
                     title=self.window_title,
                     text='Plex Account Username:',
@@ -348,7 +398,7 @@ class Console:
             ).run_async()
 
             if yn:
-                self.organizer.plex_config_enabled = False
+                self.organizer.mode = 0
                 return True
             else:
                 return False
@@ -402,9 +452,9 @@ class Console:
         if not await self.organizer.plex_get_shows():
             return False
 
-        values = []
+        values = [("", "(show not listed)")]
         default = None
-        
+
         for id, show in self.organizer.plex_config_shows.items():
             values.append((id, show["title"]))
 
@@ -513,7 +563,7 @@ class Console:
         self.organizer.progress_bar_func = self.pb_progress
 
         try:
-            if self.organizer.plex_config_enabled:
+            if self.organizer.mode != 0:
                 if self.organizer.plexapi_account is None:
                     await self.organizer.plex_login()
 
@@ -523,12 +573,35 @@ class Console:
                     if self.organizer.plexapi_server is None and self.organizer.plex_config_server_id is not None and self.organizer.plex_config_server_id != "":
                         await self.organizer.plex_select_server(self.organizer.plex_config_server_id)
 
-            self.process_task = asyncio.create_task(self.organizer.start())
+            if "new_show" in self.organizer.extra_fields and self.organizer.plex_config_show_guid != "":
+                self.organizer.extra_fields["new_show"] = self.organizer.file_action
+                self.organizer.file_action = 4 # Set metadata only mode
+                self.process_task = asyncio.create_task(self.process_plex_episodes([], True))
+            else:
+                self.process_task = asyncio.create_task(self.organizer.start())
 
-            if self.organizer.plex_config_enabled:
+            if self.organizer.mode != 0:
                 success, queue, completed, skipped = await self.process_task
 
-                if isinstance(queue, list) and len(queue) > 0:
+                if self.organizer.plex_config_show_guid == "":
+                    await self.pb_exit()
+                    self.organizer.extra_fields["new_show"] = True
+
+                    await message_dialog(
+                        title=self.window_title,
+                        text=(
+                                f"Completed: {completed} processed, {skipped} skipped\n"
+                                "--------------\n\n"
+                                f"All of the One Pace files have been created in:\n"
+                                f"{str(self.organizer.output_path)}\n\n"
+                                f"Please move the \"{self.organizer.output_path.name}\" folder to the Plex library folder you've selected, "
+                                "and make sure that it appears in Plex. When all seasons and episodes appear in Plex, re-run this wizard "
+                                "and select the Plex show."
+                            )
+                    ).run_async()
+                    return
+
+                elif isinstance(queue, list) and len(queue) > 0:
                     await utils.run(self.pb_log_output, f"Completed: {completed} processed, {skipped} skipped")
                     await utils.run(self.pb_log_output, "--------------")
                     await self.pb_exit()
@@ -573,6 +646,11 @@ class Console:
                     await utils.run(self.dialog.exit, result=True)
 
         finally:
+            file_action_val = self.organizer.extra_fields.get("new_show", False)
+            if isinstance(file_action_val, int):
+                self.organizer.file_action = file_action_val
+                del self.organizer.extra_fields["new_show"]
+
             await self.organizer.save_config()
 
 def main(organizer, log_level):

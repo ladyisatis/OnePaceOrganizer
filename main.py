@@ -44,7 +44,7 @@ def main():
 
         if is_bundle and mode == "console":
             parser.add_argument(
-                "mode",
+                "programmode",
                 choices=["console", "headless"],
                 nargs="?",
                 default=mode,
@@ -52,13 +52,14 @@ def main():
             )
         elif not is_bundle:
             parser.add_argument(
-                "mode",
+                "programmode",
                 choices=["gui", "console", "headless"],
                 nargs="?",
                 default=mode,
                 help="Program mode"
             )
 
+        parser.add_argument("--mode", help="Mode (0=.nfo, 1=Plex Username/Password, 2=Plex External Login, 3=Plex Auth Token)", default=None, type=int)
         parser.add_argument("--input-path", help="where to read unsorted .mkv/.mp4 files from", default=None)
         parser.add_argument("--output-path", help="Where to put sorted .mkv/.mp4 files (and .nfo/posters if Jellyfin)", default=None)
         parser.add_argument("--cwd", help="Working directory", default=None)
@@ -70,18 +71,16 @@ def main():
         parser.add_argument("--file-action", help="Action to take on unsorted file when processing. 0 for Move, 1 for Copy, 2 for Symlink, 3 for Hardlink, 4 for generate metadata only (not on Plex)", default=None)
         parser.add_argument("--folder-action", help="How to categorize episodes into season folders. 0 for with leading zeroes (Season 01-09), 1 for no leading zeroes (Season 1-9), 2 to disable", default=None)
         parser.add_argument("--threads", help="Use threads instead of processes", default=None, type=strbool)
-        parser.add_argument("--workers", help="Concurrency workers (0 for Automatic)", default=0, type=int)
+        parser.add_argument("--workers", help="Concurrency workers", default=None, type=int)
         parser.add_argument("--fetch-posters", help="Fetch posters if not found", default=None, type=strbool)
         parser.add_argument("--filename-tmpl", help="Filename template (see wiki page)", default=None)
         parser.add_argument("--overwrite-nfo", help="Overwrite .nfo files", default=None, type=strbool)
         parser.add_argument("--lockdata", help="Set lockdata (Jellyfin)/locked (Plex)", default=None, type=strbool)
-        parser.add_argument("--plex-enabled", help="Is Plex Enabled", default=None, type=strbool)
         parser.add_argument("--plex-url", help="Plex URL (e.g. http://127.0.0.1:32400)", default=None)
         parser.add_argument("--plex-server", help="Plex Server ID", default=None)
         parser.add_argument("--plex-library", help="Plex Library Key", default=None)
         parser.add_argument("--plex-show", help="Plex Show GUID", default=None)
         parser.add_argument("--plex-set-show-edits", help="Overwrite Plex show information", default=None, type=strbool)
-        parser.add_argument("--plex-use-token", help="Use Authorization Token instead of Username and Password", default=None, type=strbool)
         parser.add_argument("--plex-code", help="Plex 2-Factor Auth Code (headless mode only)", default=None)
         parser.add_argument("--plex-remember", help="Remember Plex Credentials", default=None, type=strbool)
         parser.add_argument("--plex-retry-times", help="How many times Organizer should retry to fetch a Plex season/episode", default=None)
@@ -89,6 +88,9 @@ def main():
         parser.add_argument("--plex-wait-secs", help="Number of seconds to wait for file transfers (headless mode only)", default=300, type=int)
 
         args = parser.parse_args()
+
+        if args.mode is not None:
+            opo.mode = int(args.mode)
 
         if args.input_path is not None:
             opo.input_path = args.input_path
@@ -108,8 +110,8 @@ def main():
         if args.dl_path is not None:
             opo.download_path = args.dl_path
 
-        if args.workers > 0:
-            opo.workers = int(args.workers)
+        if args.workers is not None:
+            opo.workers = args.workers
 
         if args.threads is not None:
             opo.set_executor(args.threads == False)
@@ -132,9 +134,6 @@ def main():
         if args.filename_tmpl is not None:
             opo.filename_tmpl = args.filename_tmpl
 
-        if args.plex_enabled is not None:
-            opo.plex_config_enabled = args.plex_enabled
-
         if args.plex_url is not None:
             opo.plex_config_url = args.plex_url
 
@@ -150,9 +149,6 @@ def main():
         if args.plex_set_show_edits is not None:
             opo.plex_set_show_edits = args.plex_set_show_edits
 
-        if args.plex_use_token is not None:
-            opo.plex_config_use_token = args.plex_use_token
-
         if args.plex_retry_times is not None:
             opo.plex_retry_times = int(args.plex_retry_times)
 
@@ -165,8 +161,8 @@ def main():
         log_level = args.log_level.upper()
         log_file = args.log_file
 
-        if hasattr(args, "mode"):
-            mode = args.mode
+        if hasattr(args, "programmode"):
+            mode = args.programmode
 
     if log_level.lower() not in ["trace", "debug", "info", "success", "warning", "error", "critical"]:
         log_level = "INFO"

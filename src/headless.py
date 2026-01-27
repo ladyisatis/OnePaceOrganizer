@@ -21,6 +21,20 @@ class Headless:
 
         self.organizer = organizer.OnePaceOrganizer() if organizer is None else organizer
         self.organizer.progress_bar_func = logger.trace
+        self.organizer.plex_jwt_func = self._plex_jwt
+
+    def _plex_jwt(self, step, data):
+        if step == 0:
+            logger.info(f"Logging into Plex...")
+        elif step == 1:
+            logger.info(f"Setting up authorization...")
+        elif step == 2:
+            logger.info(f"Please navigate to the following URL to log in:\n\n{data}")
+        elif step == 3:
+            if data:
+                logger.info("Logged in, retrieving credentials...")
+            else:
+                logger.info("Unable to log in to Plex")
 
     async def run(self):
         await self.organizer.load_config()
@@ -41,7 +55,7 @@ class Headless:
         elif self.organizer.file_action == 3:
             _action = "Action after Sorting: Hardlink"
         elif self.organizer.file_action == 4:
-            if self.organizer.plex_config_enabled:
+            if self.organizer.mode != 0:
                 _action = "After Scan: Update Plex metadata only"
             else:
                 _action = "After Scan: Generate metadata only"
@@ -52,12 +66,17 @@ class Headless:
             f"{_action}\n"
         )
 
-        if self.organizer.plex_config_enabled:
-            if self.organizer.plex_config_use_token:
+        if self.organizer.mode != 0:
+            if self.organizer.mode == 3:
                 plex_method = (
                     f"Plex Login Method: Authentication Token\n"
                     f"Plex Token: {'*'*len(self.organizer.plex_config_auth_token) if self.organizer.plex_config_auth_token != '' else '(not set)'}\n"
                     f"Remember Token: {'Yes' if self.organizer.plex_config_remember else 'No'}\n"
+                )
+            elif self.organizer.mode == 2:
+                plex_method = (
+                    f"Plex Login Method: External Login\n"
+                    f"Logged In: {'Yes' if self.organizer.plex_jwt_token != '' else 'No'}\n"
                 )
             else:
                 plex_method = (
@@ -102,7 +121,7 @@ class Headless:
 
         logger.info("-")
 
-        if self.organizer.plex_config_enabled:
+        if self.organizer.mode != 0:
             tasks = [
                 func_partial(self.organizer.plex_login),
                 func_partial(self.organizer.plex_get_servers),
@@ -119,14 +138,20 @@ class Headless:
 
         success, queue, completed, skipped = await self.organizer.start()
         if success:
-            if self.organizer.plex_config_enabled and self.organizer.file_action != 4:
+            if self.organizer.mode != 0 and self.organizer.file_action != 4:
                 logger.success(f"Completed: {completed} completed, {skipped} skipped")
-                logger.info(f"Pausing {self.plex_wait_secs} seconds to allow file transfers")
-                await asyncio.sleep(float(self.plex_wait_secs))
 
-                success, queue, completed, skipped = await self.organizer.process_plex_episodes(queue)
+                if self.organizer.plex_config_show_guid != "":
+                    logger.info(f"Pausing {self.plex_wait_secs} seconds to allow file transfers")
+                    await asyncio.sleep(float(self.plex_wait_secs))
+                    success, queue, completed, skipped = await self.organizer.process_plex_episodes(queue)
+                    logger.success(f"Completed: {completed} processed, {skipped} skipped")
 
-            logger.success(f"Completed: {completed} processed, {skipped} skipped")
+                else:
+                    logger.info((
+                        "Files are sorted in the output folder, please re-run this program in "
+                        "metadata-only mode after transferring to Plex to complete the process."
+                    ))
 
         await self.organizer.save_config()
         return 0 if success else 1
