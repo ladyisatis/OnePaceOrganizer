@@ -1348,7 +1348,6 @@ def main(organizer, log_level):
 
         async def _run():
             await organizer.load_config()
-            organizer.executor_func = concurrent.futures.ThreadPoolExecutor
 
             gui = GUI(organizer, log_level)
             gui.setWindowTitle(organizer.window_title)

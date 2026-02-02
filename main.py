@@ -70,7 +70,6 @@ def main():
         parser.add_argument("--log-file", help="Log to file (empty to disable)", default="", type=str)
         parser.add_argument("--file-action", help="Action to take on unsorted file when processing. 0 for Move, 1 for Copy, 2 for Symlink, 3 for Hardlink, 4 for generate metadata only (not on Plex)", default=None)
         parser.add_argument("--folder-action", help="How to categorize episodes into season folders. 0 for with leading zeroes (Season 01-09), 1 for no leading zeroes (Season 1-9), 2 to disable", default=None)
-        parser.add_argument("--threads", help="Use threads instead of processes", default=None, type=strbool)
         parser.add_argument("--workers", help="Concurrency workers", default=None, type=int)
         parser.add_argument("--fetch-posters", help="Fetch posters if not found", default=None, type=strbool)
         parser.add_argument("--filename-tmpl", help="Filename template (see wiki page)", default=None)
@@ -112,9 +111,6 @@ def main():
 
         if args.workers is not None:
             opo.workers = args.workers
-
-        if args.threads is not None:
-            opo.set_executor(args.threads == False)
 
         if args.file_action is not None:
             opo.file_action = int(args.file_action)

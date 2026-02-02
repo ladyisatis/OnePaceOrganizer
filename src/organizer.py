@@ -42,7 +42,6 @@ class OnePaceOrganizer:
         self.base_path = Path(utils.get_env("base_path", Path.cwd().resolve()))
         self.metadata_url = utils.get_env("metadata_url", "https://raw.githubusercontent.com/ladyisatis/one-pace-metadata/refs/heads/v2")
         self.download_path = utils.get_env("dl_path", "https://raw.githubusercontent.com/ladyisatis/OnePaceOrganizer/refs/heads/main")
-        self.set_executor(utils.get_env("pool_mode", "process") == "process")
 
         if self.workers == 0:
             self.workers = None
@@ -317,9 +316,6 @@ class OnePaceOrganizer:
                 raise res[1]
         else:
             self.opened = False
-
-    def set_executor(self, process=True):
-        self.executor_func = concurrent.futures.ProcessPoolExecutor if process else concurrent.futures.ThreadPoolExecutor
 
     async def plex_login(self, force_login=False):
         if force_login:
@@ -872,7 +868,7 @@ class OnePaceOrganizer:
     async def glob_video_files(self):
         self.logger.success("Searching for .mkv and .mp4 files...")
 
-        with self.executor_func(max_workers=self.workers) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
             crc_pattern = re.compile(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
             fname_pattern = re.compile(r'\[(?:One Pace)?\]\[\d+(?:[-,]\d+)*\]\s+(.+?)(?:\s+(\d{2,})(?:\s+(.+?))?)?\s+\[\d+p\](?:\[[^\]]+\])*\[([A-Fa-f0-9]{8})\]\.(?:mkv|mp4)')
             filelist = []
@@ -1161,7 +1157,7 @@ class OnePaceOrganizer:
 
             self.logger.success("Processing the video files...")
 
-            with self.executor_func(max_workers=self.workers) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
                 tasks = []
                 loop = asyncio.get_running_loop()
 
@@ -1750,7 +1746,7 @@ class OnePaceOrganizer:
 
         self.logger.success("Creating episode metadata and moving the video files...")
 
-        with self.executor_func(max_workers=self.workers) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
             tasks = []
             loop = asyncio.get_running_loop()
 
