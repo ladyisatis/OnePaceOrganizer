@@ -877,10 +877,10 @@ class OnePaceOrganizer:
             fname_pattern = re.compile(r'\[(?:One Pace)?\]\[\d+(?:[-,]\d+)*\]\s+(.+?)(?:\s+(\d{2,})(?:\s+(.+?))?)?\s+\[\d+p\](?:\[[^\]]+\])*\[([A-Fa-f0-9]{8})\]\.(?:mkv|mp4)')
             filelist = []
 
-            async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, recurse_symlinks=True, executor=executor):
+            async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, recurse_symlinks=True):
                 await utils.run(filelist.append, file)
 
-            async for file in utils.iter(self.input_path.rglob, "*.[mM][pP]4", case_sensitive=False, recurse_symlinks=True, executor=executor):
+            async for file in utils.iter(self.input_path.rglob, "*.[mM][pP]4", case_sensitive=False, recurse_symlinks=True):
                 await utils.run(filelist.append, file)
 
             num_found = 0
@@ -898,7 +898,7 @@ class OnePaceOrganizer:
                 file = await utils.resolve(file)
                 file_name = f"{file.stem if hasattr(file, 'stem') else ''}{file.suffix.lower() if hasattr(file, 'suffix') else ''}"
 
-                match = await utils.run(crc_pattern.search, file_name, loop=loop, executor=executor)
+                match = await utils.run(crc_pattern.search, file_name, loop=loop)
                 if match:
                     episode_id = await self.store.get_episode(file_name=file_name, crc32=match.group(1).upper() if match else None, ids_only=True)
                     if episode_id is not None:
@@ -907,7 +907,7 @@ class OnePaceOrganizer:
                         await utils.run_func(self.progress_bar_func, int((num_found / filelist_total) * 100) if filelist_total > 0 else 0)
                         continue
 
-                match = await utils.run(fname_pattern.match, file_name, loop=loop, executor=executor)
+                match = await utils.run(fname_pattern.match, file_name, loop=loop)
                 if match:
                     arc_name, ep_num, extra, crc32 = await utils.run(match.groups)
 
@@ -1119,7 +1119,7 @@ class OnePaceOrganizer:
                 ("posters", "background.*"),
                 ("posters", "backdrop.*"),
                 ("posters", "fanart.*"),
-                (self.input_path, "background.*")
+                (self.input_path, "background.*"),
                 (self.input_path, "fanart.*")
             ])
             if src is not None:
@@ -1165,7 +1165,7 @@ class OnePaceOrganizer:
                 tasks = []
                 loop = asyncio.get_running_loop()
 
-                for file_type, file_id, file in files:
+                for file_type, file_id, file, extra in files:
                     if file_type == 0:
                         episode_info = await self.store.get_episode(id=file_id, with_descriptions=True)
                     elif file_type == 1:
@@ -1344,7 +1344,7 @@ class OnePaceOrganizer:
 
             for index, item in enumerate(queue):
                 file_type, file_id, file = item
-                
+
                 if file_type == 0 or file_type == 4:
                     episode_info = await self.store.get_episode(id=file_id, with_descriptions=True)
                 elif file_type == 1:
@@ -1754,7 +1754,7 @@ class OnePaceOrganizer:
             tasks = []
             loop = asyncio.get_running_loop()
 
-            for file_type, file_id, file in files:
+            for file_type, file_id, file, extra in files:
                 if file_type == 0:
                     episode_info = await self.store.get_episode(id=file_id, with_descriptions=True)
                 elif file_type == 1:

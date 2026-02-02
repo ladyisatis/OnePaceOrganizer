@@ -62,26 +62,26 @@ def is_up_to_date(version="", base_path="."):
     latest = Version(release_json["tag_name"][1:])
     return (version == latest or version > latest, latest)
 
+def _read_file_worker(file, binary, loop, queue):
+    try:
+        mode = "rb" if binary else "r"
+        encoding = None if binary else "utf-8"
+        with file.open(mode=mode, encoding=encoding) as f:
+            while chunk := f.read(65536):
+                asyncio.run_coroutine_threadsafe(queue.put((True, chunk)), loop)
+
+    except Exception as e:
+        asyncio.run_coroutine_threadsafe(queue.put((False, e)), loop)
+
+    finally:
+        asyncio.run_coroutine_threadsafe(queue.put((True, None)), loop)
+
 async def read_file(file, binary=False):
     loop = asyncio.get_running_loop()
     queue = asyncio.Queue()
     data = bytearray() if binary else ""
 
-    def _worker():
-        try:
-            mode = "rb" if binary else "r"
-            encoding = None if binary else "utf-8"
-            with file.open(mode=mode, encoding=encoding) as f:
-                while chunk := f.read(65536):
-                    asyncio.run_coroutine_threadsafe(queue.put((True, chunk)), loop)
-
-        except Exception as e:
-            asyncio.run_coroutine_threadsafe(queue.put((False, e)), loop)
-
-        finally:
-            asyncio.run_coroutine_threadsafe(queue.put((True, None)), loop)
-
-    loop.run_in_executor(None, _worker)
+    loop.run_in_executor(None, _worker, file, binary, loop, queue)
 
     while not loop.is_closed():
         is_chunk, item = await queue.get()
@@ -105,7 +105,7 @@ async def write_file(file, data, binary=False):
         else:
             await run(file.write_text, str(data), loop=loop)
     except:
-        await run(logger.exception, f"Unable to write file {file}")
+        logger.exception(f"Unable to write to file {file}")
         return False
 
     return True
@@ -171,21 +171,21 @@ async def is_file(file):
 async def is_dir(file):
     return await run(file.is_dir)
 
+def _iter_worker(func, args, kwargs, queue, loop):
+    try:
+        for f in func(*args, **kwargs):
+            asyncio.run_coroutine_threadsafe(queue.put((True, f)), loop)
+    except Exception as e:
+        asyncio.run_coroutine_threadsafe(queue.put((False, e)), loop)
+    finally:
+        asyncio.run_coroutine_threadsafe(queue.put((True, None)), loop)
+
 async def iter(func, *args, **kwargs):
     loop = kwargs.pop("loop") if "loop" in kwargs else asyncio.get_running_loop()
     executor = kwargs.pop("executor") if "executor" in kwargs else None
     queue = asyncio.Queue()
 
-    def _worker():
-        try:
-            for f in func(*args, **kwargs):
-                asyncio.run_coroutine_threadsafe(queue.put((True, f)), loop)
-        except Exception as e:
-            asyncio.run_coroutine_threadsafe(queue.put((False, e)), loop)
-        finally:
-            asyncio.run_coroutine_threadsafe(queue.put((True, None)), loop)
-
-    loop.run_in_executor(executor, _worker)
+    loop.run_in_executor(executor, _iter_worker, func, args, kwargs, queue, loop)
 
     while not loop.is_closed():
         is_chunk, item = await queue.get()
