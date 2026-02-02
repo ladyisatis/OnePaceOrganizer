@@ -83,7 +83,7 @@ async def read_file(file, binary=False):
 
     loop.run_in_executor(None, _worker)
 
-    while True:
+    while not loop.is_closed():
         is_chunk, item = await queue.get()
         if item is None:
             break
@@ -187,7 +187,7 @@ async def iter(func, *args, **kwargs):
 
     loop.run_in_executor(executor, _worker)
 
-    while True:
+    while not loop.is_closed():
         is_chunk, item = await queue.get()
         if item is None:
             break
@@ -208,7 +208,7 @@ async def download(url, out, progress_bar_func, loop=None):
 
     f = await run(out.open, mode='wb', loop=loop)
     try:
-        resp = await run(client.stream, "GET", url, follow_redirects=True, loop=loop)
+        resp = await run(httpx.stream, "GET", url, follow_redirects=True, loop=loop)
         try:
             if resp.status_code >= 400:
                 await run(resp.close, loop=loop)
@@ -223,8 +223,9 @@ async def download(url, out, progress_bar_func, loop=None):
                 if t > 0:
                     c = c + len(chunk)
 
-                if c >= 0 and c <= 100:
-                    await run_func(progress_bar_func, c)
+                p = int((c / t) * 100)
+                if p >= 0 and p <= 100:
+                    await run_func(progress_bar_func, p)
 
                 await run(f.write, chunk, loop=loop)
 
@@ -293,15 +294,19 @@ def move_file(src, dst, file_action=0):
     file_buffer = 65536 if not network_mode else 16 * 1024 * 1024
 
     try:
-        if not network_mode and dst.exists():
-            if compare_file(src, dst, buffer=file_buffer):
-                return ""
-            else:
-                dst.unlink(missing_ok=True)
+        try:
+            if not network_mode and dst.exists():
+                if compare_file(src, dst, buffer=file_buffer):
+                    return ""
+                else:
+                    dst.unlink(missing_ok=True)
+
+        except FileNotFoundError:
+            logger.debug(f"File {dst} deleted between exists and unlink, ignoring")
 
         if file_action == 1: #Copy
             if network_mode:
-                with src.open(mode="rb", buffering=0) as fsrc, dst.open(mode="rb", buffering=0) as fdst:
+                with src.open(mode="rb", buffering=0) as fsrc, dst.open(mode="wb", buffering=0) as fdst:
                     shutil.copyfileobj(fsrc, fdst, file_buffer)
             elif sys.version_info >= (3, 14):
                 src.copy(dst, follow_symlinks=True, preserve_metadata=True)
@@ -316,7 +321,7 @@ def move_file(src, dst, file_action=0):
 
         else: #Move, or other
             if network_mode:
-                with src.open(mode="rb", buffering=0) as fsrc, dst.open(mode="rb", buffering=0) as fdst:
+                with src.open(mode="rb", buffering=0) as fsrc, dst.open(mode="wb", buffering=0) as fdst:
                     shutil.copyfileobj(fsrc, fdst, file_buffer)
 
                 src.unlink(missing_ok=True)
@@ -398,11 +403,12 @@ def get_env(name, default=""):
     key = f"OPO_{name.upper()}"
 
     if key in os.environ:
+        v = os.environ[key]
         if v.lower() in ('yes', 'true', 't', 'y', '1'):
             return True
         if v.lower() in ('no', 'false', 'f', 'n', '0'):
             return False
 
-        return os.environ[key]
+        return v
 
     return default

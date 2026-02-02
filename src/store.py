@@ -27,7 +27,7 @@ class OrganizerStore:
             return older
 
         new_dict = dict(**older)
-        async for k in utils.iter(newer.keys):
+        for k in newer.keys():
             new_dict[k] = newer[k]
 
         return new_dict
@@ -41,14 +41,16 @@ class OrganizerStore:
 
         db_uri = f"file:{str(await utils.resolve(file))}"
 
+        self.logger.debug(f"Opening SQLite DB: {file}")
         try:
-            self.logger.debug(f"Opening SQLite DB: {file}")
             self.conn = await aiosqlite.connect(db_uri, uri=True)
             self.conn.row_factory = aiosqlite.Row
             self.logger.debug("Opened")
 
             await self.conn.execute("PRAGMA journal_mode = WAL")
+            await self.conn.commit()
             await self.conn.execute("PRAGMA query_only = ON")
+            await self.conn.commit()
 
             self.langs = []
             async with self.conn.execute("SELECT DISTINCT d.lang FROM descriptions d LEFT JOIN arcs a ON (a.lang = d.lang) ORDER BY d.lang ASC", tuple([])) as cursor:
@@ -76,6 +78,7 @@ class OrganizerStore:
 
         except Exception as e:
             self.logger.exception(e)
+            await self.close()
             return (False, e)
 
     async def close(self):
@@ -237,7 +240,8 @@ class OrganizerStore:
                 raise Exception("episode must be provided alongside arc number")
 
             where_op.append("(e.arc = ? AND e.episode = ?)")
-            data.append(int(arc), int(episode))
+            data.append(int(arc))
+            data.append(int(episode))
 
         if crc32 is not None:
             where_op.append("e.hash_crc32 = ?")

@@ -726,14 +726,9 @@ class OnePaceOrganizer:
         self.plex_config_library_key = ""
 
         for k, v in self.plex_config_libraries.items():
-            if "key" in v:
-                self.plex_config_libraries[k]["selected"] = library_key == v["key"]
-                if self.plex_config_libraries[k]["selected"]:
-                    self.plex_config_library_key = v["key"]
-            else:
-                self.plex_config_libraries[k]["selected"] = library_key == k
-                if self.plex_config_libraries[k]["selected"]:
-                    self.plex_config_library_key = k
+            self.plex_config_libraries[k]["selected"] = library_key == v.get("key", k)
+            if self.plex_config_libraries[k]["selected"]:
+                self.plex_config_library_key = v.get("key", k)
 
         self.logger.debug(f"plex_select_library: Selected library '{library_key}'")
         return True
@@ -799,17 +794,18 @@ class OnePaceOrganizer:
             else:
                 self.logger.info("Reconnected")
 
-        self.logger.trace(f"plex_select_show: Looking for GUID '{guid}' (type: {type(guid)})")
-        self.logger.trace(f"plex_select_show: Available GUIDs: {list(self.plex_config_shows.keys())}")
+        if guid is not None and guid != "":
+            self.logger.trace(f"plex_select_show: Looking for GUID '{guid}' (type: {type(guid)})")
+            self.logger.trace(f"plex_select_show: Available GUIDs: {list(self.plex_config_shows.keys())}")
 
-        if guid.startswith("local://"):
-            self.logger.debug(f"plex_select_show: GUID '{guid}' is a local:// GUID, skipping lookup in available shows")
-            self.plex_config_show_guid = guid
-            return True
+            if guid.startswith("local://"):
+                self.logger.debug(f"plex_select_show: GUID '{guid}' is a local:// GUID, skipping lookup in available shows")
+                self.plex_config_show_guid = guid
+                return True
 
-        if guid != "" and guid not in self.plex_config_shows:
-            self.logger.error(f"plex_select_show: Show GUID '{guid}' not found in available shows")
-            return False
+            if guid not in self.plex_config_shows:
+                self.logger.error(f"plex_select_show: Show GUID '{guid}' not found in available shows")
+                return False
 
         self.plex_config_show_guid = guid
 
@@ -857,7 +853,7 @@ class OnePaceOrganizer:
                 if self.opened:
                     await self.store.close()
 
-                await utils.run(data_file.parent.mkdir, exist_ok=True)
+                await utils.run(data_file.parent.mkdir, exist_ok=True, parents=True)
 
                 self.logger.success("Downloading updated metadata into metadata/data.db...")
                 await utils.download(f"{self.metadata_url}/metadata/data.sqlite", data_file, self.progress_bar_func)
@@ -908,7 +904,7 @@ class OnePaceOrganizer:
                     if episode_id is not None:
                         num_found += 1
                         results.append((0, episode_id, file, None))
-                        await utils.run_func(self.progress_bar_func, int((num_found / len(filelist_total)) * 100))
+                        await utils.run_func(self.progress_bar_func, int((num_found / filelist_total) * 100) if filelist_total > 0 else 0)
                         continue
 
                 match = await utils.run(fname_pattern.match, file_name, loop=loop, executor=executor)
@@ -919,7 +915,7 @@ class OnePaceOrganizer:
                         num_found += 1
                         results.append((3, crc32, file, None))
                         self.logger.warning(f"Skipping {file.name}: This seems to be a Specials/April Fools release, but there is no metadata for it.")
-                        await utils.run_func(self.progress_bar_func, int((num_found / len(filelist_total)) * 100))
+                        await utils.run_func(self.progress_bar_func, int((num_found / filelist_total) * 100) if filelist_total > 0 else 0)
                         continue
 
                     arc_res = await self.store.get_arc(title=arc_name)
@@ -930,7 +926,7 @@ class OnePaceOrganizer:
                         if episode_id is not None:
                             num_found += 1
                             results.append((0, episode_id, file, extra))
-                            await utils.run_func(self.progress_bar_func, int((num_found / len(filelist_total)) * 100))
+                            await utils.run_func(self.progress_bar_func, int((num_found / filelist_total) * 100) if filelist_total > 0 else 0)
                             continue
 
                 file_stem = file.stem if hasattr(file, "stem") else file.name
@@ -938,7 +934,7 @@ class OnePaceOrganizer:
                 if f"2_{file_stem}" in self.store.episodes:
                     num_found += 1
                     results.append((2, key, file, None))
-                    await utils.run_func(self.progress_bar_func, int((num_found / len(filelist_total)) * 100))
+                    await utils.run_func(self.progress_bar_func, int((num_found / filelist_total) * 100) if filelist_total > 0 else 0)
                     continue
 
                 self.logger.debug(f"Add to Hash Queue: {file}")
@@ -986,7 +982,7 @@ class OnePaceOrganizer:
                                 results.append((2, key, file, None))
                                 continue
 
-                            key - f"2_{blake2s}"
+                            key = f"2_{blake2s}"
                             if key in self.store.episodes:
                                 results.append((2, key, file, None))
                                 continue
@@ -996,7 +992,7 @@ class OnePaceOrganizer:
                             self.logger.warning(f"Skipping {file.name}: Episode metadata missing. Make sure you have the latest version of this One Pace release.")
 
                         finally:
-                            await utils.run_func(self.progress_bar_func, int(((num_found + i) / len(filelist_total)) * 100))
+                            await utils.run_func(self.progress_bar_func, int(((num_found + i) / filelist_total) * 100) if filelist_total > 0 else 0)
 
                 except (asyncio.CancelledError, KeyboardInterrupt) as e:
                     if sys.version_info >= (3, 14):
@@ -1006,7 +1002,6 @@ class OnePaceOrganizer:
                             task.kill()
 
                     raise e
-                    return False
 
         await utils.run_func(self.progress_bar_func, 100)
         self.logger.success(f"Found: {num_found}, Calculated: {num_calced}, Total: {filelist_total}")
@@ -1020,19 +1015,6 @@ class OnePaceOrganizer:
             return self.output_path
  
         return Path(self.output_path, "Specials" if season == 0 else f"Season {season:02d}")
-
-    def get_season(self, season):
-        self.logger.trace(f"get_season {season} (self.arcs is a {type(self.arcs)})")
-
-        if isinstance(self.arcs, dict):
-            if int(season) in self.arcs:
-                return self.arcs[int(season)]
-            elif str(season) in self.arcs:
-                return self.arcs[str(season)]
-
-            return None
-
-        return self.arcs[season]
 
     async def process_plex(self, files):
         completed = 0
@@ -1214,10 +1196,7 @@ class OnePaceOrganizer:
                     if season not in seasons:
                         seasons.append(season)
                         self.logger.info(f"Season: {season}")
-
-                        if not await utils.is_dir(season_path):
-                            self.logger.debug(f"Creating directory: {season_path}")
-                            await utils.run(season_path.mkdir, exist_ok=True)
+                        await utils.run(season_path.mkdir, exist_ok=True, parents=True)
 
                     dst = str(Path(season_path, f"One Pace - S{season:02d}E{episode:02d} - {title}{file.suffix}"))
                     self.logger.debug(f"Queue: file={file}, dst={dst}, info={episode_info} [{self.file_action}]")
@@ -1813,10 +1792,7 @@ class OnePaceOrganizer:
                 season_path = self.get_season_folder(season)
                 if self.file_action != 4 and season not in seasons and season_path != self.output_path:
                     seasons.append(season)
-
-                    if not await utils.is_dir(season_path):
-                        self.logger.debug(f"Creating directory: {season_path}")
-                        await utils.run(season_path.mkdir, exist_ok=True)
+                    await utils.run(season_path.mkdir, exist_ok=True, parents=True)
 
                     if season_info is not None:
                         if "title" not in season_info:
@@ -2115,7 +2091,7 @@ class OnePaceOrganizer:
             video_files = await self.glob_video_files()
             extra_data = None
 
-            await utils.run(self.output_path.mkdir, exist_ok=True)
+            await utils.run(self.output_path.mkdir, exist_ok=True, parents=True)
             await utils.run_func(self.progress_bar_func, 0)
 
             if self.mode != 0:
