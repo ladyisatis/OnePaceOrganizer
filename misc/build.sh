@@ -92,16 +92,18 @@ if [ ! -d "metadata" ]; then
 
   mv one-pace-metadata-main metadata
 
-  find metadata -maxdepth 1 -type f \
-      ! -name "data.json" \
-      ! -name "arcs.yml" \
-      ! -name "tvshow.yml" \
-      -exec rm -f {} +;
-
-  find metadata -mindepth 1 -maxdepth 1 -type d \
+  pushd metadata
+  find . -maxdepth 1 -type f ! -name "data.json" -exec rm -f {} +;
+  find . -mindepth 1 -maxdepth 1 -type d \
+      ! -name "arcs" \
       ! -name "episodes" \
-      ! -name "posters" \
+      ! -name "metadata" \
       -exec rm -rf {} +;
+
+  mv metadata/data.sqlite ./data.db
+  rm -rf metadata
+  popd
+
 fi
 
 [ ! -d "temp_zip" ] && mkdir -p temp_zip
