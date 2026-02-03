@@ -1187,6 +1187,8 @@ class OnePaceOrganizer:
 
                     if episode_info.get("extended", False):
                         title = f"{title} (Extended)"
+                    elif extra is not None:
+                        title = f"{title} {extra}"
 
                     season_path = Path(self.output_path, "Specials" if season == 0 else f"Season {season:02d}")
                     if season not in seasons:
@@ -1301,17 +1303,6 @@ class OnePaceOrganizer:
                         all_episodes = [item for item in all_items if hasattr(item, 'type') and item.type == 'episode']
 
                     self.logger.info(f"Found {len(all_episodes)} episodes in Plex")
-
-                    arc_eps = {}
-                    for crc32, ep_data in self.episodes.items():
-                        _arc = ep_data.get("arc")
-                        _episode = ep_data.get("episode")
-
-                        if _arc not in arc_eps:
-                            arc_eps[_arc] = {}
-
-                        if _episode not in arc_eps[_arc]:
-                            arc_eps[_arc][_episode] = crc32
 
                     for plex_ep in all_episodes:
                         season = plex_ep.parentIndex if hasattr(plex_ep, 'parentIndex') else plex_ep.seasonNumber
@@ -1744,7 +1735,8 @@ class OnePaceOrganizer:
         total = (len(files) * 2)
         seasons = []
 
-        self.logger.success("Creating episode metadata and moving the video files...")
+        if len(files) > 0:
+            self.logger.success("Creating episode metadata and moving the video files...")
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
             tasks = []
@@ -1784,6 +1776,8 @@ class OnePaceOrganizer:
 
                 if episode_info.get("extended", False):
                     title = f"{title} (Extended)"
+                elif extra is not None:
+                    title = f"{title} {extra}"
 
                 season_path = self.get_season_folder(season)
                 if self.file_action != 4 and season not in seasons and season_path != self.output_path:
