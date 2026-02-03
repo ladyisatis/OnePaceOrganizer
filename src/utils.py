@@ -81,7 +81,7 @@ async def read_file(file, binary=False):
     queue = asyncio.Queue()
     data = bytearray() if binary else ""
 
-    loop.run_in_executor(None, _worker, file, binary, loop, queue)
+    loop.run_in_executor(None, _read_file_worker, file, binary, loop, queue)
 
     while not loop.is_closed():
         is_chunk, item = await queue.get()
