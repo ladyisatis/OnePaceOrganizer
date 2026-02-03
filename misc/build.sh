@@ -75,7 +75,7 @@ uv run pyinstaller --clean --noconfirm -F \
 rm -rf build
 
 if [ ! -d "metadata" ]; then
-  ZIP_URL="https://github.com/ladyisatis/one-pace-metadata/archive/refs/heads/main.zip"
+  ZIP_URL="https://github.com/ladyisatis/one-pace-metadata/archive/refs/heads/v2.zip"
   ZIP_FILE="metadata.zip"
 
   if command -v wget >/dev/null 2>&1; then
@@ -90,9 +90,9 @@ if [ ! -d "metadata" ]; then
   unzip "$ZIP_FILE"
   rm "$ZIP_FILE"
 
-  mv one-pace-metadata-main metadata
+  mv one-pace-metadata-2 metadata
 
-  pushd metadata
+  pushd ./metadata
   find . -maxdepth 1 -type f ! -name "data.json" -exec rm -f {} +;
   find . -mindepth 1 -maxdepth 1 -type d \
       ! -name "arcs" \
