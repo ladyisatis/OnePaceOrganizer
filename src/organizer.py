@@ -164,8 +164,11 @@ class OnePaceOrganizer:
             if "enabled" in config["plex"] and config["plex"]["enabled"] is not None:
                 self.mode = 1
 
-            if "last_login" in config["plex"] and config["plex"]["last_login"] is not None:
-                self.plex_last_login = datetime.datetime.fromisoformat(config["plex"]["last_login"])
+            if "last_login" in config["plex"] and config["plex"]["last_login"]:
+                try:
+                    self.plex_last_login = datetime.datetime.fromisoformat(config["plex"]["last_login"])
+                except ValueError:
+                    self.plex_last_login = None
 
             if "url" in config["plex"] and config["plex"]["url"] is not None and config["plex"]["url"] != "":
                 self.plex_config_url = config["plex"]["url"]
@@ -321,7 +324,6 @@ class OnePaceOrganizer:
         if force_login:
             self.plexapi_account = None
             self.plexapi_server = None
-            self.plex_config_auth_token = ""
 
         if self.plexapi_account is None and self.plexapi_server is None and self.mode != 2 and self.plex_config_auth_token != "" and self.plex_config_remember:
             try:
@@ -344,6 +346,14 @@ class OnePaceOrganizer:
             self.plex_config_shows = {}
 
             if self.mode == 3:
+                if not self.plex_config_auth_token:
+                    msg = "Plex token is empty. Paste your X-Plex-Token into the Token field before pressing Login."
+                    if self.message_dialog_func is not None:
+                        await utils.run_func(self.message_dialog_func, msg)
+                    else:
+                        self.logger.error(msg)
+                    return False
+
                 try:
                     if self.plex_config_url == "":
                         self.plexapi_account = await utils.run(MyPlexAccount, token=self.plex_config_auth_token)
@@ -462,10 +472,18 @@ class OnePaceOrganizer:
                             self.logger.exception("Unknown error")
 
             elif self.mode == 1:
+                if not self.plex_config_username or not self.plex_config_password:
+                    msg = "Plex username and password are required. If you meant to log in with a token, switch the login method to 'Token'."
+                    if self.message_dialog_func is not None:
+                        await utils.run_func(self.message_dialog_func, msg)
+                    else:
+                        self.logger.error(msg)
+                    return False
+
                 try:
                     self.plexapi_account = await utils.run(MyPlexAccount,
-                        username=self.plex_config_username, 
-                        password=self.plex_config_password, 
+                        username=self.plex_config_username,
+                        password=self.plex_config_password,
                         remember=self.plex_config_remember
                     )
                     self.plex_last_login = self.plexapi_account.rememberExpiresAt

@@ -790,7 +790,8 @@ class GUI(QMainWindow):
         self.organizer.plex_config_remember = self.plex_remember_login.prop.checkState() == Qt.Checked
 
         if self.organizer.mode == 3:
-            self.organizer.plex_config_auth_token = self.plex_token.prop.text()
+            self.organizer.plex_config_auth_token = self.plex_token.prop.text().strip()
+            logger.info(f"Token field length read at login: {len(self.organizer.plex_config_auth_token)}")
         elif self.organizer.mode == 1:
             self.organizer.plex_config_username = self.plex_username.prop.text()
             self.organizer.plex_config_password = self.plex_password.prop.text()
