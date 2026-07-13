@@ -647,7 +647,7 @@ class Console:
 
         finally:
             file_action_val = self.organizer.extra_fields.get("new_show", False)
-            if isinstance(file_action_val, int):
+            if isinstance(file_action_val, int) and not isinstance(file_action_val, bool):
                 self.organizer.file_action = file_action_val
                 del self.organizer.extra_fields["new_show"]
 
