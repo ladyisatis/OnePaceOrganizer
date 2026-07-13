@@ -57,11 +57,11 @@ class Console:
             enqueue=False
         )
 
-    def _message_dialog(self, text=""):
-        return message_dialog(
+    async def _message_dialog(self, text=""):
+        return await message_dialog(
             title=self.window_title,
             text=text
-        ).run()
+        ).run_async()
 
     async def _input_dialog(self, text, default=""):
         return await input_dialog(

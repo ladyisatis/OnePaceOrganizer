@@ -162,7 +162,7 @@ class OnePaceOrganizer:
 
         if "plex" in config:
             if "enabled" in config["plex"] and config["plex"]["enabled"] is not None:
-                self.mode = 1
+                self.mode = 1 if config["plex"]["enabled"] else 0
 
             if "last_login" in config["plex"] and config["plex"]["last_login"] is not None and config["plex"]["last_login"] != "":
                 self.plex_last_login = datetime.datetime.fromisoformat(config["plex"]["last_login"])
