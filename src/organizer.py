@@ -876,6 +876,7 @@ class OnePaceOrganizer:
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
             crc_pattern = re.compile(r'\[([A-Fa-f0-9]{8})\](?=\.(mkv|mp4))')
             fname_pattern = re.compile(r'\[(?:One Pace)?\]\[\d+(?:[-,]\d+)*\]\s+(.+?)(?:\s+(\d{2,})(?:\s+(.+?))?)?\s+\[\d+p\](?:\[[^\]]+\])*\[([A-Fa-f0-9]{8})\]\.(?:mkv|mp4)')
+            plex_pattern = re.compile(r'One Pace S(\d{2})E(\d{2})(?: \((Extended)\))?\.(?:mkv|mp4)', re.IGNORECASE)
             filelist = []
 
             async for file in utils.iter(self.input_path.rglob, "*.[mM][kK][vV]", case_sensitive=False, recurse_symlinks=True):
@@ -937,6 +938,24 @@ class OnePaceOrganizer:
                     results.append((2, key, file, None))
                     await utils.run_func(self.progress_bar_func, int((num_found / filelist_total) * 100) if filelist_total > 0 else 0)
                     continue
+
+                match = await utils.run(plex_pattern.match, file_name, loop=loop)
+                if match:
+                    season, episode, extended = await utils.run(match.groups)
+                    is_extended = extended is not None
+                    episode_matches = await self.store.get_episodes(arc=int(season), episode=int(episode), exclude_archived=False)
+                    episode_id = next((ep["id"] for ep in episode_matches if not ep["archived"] and ep["extended"] == is_extended), None)
+                    if episode_id is not None:
+                        num_found += 1
+                        results.append((0, episode_id, file, None))
+                        await utils.run_func(self.progress_bar_func, int((num_found / filelist_total) * 100) if filelist_total > 0 else 0)
+                        continue
+                    elif is_extended:
+                        num_found += 1
+                        results.append((3, None, file, None))
+                        self.logger.warning(f"Skipping {file.name}: Extended episode metadata missing. Make sure you have the latest version of this One Pace release.")
+                        await utils.run_func(self.progress_bar_func, int((num_found / filelist_total) * 100) if filelist_total > 0 else 0)
+                        continue
 
                 self.logger.debug(f"Add to Hash Queue: {file}")
                 tasks.append(loop.run_in_executor(executor, utils.hash, str(file)))
