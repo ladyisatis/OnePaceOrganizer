@@ -325,6 +325,15 @@ class Console:
                     ]
                 ).run_async()
 
+                self.organizer.plex_scan_show_folder = await button_dialog(
+                    title=self.window_title,
+                    text="Do you want to trigger Plex to Scan the Library files after import or there's no need? (eg if Plex settings do that automatically already)",
+                    buttons=[
+                        ("Tell Plex to Scan", True),
+                        ("No need", False)
+                    ]
+                ).run_async()
+
         if plex_config_enabled:
             success = await self.run_plex_wizard()
             if not success:

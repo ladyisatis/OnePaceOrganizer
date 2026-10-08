@@ -80,6 +80,7 @@ def main():
         parser.add_argument("--plex-library", help="Plex Library Key", default=None)
         parser.add_argument("--plex-show", help="Plex Show GUID", default=None)
         parser.add_argument("--plex-set-show-edits", help="Overwrite Plex show information", default=None, type=strbool)
+        parser.add_argument("--plex-scan-show-folder", help="Trigger Plex Library scan after moving/copying", default=None, type=strbool)
         parser.add_argument("--plex-code", help="Plex 2-Factor Auth Code (headless mode only)", default=None)
         parser.add_argument("--plex-remember", help="Remember Plex Credentials", default=None, type=strbool)
         parser.add_argument("--plex-retry-times", help="How many times Organizer should retry to fetch a Plex season/episode", default=None)
@@ -144,6 +145,9 @@ def main():
 
         if args.plex_set_show_edits is not None:
             opo.plex_set_show_edits = args.plex_set_show_edits
+
+        if args.plex_scan_show_folder is not None:
+            opo.plex_scan_show_folder = args.plex_scan_show_folder
 
         if args.plex_retry_times is not None:
             opo.plex_retry_times = int(args.plex_retry_times)

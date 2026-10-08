@@ -98,6 +98,7 @@ class OnePaceOrganizer:
         self.plex_retry_secs = utils.get_env("plex_retry_secs", 30)
         self.plex_retry_times = utils.get_env("plex_retry_times", 3)
         self.plex_set_show_edits = utils.get_env("plex_set_show_edits", True)
+        self.plex_scan_show_folder = utils.get_env("plex_scan_show_folder", True)
 
         self.progress_bar_func = None
         self.message_dialog_func = None
@@ -228,6 +229,9 @@ class OnePaceOrganizer:
             if "set_show_edits" in config["plex"] and config["plex"]["set_show_edits"] is not None:
                 self.plex_set_show_edits = config["plex"]["set_show_edits"]
 
+            if "scan_show_folder" in config["plex"] and config["plex"]["scan_show_folder"] is not None:
+                self.plex_scan_show_folder = config["plex"]["scan_show_folder"]
+
         if "mode" in config and config["mode"] is not None and isinstance(config["mode"], int):
             self.mode = config["mode"]
 
@@ -279,7 +283,8 @@ class OnePaceOrganizer:
                 },
                 "retry_secs": self.plex_retry_secs,
                 "retry_times": self.plex_retry_times,
-                "set_show_edits": self.plex_set_show_edits
+                "set_show_edits": self.plex_set_show_edits,
+                "scan_show_folder": self.plex_scan_show_folder
             }
         }
 
@@ -1085,7 +1090,7 @@ class OnePaceOrganizer:
                                 await utils.run(show.editOriginallyAvailable, str(tvshow["premiered"].isoformat()).split("T")[0])
                             else:
                                 await utils.run(show.editOriginallyAvailable, tvshow["premiered"])
-
+                
             # Poster
             src = await utils.run(utils.find_from_list, self.base_path, [
                 ("posters", "poster.*"),
@@ -1236,7 +1241,17 @@ class OnePaceOrganizer:
         plex_episode = None
 
         try:
+            data_file = Path(self.base_path, "metadata", "data.db")
+            if await utils.is_file(data_file):
+                await self.open_db(data_file)
+
             section = await utils.run(self.plexapi_server.library.sectionByID, int(self.plex_config_library_key))
+
+            if self.plex_scan_show_folder:
+                self.logger.info(f"Triggering Plex Library Scan")
+                section.update()
+                self.logger.debug(f"Waiting 5 seconds for library update to finish")
+                await asyncio.sleep(5)
 
             self.logger.trace(f"Looking up show with GUID: {self.plex_config_show_guid}")
             if self.plex_config_show_guid.startswith("local://"):

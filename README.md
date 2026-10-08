@@ -20,6 +20,14 @@ Metadata is sourced from [one-pace-metadata](https://github.com/ladyisatis/one-p
 
 Contributions via Pull Requests are always welcome if I miss a bug or want another feature added in, want to contribute a program icon, etc.
 
+## Running from source
+
+Details are available [on the wiki](https://github.com/ladyisatis/OnePaceOrganizer/wiki/Frequently-Asked-Questions#how-do-i-run-this-from-source), but in short you can run this from source by running:
+
+```bash
+  uv run main.py gui
+```
+
 ## Thanks
 
 - Craigy (@verywittyname on Discord) for Episode Descriptions spreadsheets and updates
