@@ -57,11 +57,11 @@ class Console:
             enqueue=False
         )
 
-    def _message_dialog(self, text=""):
-        return message_dialog(
+    async def _message_dialog(self, text=""):
+        return await message_dialog(
             title=self.window_title,
             text=text
-        ).run()
+        ).run_async()
 
     async def _input_dialog(self, text, default=""):
         return await input_dialog(
@@ -656,7 +656,7 @@ class Console:
 
         finally:
             file_action_val = self.organizer.extra_fields.get("new_show", False)
-            if isinstance(file_action_val, int):
+            if isinstance(file_action_val, int) and not isinstance(file_action_val, bool):
                 self.organizer.file_action = file_action_val
                 del self.organizer.extra_fields["new_show"]
 

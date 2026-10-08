@@ -155,7 +155,7 @@ class OrganizerStore:
         return self.lang.replace("-", "_")
 
     @language.setter
-    def set_language(self, lang):
+    def language(self, lang):
         if isinstance(lang, str):
             self.lang = lc_lang.get(lang)
             return
